@@ -1,0 +1,20 @@
+{
+    "HomePage": {
+        "title": "Dashboard",
+        "welcome": "Welcome to the Dashboard"
+    },
+    "LanguageSwitcher": {
+        "label": "Switch Language"
+    },
+    "Sidebar": {
+        "dashboard": "Dashboard",
+        "documents": "Documents",
+        "settings": "Settings"
+    },
+    "ThemeSwitcher": {
+        "label": "Toggle theme",
+        "light": "Light",
+        "dark": "Dark (Black Pastel)",
+        "skyblue": "Sky Blue (Pastel)"
+    }
+}

@@ -112,10 +112,45 @@
   --sidebar-ring: hsl(217.2 91.2% 59.8%);
 }
 
+.skyblue {
+  --background: oklch(0.95 0.02 240);
+  --foreground: oklch(0.25 0.05 240);
+  --card: oklch(0.97 0.01 240);
+  --card-foreground: oklch(0.25 0.05 240);
+  --popover: oklch(0.97 0.01 240);
+  --popover-foreground: oklch(0.25 0.05 240);
+  --primary: oklch(0.65 0.15 240);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.92 0.03 240);
+  --secondary-foreground: oklch(0.3 0.05 240);
+  --muted: oklch(0.92 0.03 240);
+  --muted-foreground: oklch(0.5 0.05 240);
+  --accent: oklch(0.92 0.03 240);
+  --accent-foreground: oklch(0.3 0.05 240);
+  --destructive: oklch(0.6 0.15 20);
+  --border: oklch(0.85 0.02 240);
+  --input: oklch(0.85 0.02 240);
+  --ring: oklch(0.65 0.15 240);
+  --chart-1: oklch(0.65 0.15 240);
+  --chart-2: oklch(0.75 0.12 220);
+  --chart-3: oklch(0.85 0.1 200);
+  --chart-4: oklch(0.6 0.15 260);
+  --chart-5: oklch(0.7 0.12 280);
+  --sidebar: oklch(0.96 0.01 240);
+  --sidebar-foreground: oklch(0.25 0.05 240);
+  --sidebar-primary: oklch(0.65 0.15 240);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.93 0.02 240);
+  --sidebar-accent-foreground: oklch(0.25 0.05 240);
+  --sidebar-border: oklch(0.88 0.02 240);
+  --sidebar-ring: oklch(0.65 0.15 240);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }

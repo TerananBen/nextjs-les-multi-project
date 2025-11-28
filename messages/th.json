@@ -1,0 +1,20 @@
+{
+    "HomePage": {
+        "title": "แดชบอร์ด",
+        "welcome": "ยินดีต้อนรับสู่แดชบอร์ด"
+    },
+    "LanguageSwitcher": {
+        "label": "เปลี่ยนภาษา"
+    },
+    "Sidebar": {
+        "dashboard": "แดชบอร์ด",
+        "documents": "เอกสาร",
+        "settings": "ตั้งค่า"
+    },
+    "ThemeSwitcher": {
+        "label": "เปลี่ยนธีม",
+        "light": "สว่าง",
+        "dark": "มืด (ดำพาสเทล)",
+        "skyblue": "ฟ้า (ฟ้าพาสเทล)"
+    }
+}

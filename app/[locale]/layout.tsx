@@ -55,7 +55,7 @@ export default async function RootLayout({
           disableTransitionOnChange
           themes={["light", "dark", "skyblue"]}
         >
-          <NextIntlClientProvider messages={messages}>
+          <NextIntlClientProvider messages={messages} locale={locale}>
             {children}
           </NextIntlClientProvider>
         </ThemeProvider>

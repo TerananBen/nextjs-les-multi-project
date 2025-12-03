@@ -16,5 +16,108 @@
         "light": "Light",
         "dark": "Dark (Black Pastel)",
         "skyblue": "Sky Blue (Pastel)"
+    },
+    "LoginForm": {
+        "welcomeTitle": "Welcome back",
+        "welcomeDescription": "Login with your username and password",
+        "usernameLabel": "Username",
+        "usernamePlaceholder": "Username",
+        "passwordLabel": "Password",
+        "forgotPassword": "Forgot your password?",
+        "loginButton": "Login",
+        "noAccount": "Don't have an account?",
+        "signUp": "Sign up",
+        "termsText": "By clicking continue, you agree to our",
+        "termsLink": "Terms of Service",
+        "and": "and",
+        "privacyLink": "Privacy Policy",
+        "usernameError": "Username incorrect or does not exist",
+        "connectionError": "Failed to connect to the server",
+        "failedAttempts": "Failed attempts: {count}"
+    },
+    "Personal": {
+        "title": "Personal Management",
+        "subtitle": "Manage users, roles, and access permissions.",
+        "searchPlaceholder": "Filter names...",
+        "addUser": "Add User",
+        "table": {
+            "name": "Name",
+            "username": "Username",
+            "role": "Role",
+            "lastLogin": "Last Login",
+            "status": "Status",
+            "active": "Active",
+            "disabled": "Disabled",
+            "actions": "Actions",
+            "edit": "Edit",
+            "delete": "Delete"
+        },
+        "form": {
+            "editTitle": "Edit User",
+            "addTitle": "Add User",
+            "editDescription": "Make changes to the user profile here. Click save when you're done.",
+            "addDescription": "Add a new user to the system.",
+            "firstName": "First Name",
+            "lastName": "Last Name",
+            "username": "Username",
+            "password": "Password",
+            "passwordPlaceholder": "Password",
+            "passwordHint": "(Leave blank to keep current)",
+            "role": "Role",
+            "selectRole": "Select a role",
+            "cancel": "Cancel",
+            "save": "Save",
+            "saving": "Saving...",
+            "deleting": "Deleting...",
+            "deleteTitle": "Are you sure?",
+            "deleteDescription": "This action cannot be undone. This will permanently delete the user account for",
+            "usernameExists": "Username already exists",
+            "required": "Required"
+        },
+        "messages": {
+            "successAdd": "User added successfully",
+            "successUpdate": "User updated successfully",
+            "successDelete": "User deleted successfully",
+            "successEnable": "User enabled successfully",
+            "successDisable": "User disabled successfully",
+            "errorSave": "Failed to save user",
+            "errorDelete": "Failed to delete user",
+            "errorStatus": "Failed to update status",
+            "errorGeneric": "An error occurred"
+        }
+    },
+    "GroupDashboard": {
+        "filter": {
+            "searchLabel": "Search :",
+            "selectGroupPlaceholder": "-- Select Group --",
+            "selectTypePlaceholder": "Select Type",
+            "types": {
+                "now": "Now",
+                "day": "Day",
+                "week": "Week",
+                "month": "Monthly",
+                "quarter": "Quarter",
+                "year": "Year"
+            },
+            "searchButton": "Search",
+            "printButton": "Print"
+        },
+        "summary": {
+            "onlineTotal": "Online/Total",
+            "lamp": "Lamp",
+            "lampFailure": "Lamp failure",
+            "onlineStatus": "Online Status",
+            "failureCount": "Failure Count",
+            "voltage": "Voltage",
+            "volt": "Volt",
+            "averageVoltage": "Average Voltage",
+            "energyConsumption": "Energy Consumption",
+            "kwh": "kWh",
+            "perMonth": "Per Month"
+        },
+        "charts": {
+            "energyConsumption": "Energy consumption (kWh)",
+            "lampFailure": "Lamp failure (unit)"
+        }
     }
 }

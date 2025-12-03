@@ -16,5 +16,108 @@
         "light": "สว่าง",
         "dark": "มืด (ดำพาสเทล)",
         "skyblue": "ฟ้า (ฟ้าพาสเทล)"
+    },
+    "LoginForm": {
+        "welcomeTitle": "ยินดีต้อนรับกลับ",
+        "welcomeDescription": "เข้าสู่ระบบด้วยชื่อผู้ใช้และรหัสผ่านของคุณ",
+        "usernameLabel": "ชื่อผู้ใช้",
+        "usernamePlaceholder": "ชื่อผู้ใช้",
+        "passwordLabel": "รหัสผ่าน",
+        "forgotPassword": "ลืมรหัสผ่าน?",
+        "loginButton": "เข้าสู่ระบบ",
+        "noAccount": "ยังไม่มีบัญชี?",
+        "signUp": "ลงทะเบียน",
+        "termsText": "เมื่อคลิกดำเนินการต่อ คุณยอมรับ",
+        "termsLink": "เงื่อนไขการให้บริการ",
+        "and": "และ",
+        "privacyLink": "นโยบายความเป็นส่วนตัว",
+        "usernameError": "ชื่อผู้ใช้ไม่ถูกต้องหรือไม่มีในระบบ",
+        "connectionError": "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้",
+        "failedAttempts": "จำนวนครั้งที่ผิดพลาด: {count}"
+    },
+    "Personal": {
+        "title": "การจัดการบุคลากร",
+        "subtitle": "จัดการผู้ใช้ บทบาท และสิทธิ์การเข้าถึง",
+        "searchPlaceholder": "กรองชื่อ...",
+        "addUser": "เพิ่มผู้ใช้",
+        "table": {
+            "name": "ชื่อ",
+            "username": "ชื่อผู้ใช้",
+            "role": "บทบาท",
+            "lastLogin": "เข้าสู่ระบบล่าสุด",
+            "status": "สถานะ",
+            "active": "ใช้งาน",
+            "disabled": "ปิดใช้งาน",
+            "actions": "การกระทำ",
+            "edit": "แก้ไข",
+            "delete": "ลบ"
+        },
+        "form": {
+            "editTitle": "แก้ไขผู้ใช้",
+            "addTitle": "เพิ่มผู้ใช้",
+            "editDescription": "แก้ไขข้อมูลผู้ใช้ที่นี่ คลิกบันทึกเมื่อเสร็จสิ้น",
+            "addDescription": "เพิ่มผู้ใช้ใหม่ในระบบ",
+            "firstName": "ชื่อจริง",
+            "lastName": "นามสกุล",
+            "username": "ชื่อผู้ใช้",
+            "password": "รหัสผ่าน",
+            "passwordPlaceholder": "รหัสผ่าน",
+            "passwordHint": "(เว้นว่างไว้หากไม่ต้องการเปลี่ยน)",
+            "role": "บทบาท",
+            "selectRole": "เลือกบทบาท",
+            "cancel": "ยกเลิก",
+            "save": "บันทึก",
+            "saving": "กำลังบันทึก...",
+            "deleting": "กำลังลบ...",
+            "deleteTitle": "คุณแน่ใจหรือไม่?",
+            "deleteDescription": "การกระทำนี้ไม่สามารถย้อนกลับได้ จะเป็นการลบบัญชีผู้ใช้อย่างถาวรสำหรับ",
+            "usernameExists": "ชื่อผู้ใช้นี้มีอยู่ในระบบแล้ว",
+            "required": "จำเป็นต้องระบุ"
+        },
+        "messages": {
+            "successAdd": "เพิ่มผู้ใช้สำเร็จ",
+            "successUpdate": "อัปเดตผู้ใช้สำเร็จ",
+            "successDelete": "ลบผู้ใช้สำเร็จ",
+            "successEnable": "เปิดใช้งานผู้ใช้สำเร็จ",
+            "successDisable": "ปิดใช้งานผู้ใช้สำเร็จ",
+            "errorSave": "บันทึกผู้ใช้ไม่สำเร็จ",
+            "errorDelete": "ลบผู้ใช้ไม่สำเร็จ",
+            "errorStatus": "อัปเดตสถานะไม่สำเร็จ",
+            "errorGeneric": "เกิดข้อผิดพลาด"
+        }
+    },
+    "GroupDashboard": {
+        "filter": {
+            "searchLabel": "ค้นหา :",
+            "selectGroupPlaceholder": "-- เลือกกลุ่ม --",
+            "selectTypePlaceholder": "เลือกประเภท",
+            "types": {
+                "now": "ปัจจุบัน",
+                "day": "รายวัน",
+                "week": "รายสัปดาห์",
+                "month": "รายเดือน",
+                "quarter": "รายไตรมาส",
+                "year": "รายปี"
+            },
+            "searchButton": "ค้นหา",
+            "printButton": "พิมพ์"
+        },
+        "summary": {
+            "onlineTotal": "ออนไลน์/ทั้งหมด",
+            "lamp": "โคม",
+            "lampFailure": "โคมเสีย",
+            "onlineStatus": "สถานะออนไลน์",
+            "failureCount": "จำนวนที่เสีย",
+            "voltage": "แรงดันไฟฟ้า",
+            "volt": "โวลต์",
+            "averageVoltage": "แรงดันไฟฟ้าเฉลี่ย",
+            "energyConsumption": "การใช้พลังงาน",
+            "kwh": "กิโลวัตต์-ชั่วโมง",
+            "perMonth": "ต่อเดือน"
+        },
+        "charts": {
+            "energyConsumption": "การใช้พลังงาน (kWh)",
+            "lampFailure": "โคมเสีย (จำนวน)"
+        }
     }
 }

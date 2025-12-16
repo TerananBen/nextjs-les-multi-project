@@ -1,4 +1,5 @@
 {
+    "ProjectName": "ท่าอากาศยานนานาชาติกระบี่",
     "HomePage": {
         "title": "แดชบอร์ด",
         "welcome": "ยินดีต้อนรับสู่แดชบอร์ด"
@@ -7,9 +8,30 @@
         "label": "เปลี่ยนภาษา"
     },
     "Sidebar": {
-        "dashboard": "แดชบอร์ด",
-        "documents": "เอกสาร",
-        "settings": "ตั้งค่า"
+        "groups": {
+            "streetLight": "โคมไฟถนน",
+            "controlEdit": "ควบคุมและแก้ไข",
+            "mapLamp": "แผนที่แสดงโคมไฟ",
+            "maintenance": "การบำรุงรักษา",
+            "systemSettings": "ตั้งค่าระบบ"
+        },
+        "menu": {
+            "overview": "ภาพรวม",
+            "alerts": "แจ้งเตือน",
+            "groupConfig": "กำหนดค่ากลุ่ม",
+            "groupDashboard": "แดชบอร์ดกลุ่ม",
+            "maintenanceConfig": "กำหนดค่าการบำรุงรักษา",
+            "maintenanceDashboard": "แดชบอร์ดการบำรุงรักษา",
+            "mapDisconnect": "แผนที่ตัดการเชื่อมต่อ",
+            "mapGlobal": "แผนที่ทั่วโลก",
+            "personal": "จัดการบุคลากร",
+            "menuSettings": "ตั้งค่าเมนู",
+            "scheduleSettings": "ตั้งค่าตารางเวลา",
+            "streetLight": "โคมไฟถนน",
+            "maintenanceDetail": "รายละเอียดการบำรุงรักษา",
+            "mapChangeLamp": "แผนที่เปลี่ยนหลอดไฟ",
+            "deviceSettings": "ตั้งค่าอุปกรณ์"
+        }
     },
     "ThemeSwitcher": {
         "label": "เปลี่ยนธีม",
@@ -50,7 +72,11 @@
             "disabled": "ปิดใช้งาน",
             "actions": "การกระทำ",
             "edit": "แก้ไข",
-            "delete": "ลบ"
+            "delete": "ลบ",
+            "rowsSelected": "เลือก {selected} จาก {total} แถว",
+            "previous": "ก่อนหน้า",
+            "next": "ถัดไป",
+            "noResults": "ไม่พบข้อมูล"
         },
         "form": {
             "editTitle": "แก้ไขผู้ใช้",

@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DashboardData } from "@/app/actions/dashboard"
 import { Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 
 interface ChartsSectionProps {
     data: DashboardData | null
@@ -11,6 +11,7 @@ interface ChartsSectionProps {
 
 export function ChartsSection({ data }: ChartsSectionProps) {
     const t = useTranslations("GroupDashboard.charts")
+    const locale = useLocale()
     if (!data) return null
 
     // Prepare data for Energy Consumption Chart
@@ -41,8 +42,8 @@ export function ChartsSection({ data }: ChartsSectionProps) {
                             <AreaChart data={energyData}>
                                 <defs>
                                     <linearGradient id="colorEnergy" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="5%" stopColor="#f87171" stopOpacity={0.8} />
-                                        <stop offset="95%" stopColor="#f87171" stopOpacity={0} />
+                                        <stop offset="5%" stopColor="var(--chart-1)" stopOpacity={0.8} />
+                                        <stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0} />
                                     </linearGradient>
                                 </defs>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -53,7 +54,11 @@ export function ChartsSection({ data }: ChartsSectionProps) {
                                     tickMargin={10}
                                     tickFormatter={(value) => {
                                         const date = new Date(value)
-                                        return `${date.getDate()}-${date.toLocaleString('default', { month: 'short' })}-${date.getFullYear()}`
+                                        return date.toLocaleDateString(locale, {
+                                            day: "numeric",
+                                            month: "short",
+                                            year: "numeric"
+                                        })
                                     }}
                                     fontSize={12}
                                 />
@@ -64,12 +69,12 @@ export function ChartsSection({ data }: ChartsSectionProps) {
                                 />
                                 <Tooltip
                                     contentStyle={{ borderRadius: "8px" }}
-                                    labelFormatter={(value) => new Date(value).toLocaleDateString()}
+                                    labelFormatter={(value) => new Date(value).toLocaleDateString(locale)}
                                 />
                                 <Area
                                     type="monotone"
                                     dataKey="value"
-                                    stroke="#f87171"
+                                    stroke="var(--chart-1)"
                                     fillOpacity={1}
                                     fill="url(#colorEnergy)"
                                 />
@@ -95,7 +100,11 @@ export function ChartsSection({ data }: ChartsSectionProps) {
                                     tickMargin={10}
                                     tickFormatter={(value) => {
                                         const date = new Date(value)
-                                        return `${date.getDate()}-${date.toLocaleString('default', { month: 'short' })}-${date.getFullYear()}`
+                                        return date.toLocaleDateString(locale, {
+                                            day: "numeric",
+                                            month: "short",
+                                            year: "numeric"
+                                        })
                                     }}
                                     fontSize={12}
                                 />
@@ -107,11 +116,11 @@ export function ChartsSection({ data }: ChartsSectionProps) {
                                 <Tooltip
                                     cursor={{ fill: 'transparent' }}
                                     contentStyle={{ borderRadius: "8px" }}
-                                    labelFormatter={(value) => new Date(value).toLocaleDateString()}
+                                    labelFormatter={(value) => new Date(value).toLocaleDateString(locale)}
                                 />
                                 <Bar
                                     dataKey="value"
-                                    fill="#fca5a5"
+                                    fill="var(--chart-2)"
                                     radius={[4, 4, 0, 0]}
                                     barSize={40}
                                 />

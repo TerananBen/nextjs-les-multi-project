@@ -12,6 +12,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { GroupItem } from "@/app/actions/dashboard"
 import { Printer, Search } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 interface FilterBarProps {
     groups: GroupItem[]
@@ -19,6 +20,7 @@ interface FilterBarProps {
 }
 
 export function FilterBar({ groups, onSearch }: FilterBarProps) {
+    const t = useTranslations("GroupDashboard.filter")
     const [selectedGroup, setSelectedGroup] = useState<string>("")
     const [selectedType, setSelectedType] = useState<string>("Month")
     const [selectedDate, setSelectedDate] = useState<string>("")
@@ -45,12 +47,12 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
     }
 
     return (
-        <div className="flex flex-wrap items-center gap-4 p-4 bg-white dark:bg-zinc-900 rounded-lg shadow-sm border">
+        <div className="flex flex-wrap items-center gap-4 p-4 bg-card rounded-lg shadow-sm border">
             <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">Search :</span>
+                <span className="text-sm font-medium">{t("searchLabel")}</span>
                 <Select value={selectedGroup} onValueChange={setSelectedGroup}>
                     <SelectTrigger className="w-[200px]">
-                        <SelectValue placeholder="-- Select Group --" />
+                        <SelectValue placeholder={t("selectGroupPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
                         {groups.map((group) => (
@@ -64,15 +66,15 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
 
             <Select value={selectedType} onValueChange={setSelectedType}>
                 <SelectTrigger className="w-[150px]">
-                    <SelectValue placeholder="Select Type" />
+                    <SelectValue placeholder={t("selectTypePlaceholder")} />
                 </SelectTrigger>
                 <SelectContent>
-                    <SelectItem value="Now">Now</SelectItem>
-                    <SelectItem value="Day">Day</SelectItem>
-                    <SelectItem value="Week">Week</SelectItem>
-                    <SelectItem value="Month">Monthly</SelectItem>
-                    <SelectItem value="Quarter">Quarter</SelectItem>
-                    <SelectItem value="Year">Year</SelectItem>
+                    <SelectItem value="Now">{t("types.now")}</SelectItem>
+                    <SelectItem value="Day">{t("types.day")}</SelectItem>
+                    <SelectItem value="Week">{t("types.week")}</SelectItem>
+                    <SelectItem value="Month">{t("types.month")}</SelectItem>
+                    <SelectItem value="Quarter">{t("types.quarter")}</SelectItem>
+                    <SelectItem value="Year">{t("types.year")}</SelectItem>
                 </SelectContent>
             </Select>
 
@@ -86,18 +88,18 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
 
             <div className="flex items-center gap-2 ml-auto">
                 <Button
-                    className="bg-red-400 hover:bg-red-500 text-white"
+                    variant="destructive"
                     onClick={handleSearch}
                 >
                     <Search className="w-4 h-4 mr-2" />
-                    Search
+                    {t("searchButton")}
                 </Button>
                 <Button
-                    className="bg-indigo-500 hover:bg-indigo-600 text-white"
+                    variant="secondary"
                     onClick={() => window.print()}
                 >
                     <Printer className="w-4 h-4 mr-2" />
-                    Print
+                    {t("printButton")}
                 </Button>
             </div>
         </div>

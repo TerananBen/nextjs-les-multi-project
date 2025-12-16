@@ -50,7 +50,7 @@ export default async function RootLayout({
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme={process.env.NEXT_PUBLIC_DEFAULT_THEME || "skyblue"}
           enableSystem
           disableTransitionOnChange
           themes={["light", "dark", "skyblue"]}

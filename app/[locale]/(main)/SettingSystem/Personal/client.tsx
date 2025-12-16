@@ -194,8 +194,8 @@ export function PersonalClient({ initialData, roles }: PersonalClientProps) {
     })
 
     return (
-        <div className="w-full space-y-4">
-            <div className="flex items-center justify-between">
+        <div className="flex flex-col h-[calc(100vh-140px)] gap-4 w-full">
+            <div className="flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-2">
                     <div className="relative">
                         <IconSearch className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -214,9 +214,9 @@ export function PersonalClient({ initialData, roles }: PersonalClientProps) {
                 </Button>
             </div>
 
-            <div className="rounded-md border">
+            <div className="rounded-md border flex-1 relative overflow-auto">
                 <Table>
-                    <TableHeader>
+                    <TableHeader className="sticky top-0 bg-background z-10">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
@@ -257,7 +257,7 @@ export function PersonalClient({ initialData, roles }: PersonalClientProps) {
                                     colSpan={columns.length}
                                     className="h-24 text-center"
                                 >
-                                    No results.
+                                    {t('table.noResults')}
                                 </TableCell>
                             </TableRow>
                         )}
@@ -265,10 +265,12 @@ export function PersonalClient({ initialData, roles }: PersonalClientProps) {
                 </Table>
             </div>
 
-            <div className="flex items-center justify-end space-x-2 py-4">
+            <div className="flex items-center justify-end space-x-2 py-4 shrink-0 mt-auto">
                 <div className="flex-1 text-sm text-muted-foreground">
-                    {table.getFilteredSelectedRowModel().rows.length} of{" "}
-                    {table.getFilteredRowModel().rows.length} row(s) selected.
+                    {t('table.rowsSelected', {
+                        selected: table.getFilteredSelectedRowModel().rows.length,
+                        total: table.getFilteredRowModel().rows.length
+                    })}
                 </div>
                 <div className="space-x-2">
                     <Button
@@ -278,7 +280,7 @@ export function PersonalClient({ initialData, roles }: PersonalClientProps) {
                         disabled={!table.getCanPreviousPage()}
                     >
                         <IconChevronLeft className="h-4 w-4" />
-                        Previous
+                        {t('table.previous')}
                     </Button>
                     <Button
                         variant="outline"
@@ -286,7 +288,7 @@ export function PersonalClient({ initialData, roles }: PersonalClientProps) {
                         onClick={() => table.nextPage()}
                         disabled={!table.getCanNextPage()}
                     >
-                        Next
+                        {t('table.next')}
                         <IconChevronRight className="h-4 w-4" />
                     </Button>
                 </div>

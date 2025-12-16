@@ -2,6 +2,7 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant skyblue (&:is(.skyblue *));
 
 @theme inline {
   --color-background: var(--background);
@@ -102,7 +103,7 @@
   --chart-3: oklch(0.769 0.188 70.08);
   --chart-4: oklch(0.627 0.265 303.9);
   --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: hsl(240 5.9% 10%);
+  --sidebar: hsl(0 0% 0%);
   --sidebar-foreground: hsl(240 4.8% 95.9%);
   --sidebar-primary: hsl(224.3 76.3% 48%);
   --sidebar-primary-foreground: hsl(0 0% 100%);
@@ -113,6 +114,7 @@
 }
 
 .skyblue {
+  /* Using Hex/HSL for specific blue requested: #1e88e5 (Material Blue 600) or similar vibrant blue */
   --background: oklch(0.95 0.02 240);
   --foreground: oklch(0.25 0.05 240);
   --card: oklch(0.97 0.01 240);
@@ -136,13 +138,15 @@
   --chart-3: oklch(0.85 0.1 200);
   --chart-4: oklch(0.6 0.15 260);
   --chart-5: oklch(0.7 0.12 280);
-  --sidebar: oklch(0.96 0.01 240);
-  --sidebar-foreground: oklch(0.25 0.05 240);
-  --sidebar-primary: oklch(0.65 0.15 240);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.93 0.02 240);
-  --sidebar-accent-foreground: oklch(0.25 0.05 240);
-  --sidebar-border: oklch(0.88 0.02 240);
+  
+  /* Sidebar Specifics */
+  --sidebar: #1e88e5;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #1e88e5;
+  --sidebar-accent: #1565c0; /* Darker blue */
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #1e88e5; /* Hide border */
   --sidebar-ring: oklch(0.65 0.15 240);
 }
 
@@ -154,4 +158,14 @@
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }

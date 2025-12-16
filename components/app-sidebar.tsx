@@ -14,7 +14,11 @@ import {
   IconCalendarTime,
   IconDeviceAnalytics,
   IconReplace,
+  IconBriefcase,
+  IconBell,
+  IconMap2,
 } from "@tabler/icons-react"
+import { useTranslations } from "next-intl"
 
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
@@ -35,21 +39,21 @@ import { Link, usePathname } from "@/i18n/routing"
 
 // Map menu_name to icon and title
 const menuMapping: Record<string, { title: string; icon: any; url: string }> = {
-  "V_Dashboard": { title: "Dashboard", icon: IconDashboard, url: "/Dashboard/Dashboard" },
-  "V_AlertStreetLight": { title: "Alerts", icon: IconAlertTriangle, url: "/SettingSystem/Alerts" },
-  "V_GroupConfig": { title: "Group Config", icon: IconSettings, url: "/SettingControl/GroupConfig" },
-  "V_GroupDashboard": { title: "Group Dashboard", icon: IconDashboard, url: "/Dashboard/GroupDashboard" },
-  "V_MaintenanceConfig": { title: "Maintenance Config", icon: IconTool, url: "/Maintenance/MaintenanceConfig" },
-  "V_MaintenanceDashboard": { title: "Maintenance Dashboard", icon: IconDashboard, url: "/Maintenance/MaintenanceDashboard" },
-  "V_MapDisconnect": { title: "Map Disconnect", icon: IconMap, url: "/Map/MapDisconnect" },
-  "V_MapGlobal": { title: "Map Global", icon: IconMap, url: "/Map/MapGlobal" },
-  "V_Personal": { title: "Personal", icon: IconUser, url: "/SettingSystem/Personal" },
-  "V_SettingMenu": { title: "Menu Settings", icon: IconSettings, url: "/SettingSystem/MenuSettings" },
-  "V_SettingSchedule": { title: "Schedule Settings", icon: IconCalendarTime, url: "/SettingControl/ScheduleSettings" },
-  "V_StreetLight": { title: "Street Light", icon: IconBulb, url: "/SettingControl/StreetLight" },
-  "V_MaintenanceDetail": { title: "Maintenance Detail", icon: IconListDetails, url: "/Maintenance/MaintenanceDetail" },
-  "V_MapChangeLamp": { title: "Map Change Lamp", icon: IconReplace, url: "/Map/MapChangeLamp" },
-  "V_SettingDevice": { title: "Device Settings", icon: IconDeviceAnalytics, url: "/dashboard/settings-device" },
+  "V_Dashboard": { title: "menu.overview", icon: IconBriefcase, url: "/Dashboard/Dashboard" },
+  "V_AlertStreetLight": { title: "menu.alerts", icon: IconBell, url: "/SettingSystem/Alerts" },
+  "V_GroupConfig": { title: "menu.groupConfig", icon: IconSettings, url: "/SettingControl/GroupConfig" },
+  "V_GroupDashboard": { title: "menu.groupDashboard", icon: IconBriefcase, url: "/Dashboard/GroupDashboard" },
+  "V_MaintenanceConfig": { title: "menu.maintenanceConfig", icon: IconTool, url: "/Maintenance/MaintenanceConfig" },
+  "V_MaintenanceDashboard": { title: "menu.maintenanceDashboard", icon: IconBriefcase, url: "/Maintenance/MaintenanceDashboard" },
+  "V_MapDisconnect": { title: "menu.mapDisconnect", icon: IconMap2, url: "/Map/MapDisconnect" },
+  "V_MapGlobal": { title: "menu.mapGlobal", icon: IconMap2, url: "/Map/MapGlobal" },
+  "V_Personal": { title: "menu.personal", icon: IconUser, url: "/SettingSystem/Personal" },
+  "V_SettingMenu": { title: "menu.menuSettings", icon: IconSettings, url: "/SettingSystem/MenuSettings" },
+  "V_SettingSchedule": { title: "menu.scheduleSettings", icon: IconCalendarTime, url: "/SettingControl/ScheduleSettings" },
+  "V_StreetLight": { title: "menu.streetLight", icon: IconBulb, url: "/SettingControl/StreetLight" },
+  "V_MaintenanceDetail": { title: "menu.maintenanceDetail", icon: IconListDetails, url: "/Maintenance/MaintenanceDetail" },
+  "V_MapChangeLamp": { title: "menu.mapChangeLamp", icon: IconReplace, url: "/Map/MapChangeLamp" },
+  "V_SettingDevice": { title: "menu.deviceSettings", icon: IconDeviceAnalytics, url: "/dashboard/settings-device" },
 }
 
 const data = {
@@ -63,23 +67,23 @@ const data = {
 // Define menu groups
 const menuGroups = [
   {
-    title: "Dashboard",
+    title: "groups.streetLight",
     items: ["V_GroupDashboard", "V_Dashboard"],
   },
   {
-    title: "Setting & Control",
+    title: "groups.controlEdit",
     items: ["V_StreetLight", "V_GroupConfig", "V_SettingSchedule"],
   },
   {
-    title: "Map",
+    title: "groups.mapLamp",
     items: ["V_MapDisconnect", "V_MapGlobal"],
   },
   {
-    title: "Maintenance",
+    title: "groups.maintenance",
     items: ["V_MaintenanceDashboard", "V_MaintenanceConfig", "V_MaintenanceDetail"],
   },
   {
-    title: "Setting System",
+    title: "groups.systemSettings",
     items: ["V_SettingMenu", "V_AlertStreetLight", "V_Personal"],
   },
 ]
@@ -90,6 +94,10 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 
 export function AppSidebar({ menuItems = [], ...props }: AppSidebarProps) {
   const pathname = usePathname()
+  const t = useTranslations("Sidebar")
+
+  // Environment variables for personalization
+  const sidebarLogo = process.env.NEXT_PUBLIC_SIDEBAR_LOGO || "/logo-placeholder.png"
 
   // Create a map of readable menu items for easy lookup
   const readableItems = React.useMemo(() => {
@@ -103,23 +111,19 @@ export function AppSidebar({ menuItems = [], ...props }: AppSidebarProps) {
   }, [menuItems])
 
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
-              <Link href="#">
-                <IconPlugConnected className="!size-5" />
-                <span className="text-base font-semibold">L&E Inc.</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+    <Sidebar collapsible="offcanvas" {...props} className="border-r-0">
+      <SidebarHeader className="flex items-center justify-center py-4 z-20">
+        {/* Logo Area */}
+        <div className="flex flex-col items-center">
+          {sidebarLogo ? (
+            <img src={sidebarLogo} alt="L&E" className="h-10 object-contain" />
+          ) : (
+            <div className="bg-white/20 p-2 rounded text-lg font-bold border-2 border-white">L&E</div>
+          )}
+        </div>
       </SidebarHeader>
-      <SidebarContent>
+
+      <SidebarContent className="z-20 pt-4 no-scrollbar">
         {menuGroups.map((group) => {
           // Filter items in this group that are readable
           const groupItems = group.items
@@ -137,15 +141,21 @@ export function AppSidebar({ menuItems = [], ...props }: AppSidebarProps) {
 
           return (
             <SidebarGroup key={group.title}>
-              <SidebarGroupLabel>{group.title}</SidebarGroupLabel>
+              <SidebarGroupLabel className="text-sidebar-foreground/80 font-medium text-sm px-4 mb-2">{t(group.title)}</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   {groupItems.map((item) => (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild isActive={pathname === item.url}>
-                        <Link href={item.url}>
-                          <item.icon />
-                          <span>{item.title}</span>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={pathname === item.url}
+                        className="my-0.5"
+                      >
+                        <Link href={item.url} className="px-4 py-3">
+                          <item.icon className="!size-5" />
+                          <span className="font-medium text-[15px]">{t(item.title)}</span>
+                          {/* Right Arrow for sub-navigation feeling */}
+                          {/* <ChevronRight className="ml-auto size-4 opacity-50" /> */}
                         </Link>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -156,7 +166,7 @@ export function AppSidebar({ menuItems = [], ...props }: AppSidebarProps) {
           )
         })}
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="z-20">
         <NavUser user={data.user} />
       </SidebarFooter>
     </Sidebar>

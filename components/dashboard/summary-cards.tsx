@@ -16,18 +16,18 @@ export function SummaryCards({ data }: SummaryCardsProps) {
     const onlineLamp = totalLamp - totalLampLose
 
     return (
-        <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-xs lg:grid-cols-4">
+        <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-sm lg:grid-cols-4">
             <Card className="@container/card">
                 <CardHeader>
                     <CardDescription>{t("onlineTotal")}</CardDescription>
                     <CardTitle className="text-2xl font-semibold tabular-nums">
-                        <span className="text-green-500">{onlineLamp}</span>
+                        <span className="text-[var(--chart-2)]">{onlineLamp}</span>
                         <span className="text-muted-foreground text-lg font-normal"> / {totalLamp} {t("lamp")}</span>
                     </CardTitle>
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1.5 text-sm">
                     <div className="line-clamp-1 flex gap-2 font-medium">
-                        {t("onlineStatus")} <Lightbulb className="size-4 text-yellow-500" />
+                        {t("onlineStatus")} <Lightbulb className="size-4 text-[var(--chart-4)]" />
                     </div>
                 </CardFooter>
             </Card>
@@ -41,7 +41,7 @@ export function SummaryCards({ data }: SummaryCardsProps) {
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1.5 text-sm">
                     <div className="line-clamp-1 flex gap-2 font-medium">
-                        {t("failureCount")} <LightbulbOff className="size-4 text-gray-500" />
+                        {t("failureCount")} <LightbulbOff className="size-4 text-muted-foreground" />
                     </div>
                 </CardFooter>
             </Card>
@@ -55,7 +55,7 @@ export function SummaryCards({ data }: SummaryCardsProps) {
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1.5 text-sm">
                     <div className="line-clamp-1 flex gap-2 font-medium">
-                        {t("averageVoltage")} <Zap className="size-4 text-orange-500" />
+                        {t("averageVoltage")} <Zap className="size-4 text-[var(--chart-1)]" />
                     </div>
                 </CardFooter>
             </Card>
@@ -70,7 +70,7 @@ export function SummaryCards({ data }: SummaryCardsProps) {
                 </CardHeader>
                 <CardFooter className="flex-col items-start gap-1.5 text-sm">
                     <div className="line-clamp-1 flex gap-2 font-medium">
-                        {t("perMonth")} <Zap className="size-4 text-orange-500" />
+                        {t("perMonth")} <Zap className="size-4 text-[var(--chart-1)]" />
                     </div>
                 </CardFooter>
             </Card>

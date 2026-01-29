@@ -18,7 +18,8 @@ import {
     Hand,
     MousePointer2,
     Layers,
-    X
+    X,
+    ArrowUpDown
 } from "lucide-react"
 import {
     Popover,
@@ -38,6 +39,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 
 // --- Command Cell Component ---
 const CommandCell = ({
@@ -119,14 +121,39 @@ const CommandCell = ({
                     <div className="py-6 space-y-6">
                         {/* Slider Section */}
                         <div className="space-y-4">
-                            <div className="flex justify-between items-center px-1">
-                                <span className="text-sm font-medium">{t("brightness")}</span>
-                                <span className="text-sm font-bold text-primary">{dimLevel}%</span>
+                            <div className="flex justify-between items-center px-1 gap-4">
+                                <span className="text-sm font-medium shrink-0">{t("brightness")}</span>
+                                <div className="flex items-center gap-1">
+                                    <Input
+                                        type="text" // Use text to control validation manually or number
+                                        value={dimLevel}
+                                        onChange={(e) => {
+                                            const val = e.target.value
+                                            // Allow empty for typing
+                                            if (val === "") {
+                                                // @ts-ignore - temporary cast for transition valid number
+                                                setDimLevel("" as any)
+                                                return
+                                            }
+                                            const num = parseInt(val, 10)
+                                            if (!isNaN(num)) {
+                                                if (num > 100) setDimLevel(100)
+                                                else if (num < 0) setDimLevel(0) // Logic allows 0 but user said 1-100. Let's stick to 0-100 range in general but UI text said 1-100. Slider allows 0.
+                                                else setDimLevel(num)
+                                            }
+                                        }}
+                                        onBlur={() => {
+                                            if (dimLevel === "" as any) setDimLevel(0)
+                                        }}
+                                        className="w-16 h-8 text-right font-bold text-primary"
+                                    />
+                                    <span className="text-sm font-bold text-primary">%</span>
+                                </div>
                             </div>
                             <div className="flex items-center gap-4">
                                 <Slider
-                                    defaultValue={[dimLevel]}
-                                    value={[dimLevel]}
+                                    defaultValue={[Number(dimLevel) || 0]}
+                                    value={[Number(dimLevel) || 0]}
                                     max={100}
                                     step={1}
                                     onValueChange={(vals) => setDimLevel(vals[0])}
@@ -155,20 +182,56 @@ export const useStreetLightColumns = () => {
 
     const columns: ColumnDef<StreetLightDevice>[] = [
         {
-            accessorKey: "streetLightName", // Combined Name + ID
-            header: t("streetLightName"),
+            accessorKey: "streetLightName", // Name
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        {t("streetLightName")}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                )
+            },
             cell: ({ row }) => {
                 return (
                     <div className="flex flex-col">
                         <span className="font-semibold text-sm">{row.original.streetLightName || "-"}</span>
-                        <span className="text-xs text-muted-foreground">{row.original.imeI_Name}</span>
                     </div>
                 )
             },
         },
         {
+            accessorKey: "imeI_Name", // IMEI
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        IMEI
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                )
+            },
+            cell: ({ row }) => <div className="text-sm">{row.original.imeI_Name || "-"}</div>,
+        },
+        {
             accessorKey: "streetLightSerial", // Gov / Asset ID
-            header: t("gov"),
+            header: ({ column }) => {
+                return (
+                    <div className="text-center">
+                        <Button
+                            variant="ghost"
+                            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        >
+                            {t("gov")}
+                            <ArrowUpDown className="ml-2 h-4 w-4" />
+                        </Button>
+                    </div>
+                )
+            },
             cell: ({ row }) => <div className="text-center">{row.original.streetLightSerial || "-"}</div>
         },
         {
@@ -211,17 +274,47 @@ export const useStreetLightColumns = () => {
         },
         {
             accessorKey: "streetLightLastUpdate",
-            header: t("lastUpdate"),
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        {t("lastUpdate")}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                )
+            },
             cell: ({ row }) => <div className="text-center text-sm">{row.original.streetLightLastUpdate || "-"}</div>
         },
         {
             accessorKey: "lifeTime",
-            header: t("lifeTime"),
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        {t("lifeTime")}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                )
+            },
             cell: ({ row }) => <div className="text-center text-sm">{row.original.lifeTime}</div>
         },
         {
             accessorKey: "lastPower",
-            header: t("lastPower"),
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        {t("lastPower")}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                )
+            },
             cell: ({ row }) => {
                 const [power, setPower] = React.useState(row.original.lastPower || "0");
                 const [loading, setLoading] = React.useState(false);

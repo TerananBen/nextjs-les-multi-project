@@ -183,6 +183,7 @@
         "rowsPerPage": "แถวต่อหน้า :",
         "searchPlaceholder": "ค้นหาด้วยชื่อโคมไฟหรือหมายเลขอุปกรณ์",
         "searchGroupPlaceholder": "ค้นหากลุ่ม...",
-        "noGroupFound": "ไม่พบกลุ่ม"
+        "noGroupFound": "ไม่พบกลุ่ม",
+        "loading": "กำลังโหลด..."
     }
 }

@@ -140,7 +140,7 @@ export function StreetLightClient() {
 
             {/* Table Section */}
             <div className="flex-1">
-                <DataTable columns={columns} data={filteredDevices} />
+                <DataTable columns={columns} data={filteredDevices} loading={loading} />
             </div>
         </div>
     )

@@ -183,6 +183,7 @@
         "rowsPerPage": "Rows per page :",
         "searchPlaceholder": "Search by StreetLight Name or Device No.",
         "searchGroupPlaceholder": "Search group...",
-        "noGroupFound": "No group found."
+        "noGroupFound": "No group found.",
+        "loading": "Loading..."
     }
 }

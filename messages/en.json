@@ -179,6 +179,37 @@
             "off": "Off",
             "dim": "Dim"
         },
+        "historyPowerTitle": "Power History",
+        "powerHistory": {
+            "validation": {
+                "startDateAfterEndDate": "Start date cannot be after end date",
+                "futureDatesNotAllowed": "Cannot select future dates",
+                "rangeExceeded": "Date range cannot exceed 1 month (31 days)"
+            },
+            "status": {
+                "noData": "No data found for this period",
+                "foundRecords": "Found {count} records",
+                "error": "Failed to fetch history",
+                "noDataExport": "No data to export"
+            },
+            "labels": {
+                "selectDateRange": "Date Range :",
+                "to": "to",
+                "averagePower": "Average Power",
+                "averageVoltage": "Average Voltage",
+                "averageCurrent": "Average Current",
+                "exportExcel": "Export to Excel",
+                "showing": "Showing {start} to {end} of {total} entries"
+            },
+            "table": {
+                "dateTime": "Date-Time",
+                "i": "mA",
+                "v": "V",
+                "w": "W",
+                "pf": "PF"
+            }
+        },
+        "device": "Device",
         "totalDevice": "Total Device",
         "rowsPerPage": "Rows per page :",
         "searchPlaceholder": "Search by StreetLight Name or Device No.",

@@ -1,20 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { getFont } from "@/lib/fonts";
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import "../globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const font = getFont();
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -44,10 +36,13 @@ export default async function RootLayout({
   // side is the easiest way to get started
   const messages = await getMessages();
 
+  // Get base font size from env or default to 16
+  const baseFontSize = process.env.NEXT_PUBLIC_BASE_FONT_SIZE || 16;
+
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning style={{ fontSize: `${baseFontSize}px` }}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${font.variable} antialiased font-sans`}
       >
         <ThemeProvider
           attribute="class"

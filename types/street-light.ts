@@ -34,3 +34,21 @@ export interface SearchStreetLightResponse {
     dateTime: string;
     dataReturn: StreetLightDevice[];
 }
+
+export interface StreetLightLog {
+    ts: string;
+    da: string | null;
+    date: string;
+    time: string;
+    i: string;
+    pf: string;
+    v: string;
+    w: string;
+}
+
+export interface GetLogResponse {
+    result: boolean;
+    apiName: string;
+    dateTime: string;
+    dataReturn: Record<string, StreetLightLog>;
+}

@@ -179,6 +179,37 @@
             "off": "ปิด",
             "dim": "หรี่ไฟ"
         },
+        "historyPowerTitle": "ประวัติกำลังไฟฟ้า",
+        "powerHistory": {
+            "validation": {
+                "startDateAfterEndDate": "วันที่เริ่มต้นต้องไม่เกินวันที่สิ้นสุด",
+                "futureDatesNotAllowed": "ไม่สามารถเลือกวันที่ในอนาคตได้",
+                "rangeExceeded": "ช่วงเวลาต้องไม่เกิน 1 เดือน (31 วัน)"
+            },
+            "status": {
+                "noData": "ไม่พบข้อมูลในช่วงเวลานี้",
+                "foundRecords": "พบข้อมูล {count} รายการ",
+                "error": "ไม่สามารถดึงข้อมูลประวัติได้",
+                "noDataExport": "ไม่พบข้อมูลสำหรับส่งออก"
+            },
+            "labels": {
+                "selectDateRange": "เลือกช่วงวันที่ :",
+                "to": "ถึง",
+                "averagePower": "กำลังเฉลี่ยโหลด",
+                "averageVoltage": "แรงดันเฉลี่ยโหลด",
+                "averageCurrent": "กระแสเฉลี่ยโหลด",
+                "exportExcel": "ส่งออกเป็น CSV",
+                "showing": "แสดง {start} ถึง {end} ของ {total} รายการ"
+            },
+            "table": {
+                "dateTime": "วันที่-เวลา",
+                "i": "mA",
+                "v": "V",
+                "w": "W",
+                "pf": "PF"
+            }
+        },
+        "device": "อุปกรณ์",
         "totalDevice": "อุปกรณ์ทั้งหมด",
         "rowsPerPage": "แถวต่อหน้า :",
         "searchPlaceholder": "ค้นหาด้วยชื่อโคมไฟหรือหมายเลขอุปกรณ์",

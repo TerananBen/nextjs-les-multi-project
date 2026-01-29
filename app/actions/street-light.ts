@@ -1,7 +1,7 @@
 "use server"
 
 import { cookies } from "next/headers"
-import { GetListDataGroupResponse, SearchStreetLightResponse, DeviceGroup, StreetLightDevice } from "@/types/street-light"
+import { GetListDataGroupResponse, SearchStreetLightResponse, DeviceGroup, StreetLightDevice, GetLogResponse, StreetLightLog } from "@/types/street-light"
 
 const API_URL = process.env.API_URL
 
@@ -187,5 +187,50 @@ export async function sendStreetLightCommandAction(
     } catch (error) {
         console.error("Send Command Error:", error)
         return { success: false, error: "Exception" }
+    }
+}
+
+export async function getDataLogStreetLightMongoAction(
+    imsi: string,
+    timestamp_start: string,
+    timestamp_end: string
+): Promise<Record<string, StreetLightLog>> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) {
+        return {}
+    }
+
+    try {
+        const body = {
+            imsi,
+            timestamp_start,
+            timestamp_end
+        }
+
+        const response = await fetch(`${API_URL}/StreetLight/getDataLogStreetLightMongo`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(body)
+        })
+
+        if (!response.ok) {
+            console.error(`API error: ${response.status} ${response.statusText}`)
+            return {}
+        }
+
+        const data: GetLogResponse = await response.json()
+        if (data.result) {
+            return data.dataReturn
+        }
+        return {}
+
+    } catch (error) {
+        console.error("Get Log Error:", error)
+        return {}
     }
 }

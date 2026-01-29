@@ -40,6 +40,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { HistoryPowerDialog } from "./history-power-dialog"
 
 // --- Command Cell Component ---
 const CommandCell = ({
@@ -379,13 +380,15 @@ export const useStreetLightColumns = () => {
         {
             id: "logPower",
             header: t("logPower"),
-            cell: () => (
-                <div className="flex justify-center">
-                    <Button variant="default" size="icon" className="h-8 w-8 bg-green-500 hover:bg-green-600 rounded-lg">
-                        <FileText className="h-4 w-4 text-white" />
-                    </Button>
-                </div>
-            )
+            cell: ({ row }) => {
+                const imei = row.original.imeI_Name
+                const deviceName = row.original.streetLightName
+                return (
+                    <div className="flex justify-center">
+                        <HistoryPowerDialog imei={imei} deviceName={deviceName} />
+                    </div>
+                )
+            }
         },
         {
             id: "logControl",

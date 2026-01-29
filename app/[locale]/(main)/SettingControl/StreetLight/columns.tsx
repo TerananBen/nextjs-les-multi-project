@@ -9,13 +9,9 @@ import {
     Lightbulb,
     RefreshCcw,
     FileText,
-    Activity,
-    Power,
-    Clock,
     Sun,
     Moon,
     MapPin,
-    Hand,
     MousePointer2,
     Layers,
     X,
@@ -390,34 +386,7 @@ export const useStreetLightColumns = () => {
                 )
             }
         },
-        {
-            id: "logControl",
-            header: t("logControl"),
-            cell: () => (
-                <div className="flex justify-center">
-                    <Button variant="default" size="icon" className="h-8 w-8 bg-green-500 hover:bg-green-600 rounded-lg">
-                        <Activity className="h-4 w-4 text-white" />
-                    </Button>
-                </div>
-            )
-        },
-        {
-            id: "automatic",
-            header: t("automatic"),
-            cell: ({ row }) => {
-                const isAuto = row.original.typeSchedule === "light" // Example
-                return (
-                    <div className="flex justify-center items-center gap-2">
-                        <div className={`flex items-center justify-center h-8 w-8 rounded-full ${isAuto ? 'bg-green-500' : 'bg-gray-300'}`}>
-                            <Power className="h-4 w-4 text-white" />
-                        </div>
-                        <div className={`flex items-center justify-center h-8 w-8 rounded-full border ${isAuto ? 'border-green-500 text-green-500' : 'border-gray-300 text-gray-300'}`}>
-                            {isAuto ? <Clock className="h-4 w-4" /> : <Hand className="h-4 w-4" />}
-                        </div>
-                    </div>
-                )
-            }
-        },
+
     ]
 
     return columns

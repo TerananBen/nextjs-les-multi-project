@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 };
 
 import { ThemeProvider } from "@/components/theme-provider"
+import { Toaster } from "@/components/ui/sonner"
 
 // ... (existing imports)
 
@@ -57,6 +58,7 @@ export default async function RootLayout({
         >
           <NextIntlClientProvider messages={messages} locale={locale}>
             {children}
+            <Toaster />
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>

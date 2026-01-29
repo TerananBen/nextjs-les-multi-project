@@ -145,5 +145,44 @@
             "energyConsumption": "Energy consumption (kWh)",
             "lampFailure": "Lamp failure (unit)"
         }
+    },
+    "StreetLight": {
+        "title": "Street Light Control",
+        "groupLabel": "Group",
+        "selectGroupPlaceholder": "-- Select Group --",
+        "searchButton": "Search",
+        "noData": "No Data",
+        "table": {
+            "streetLightName": "Streetlight Name",
+            "gov": "Gov",
+            "groupName": "Group Name",
+            "lastUpdate": "Last Update",
+            "lifeTime": "LifeTime",
+            "lastPower": "Last Power",
+            "command": "Command",
+            "logPower": "Log Power",
+            "logControl": "Log Control",
+            "automatic": "Automatic",
+            "refreshSuccess": "Power updated successfully",
+            "refreshFailed": "Failed to update power",
+            "refreshError": "An error occurred",
+            "errorConfigMissing": "Device configuration missing",
+            "controlTitle": "Control",
+            "brightness": "Brightness (%)",
+            "send": "Send",
+            "stop": "Stop",
+            "commandSuccess": "Command sent successfully",
+            "commandFailed": "Failed to send command"
+        },
+        "commands": {
+            "on": "On",
+            "off": "Off",
+            "dim": "Dim"
+        },
+        "totalDevice": "Total Device",
+        "rowsPerPage": "Rows per page :",
+        "searchPlaceholder": "Search by StreetLight Name or Device No.",
+        "searchGroupPlaceholder": "Search group...",
+        "noGroupFound": "No group found."
     }
 }

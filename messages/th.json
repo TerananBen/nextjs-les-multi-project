@@ -145,5 +145,44 @@
             "energyConsumption": "การใช้พลังงาน (kWh)",
             "lampFailure": "โคมเสีย (จำนวน)"
         }
+    },
+    "StreetLight": {
+        "title": "ควบคุมโคมไฟถนน",
+        "groupLabel": "กลุ่ม",
+        "selectGroupPlaceholder": "-- เลือกกลุ่ม --",
+        "searchButton": "ค้นหา",
+        "noData": "ไม่พบข้อมูล",
+        "table": {
+            "streetLightName": "ชื่อโคมไฟ",
+            "gov": "ครุภัณฑ์",
+            "groupName": "ชื่อกลุ่ม",
+            "lastUpdate": "อัปเดตล่าสุด",
+            "lifeTime": "อายุการใช้งาน",
+            "lastPower": "กำลังไฟล่าสุด",
+            "command": "คำสั่ง",
+            "logPower": "ประวัติกำลังไฟ",
+            "logControl": "ประวัติคำสั่ง",
+            "automatic": "อัตโนมัติ",
+            "refreshSuccess": "อัปเดตกำลังไฟสำเร็จ",
+            "refreshFailed": "อัปเดตกำลังไฟไม่สำเร็จ",
+            "refreshError": "เกิดข้อผิดพลาดในการอัปเดต",
+            "errorConfigMissing": "ไม่พบการตั้งค่าอุปกรณ์",
+            "controlTitle": "ควบคุม",
+            "brightness": "ความสว่าง (%)",
+            "send": "ส่ง",
+            "stop": "หยุด",
+            "commandSuccess": "ส่งคำสั่งสำเร็จ",
+            "commandFailed": "ส่งคำสั่งไม่สำเร็จ"
+        },
+        "commands": {
+            "on": "เปิด",
+            "off": "ปิด",
+            "dim": "หรี่ไฟ"
+        },
+        "totalDevice": "อุปกรณ์ทั้งหมด",
+        "rowsPerPage": "แถวต่อหน้า :",
+        "searchPlaceholder": "ค้นหาด้วยชื่อโคมไฟหรือหมายเลขอุปกรณ์",
+        "searchGroupPlaceholder": "ค้นหากลุ่ม...",
+        "noGroupFound": "ไม่พบกลุ่ม"
     }
 }

@@ -4,15 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { PersonalItem } from "@/app/actions/personal"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { IconDotsVertical, IconEdit, IconTrash } from "@tabler/icons-react"
+import { IconEdit, IconTrash } from "@tabler/icons-react"
 
 export type PersonalColumnActions = {
     onEdit: (personal: PersonalItem) => void
@@ -72,35 +64,35 @@ export const getColumns = (
             },
         },
         {
-            id: "actions",
-            header: t('table.actions'),
+            id: "edit",
+            header: t('table.edit'),
             cell: ({ row }) => {
-                const personal = row.original
-
                 return (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <IconDotsVertical className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>{t('table.actions')}</DropdownMenuLabel>
-                            <DropdownMenuItem onClick={() => onEdit(personal)}>
-                                <IconEdit className="mr-2 h-4 w-4" />
-                                {t('table.edit')}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                                onClick={() => onDelete(personal)}
-                                className="text-red-600 focus:text-red-600"
-                            >
-                                <IconTrash className="mr-2 h-4 w-4" />
-                                {t('table.delete')}
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onEdit(row.original)}
+                        title={t('table.edit')}
+                    >
+                        <IconEdit className="h-4 w-4" />
+                    </Button>
+                )
+            },
+        },
+        {
+            id: "delete",
+            header: t('table.delete'),
+            cell: ({ row }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => onDelete(row.original)}
+                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                        title={t('table.delete')}
+                    >
+                        <IconTrash className="h-4 w-4" />
+                    </Button>
                 )
             },
         },

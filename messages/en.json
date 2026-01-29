@@ -98,6 +98,10 @@
             "deleteTitle": "Are you sure?",
             "deleteDescription": "This action cannot be undone. This will permanently delete the user account for",
             "usernameExists": "Username already exists",
+            "statusTitle": "Change Status",
+            "statusDescription": "Are you sure you want to change the status for",
+            "confirm": "Confirm",
+            "changing": "Changing...",
             "required": "Required"
         },
         "messages": {

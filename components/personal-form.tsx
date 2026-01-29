@@ -53,11 +53,11 @@ export function PersonalForm({
     const form = useForm<PersonalFormValues>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            personal_firstname: "",
-            personal_lastname: "",
-            personal_username: "",
+            personal_firstname: initialData?.first_name || "",
+            personal_lastname: initialData?.last_name || "",
+            personal_username: initialData?.personal_username || "",
             personal_password: "",
-            roles_id: "",
+            roles_id: initialData?.roles_id ? String(initialData.roles_id) : "",
         },
     })
 
@@ -68,7 +68,7 @@ export function PersonalForm({
                 personal_lastname: initialData.last_name,
                 personal_username: initialData.personal_username,
                 personal_password: "", // Password is usually not sent back, or we leave it empty to not change
-                roles_id: String(initialData.roles_id),
+                roles_id: initialData.roles_id ? String(initialData.roles_id) : "",
             })
         } else {
             form.reset({
@@ -171,7 +171,7 @@ export function PersonalForm({
                     render={({ field }) => (
                         <FormItem>
                             <FormLabel>{t('form.role')}</FormLabel>
-                            <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                            <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
                                     <SelectTrigger>
                                         <SelectValue placeholder={t('form.selectRole')} />

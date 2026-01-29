@@ -8,7 +8,8 @@ import {
     ArrowUpDown,
     Settings2,
     Plus,
-    Trash2
+    Trash2,
+    SquarePen
 } from "lucide-react"
 
 export const useGroupConfigColumns = (onDeleteSuccess?: () => void) => {
@@ -147,7 +148,7 @@ function AddDeviceCell({ row }: { row: GroupConfigData }) {
                 className="h-8 text-blue-600 border-blue-200 hover:bg-blue-50"
                 onClick={() => setOpen(true)}
             >
-                <Plus className="mr-2 h-4 w-4" />
+                <SquarePen className="mr-2 h-4 w-4" />
                 {t("addDevice")}
             </Button>
             <AddDeviceDialog open={open} onOpenChange={setOpen} group={row} />

@@ -232,7 +232,7 @@
         "table": {
             "groupName": "Group Name",
             "control": "Control",
-            "addDevice": "Add Device",
+            "addDevice": "Manage Devices",
             "delete": "Delete"
         },
         "dialog": {
@@ -255,8 +255,8 @@
             "error": "Failed to delete group"
         },
         "addDeviceDialog": {
-            "title": "Add Device",
-            "description": "Select devices to add to the group.",
+            "title": "Manage Group Devices",
+            "description": "Add, Edit, or Delete devices in the group.",
             "searchPlaceholder": "Search devices...",
             "table": {
                 "name": "Streetlight Name",

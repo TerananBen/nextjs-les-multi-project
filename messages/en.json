@@ -220,5 +220,60 @@
         "searchGroupPlaceholder": "Search group...",
         "noGroupFound": "No group found.",
         "loading": "Loading..."
+    },
+    "GroupConfig": {
+        "searchPlaceholder": "Search group...",
+        "addGroup": "Add Group",
+        "loadFailed": "Failed to load groups",
+        "totalItems": "Total Items :",
+        "rowsPerPage": "Rows per page",
+        "loading": "Loading...",
+        "noData": "No results.",
+        "table": {
+            "groupName": "Group Name",
+            "control": "Control",
+            "addDevice": "Add Device",
+            "delete": "Delete"
+        },
+        "dialog": {
+            "title": "Add New Group",
+            "groupNameLabel": "Group Name",
+            "cancel": "Cancel",
+            "save": "Save",
+            "saving": "Saving...",
+            "required": "Group name is required",
+            "success": "Group added successfully",
+            "error": "Failed to add group"
+        },
+        "deleteDialog": {
+            "title": "Delete Group",
+            "description": "Are you sure you want to delete the group \"{name}\"? This action cannot be undone.",
+            "confirm": "Delete",
+            "cancel": "Cancel",
+            "deleting": "Deleting...",
+            "success": "Group deleted successfully",
+            "error": "Failed to delete group"
+        },
+        "addDeviceDialog": {
+            "title": "Add Device",
+            "description": "Select devices to add to the group.",
+            "searchPlaceholder": "Search devices...",
+            "table": {
+                "name": "Streetlight Name",
+                "imsi": "IMSI",
+                "gov": "Gov Name",
+                "lat": "Latitude",
+                "lng": "Longitude",
+                "actions": "Actions"
+            },
+            "saveSuccess": "Device saved successfully",
+            "saveError": "Failed to save device",
+            "saveCancelled": "Save cancelled",
+            "deleteSuccess": "Device deleted successfully",
+            "deleteError": "Failed to delete device",
+            "deleteCancelled": "Delete cancelled",
+            "close": "Close",
+            "noData": "No devices found"
+        }
     }
 }

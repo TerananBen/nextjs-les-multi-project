@@ -220,5 +220,60 @@
         "searchGroupPlaceholder": "ค้นหากลุ่ม...",
         "noGroupFound": "ไม่พบกลุ่ม",
         "loading": "กำลังโหลด..."
+    },
+    "GroupConfig": {
+        "searchPlaceholder": "ค้นหากลุ่ม...",
+        "addGroup": "เพิ่มกลุ่ม",
+        "loadFailed": "โหลดข้อมูลไม่สำเร็จ",
+        "totalItems": "รายการทั้งหมด :",
+        "rowsPerPage": "แถวต่อหน้า",
+        "loading": "กำลังโหลด...",
+        "noData": "ไม่พบข้อมูล",
+        "table": {
+            "groupName": "ชื่อกลุ่ม",
+            "control": "ควบคุม",
+            "addDevice": "เพิ่มอุปกรณ์",
+            "delete": "ลบ"
+        },
+        "dialog": {
+            "title": "เพิ่มกลุ่มใหม่",
+            "groupNameLabel": "ชื่อกลุ่ม",
+            "cancel": "ยกเลิก",
+            "save": "บันทึก",
+            "saving": "กำลังบันทึก...",
+            "required": "กรุณาระบุชื่อกลุ่ม",
+            "success": "เพิ่มกลุ่มสำเร็จ",
+            "error": "เพิ่มกลุ่มไม่สำเร็จ"
+        },
+        "deleteDialog": {
+            "title": "ลบกลุ่ม",
+            "description": "คุณแน่ใจหรือไม่ที่จะลบกลุ่ม \"{name}\"? การกระทำนี้ไม่สามารถย้อนกลับได้",
+            "confirm": "ลบ",
+            "cancel": "ยกเลิก",
+            "deleting": "กำลังลบ...",
+            "success": "ลบกลุ่มสำเร็จ",
+            "error": "ลบกลุ่มไม่สำเร็จ"
+        },
+        "addDeviceDialog": {
+            "title": "เพิ่มอุปกรณ์",
+            "description": "เลือกอุปกรณ์เพื่อเพิ่มเข้ากลุ่ม",
+            "searchPlaceholder": "ค้นหาอุปกรณ์...",
+            "table": {
+                "name": "ชื่อโคมไฟ",
+                "imsi": "IMSI",
+                "gov": "ครุภัณฑ์",
+                "lat": "ละติจูด",
+                "lng": "ลองจิจูด",
+                "actions": "การกระทำ"
+            },
+            "saveSuccess": "บันทึกข้อมูลสำเร็จ",
+            "saveError": "บันทึกข้อมูลไม่สำเร็จ",
+            "saveCancelled": "ยกเลิกการบันทึก",
+            "deleteSuccess": "ลบข้อมูลสำเร็จ",
+            "deleteError": "ลบข้อมูลไม่สำเร็จ",
+            "deleteCancelled": "ยกเลิกการลบ",
+            "close": "ปิด",
+            "noData": "ไม่พบข้อมูลอุปกรณ์"
+        }
     }
 }

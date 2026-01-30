@@ -37,12 +37,7 @@ export const useGroupConfigColumns = (onDeleteSuccess?: () => void) => {
         {
             id: "control",
             header: t("control"),
-            cell: ({ row }) => (
-                <Button variant="outline" size="sm" className="h-8">
-                    <Settings2 className="mr-2 h-4 w-4" />
-                    {t("control")}
-                </Button>
-            ),
+            cell: ({ row }) => <ControlGroupCell row={row.original} />,
         },
         {
             id: "addDevice",
@@ -145,7 +140,31 @@ function DeleteCell({ row, onSuccess }: DeleteCellProps) {
             </AlertDialogContent>
         </AlertDialog>
     )
+
 }
+
+import { ControlGroupDialog } from "./control-group-dialog"
+
+function ControlGroupCell({ row }: { row: GroupConfigData }) {
+    const t = useTranslations("GroupConfig.table")
+    const [open, setOpen] = useState(false)
+
+    return (
+        <>
+            <Button
+                variant="outline"
+                size="sm"
+                className="h-8"
+                onClick={() => setOpen(true)}
+            >
+                <Settings2 className="mr-2 h-4 w-4" />
+                {t("control")}
+            </Button>
+            <ControlGroupDialog open={open} onOpenChange={setOpen} group={row} />
+        </>
+    )
+}
+
 
 import { AddDeviceDialog } from "./add-device-dialog"
 import { AddDeviceCsvDialog } from "./add-device-csv-dialog"

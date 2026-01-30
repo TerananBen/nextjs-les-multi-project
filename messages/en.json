@@ -306,6 +306,38 @@
             "deleteCancelled": "Delete cancelled",
             "close": "Close",
             "noData": "No devices found"
+        },
+        "controlDialog": {
+            "title": "Control Group",
+            "description": "Control devices in the group.",
+            "searchPlaceholder": "Search devices...",
+            "brightness": "Brightness",
+            "on": "On",
+            "off": "Off",
+            "resend": "Resend Command",
+            "refresh": "Refresh Status",
+            "selectDeviceWarning": "Please select at least one device.",
+            "commandSent": "Command sent successfully",
+            "commandFailed": "Failed to send command",
+            "resendSuccess": "Resend command successfully",
+            "resendFailed": "Failed to resend command",
+            "resendError": "Error resending command",
+            "statusUpdated": "Status updated: {success} Success, {failed} Pending/Failed",
+            "checkStatus": "Check Command Status",
+            "fetchError": "Failed to fetch device list",
+            "selectedCount": "{count} devices selected",
+            "totalCount": "Total: {count}",
+            "noData": "No devices found",
+            "table": {
+                "name": "Name",
+                "imsi": "IMSI",
+                "asset": "Asset ID",
+                "lat": "Lat",
+                "lng": "Lng",
+                "lastWorkTime": "Last Work Time",
+                "status": "Status",
+                "cmdStatus": "Command Result"
+            }
         }
     }
 }

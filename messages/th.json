@@ -306,6 +306,38 @@
             "deleteCancelled": "ยกเลิกการลบ",
             "close": "ปิด",
             "noData": "ไม่พบข้อมูลอุปกรณ์"
+        },
+        "controlDialog": {
+            "title": "ควบคุมกลุ่ม",
+            "description": "ควบคุมอุปกรณ์ในกลุ่ม",
+            "searchPlaceholder": "ค้นหาอุปกรณ์...",
+            "brightness": "ความสว่าง",
+            "on": "เปิด",
+            "off": "ปิด",
+            "resend": "ส่งคำสั่งซ้ำ",
+            "refresh": "อรีเฟรชสถานะ",
+            "selectDeviceWarning": "กรุณาเลือกอุปกรณ์อย่างน้อย 1 รายการ",
+            "commandSent": "ส่งคำสั่งสำเร็จ",
+            "commandFailed": "ส่งคำสั่งไม่สำเร็จ",
+            "resendSuccess": "ส่งคำสั่งซ้ำสำเร็จ",
+            "resendFailed": "ส่งคำสั่งซ้ำไม่สำเร็จ",
+            "resendError": "เกิดข้อผิดพลาดในการส่งคำสั่งซ้ำ",
+            "statusUpdated": "อัปเดตสถานะ: สำเร็จ {success}, รอผล/ไม่สำเร็จ {failed}",
+            "checkStatus": "ตรวจสอบสถานะคำสั่ง",
+            "fetchError": "โหลดรายการอุปกรณ์ไม่สำเร็จ",
+            "selectedCount": "เลือก {count} รายการ",
+            "totalCount": "ทั้งหมด: {count}",
+            "noData": "ไม่พบรายการอุปกรณ์",
+            "table": {
+                "name": "ชื่อโคมไฟ",
+                "imsi": "IMSI",
+                "asset": "ครุภัณฑ์",
+                "lat": "ละติจูด",
+                "lng": "ลองจิจูด",
+                "lastWorkTime": "เวลาทำงานล่าสุด",
+                "status": "สถานะ",
+                "cmdStatus": "ผลการสั่งการ"
+            }
         }
     }
 }

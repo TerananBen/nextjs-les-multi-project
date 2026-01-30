@@ -57,3 +57,36 @@ export interface GetDataLatLongResponse {
     dateTime: string;
     dataReturn: LatLongData[];
 }
+
+export interface ControlGroupResponse {
+    result: boolean;
+    apiName: string;
+    dateTime: string;
+    dataReturn: string;
+}
+
+export interface ResendCommandResponse {
+    result: boolean;
+    apiName: string;
+    dateTime: string;
+    dataReturn: boolean;
+}
+
+export interface LatLongResponseControlData {
+    id: string | null;
+    imsi: string;
+    lat: string;
+    lng: string;
+    using_sensor: string | null;
+    last_power: string | null;
+    type_schedule: string | null;
+    gateway_id: string;
+    status: string; // "0" | "1"
+}
+
+export interface GetDataLatLongResponseControlResponse {
+    result: boolean;
+    apiName: string;
+    dateTime: string;
+    dataReturn: LatLongResponseControlData[];
+}

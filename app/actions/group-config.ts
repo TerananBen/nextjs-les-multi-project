@@ -1,7 +1,13 @@
 "use server"
 
 import { cookies } from "next/headers"
-import { GetListDataGroupAllResponse, GroupConfigData } from "@/types/group-config"
+import {
+    GetListDataGroupAllResponse,
+    GroupConfigData,
+    ControlGroupResponse,
+    ResendCommandResponse,
+    GetDataLatLongResponseControlResponse
+} from "@/types/group-config"
 
 const API_URL = process.env.API_URL
 
@@ -324,6 +330,155 @@ export async function addRtuToGroupAction(data: {
 
     } catch (error) {
         console.error("Error adding device to group:", error)
+        return { result: false, message: "Network error" }
+    }
+}
+
+export async function sendCommandMqttMultiGroupV2Action(data: {
+    group_code: string;
+    command_type: string;
+    dim_percent: string;
+}): Promise<{ result: boolean; dataReturn?: string; message?: string }> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) {
+        return { result: false, message: "Server configuration error" }
+    }
+
+    try {
+        const payload = {
+            type_open: "group",
+            group_code: JSON.stringify([data.group_code]),
+            command_type: data.command_type,
+            dim_percent: data.dim_percent
+        }
+
+        const response = await fetch(`${API_URL}/StreetLight/sendCommandMqttMultiGroupV2`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        })
+
+        const resData: ControlGroupResponse = await response.json()
+
+        if (response.ok && resData.result) {
+            return { result: true, dataReturn: resData.dataReturn }
+        }
+
+        return { result: false, message: "API failure" }
+    } catch (error) {
+        console.error("Error sending group command:", error)
+        return { result: false, message: "Network error" }
+    }
+}
+
+export async function sendCommandMqttMultiRtuV2Action(data: {
+    list_imsi: string[];
+    command_type: string;
+    dim_percent: string;
+}): Promise<{ result: boolean; dataReturn?: string; message?: string }> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) {
+        return { result: false, message: "Server configuration error" }
+    }
+
+    try {
+        const payload = {
+            type_open: "4",
+            list_imsi: JSON.stringify(data.list_imsi),
+            command_type: data.command_type,
+            dim_percent: data.dim_percent
+        }
+
+        const response = await fetch(`${API_URL}/StreetLight/sendCommandMqttMultiRtuV2`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        })
+
+        const resData: ControlGroupResponse = await response.json()
+
+        if (response.ok && resData.result) {
+            return { result: true, dataReturn: resData.dataReturn }
+        }
+
+        return { result: false, message: "API failure" }
+    } catch (error) {
+        console.error("Error sending RTU command:", error)
+        return { result: false, message: "Network error" }
+    }
+}
+
+export async function resendCommandOnOffAction(tokenStr: string): Promise<{ result: boolean; message?: string }> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) {
+        return { result: false, message: "Server configuration error" }
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLight/resendCommandOnOff`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ token: tokenStr })
+        })
+
+        const resData: ResendCommandResponse = await response.json()
+
+        if (response.ok && resData.result) {
+            return { result: true }
+        }
+
+        return { result: false, message: "API failure" }
+    } catch (error) {
+        console.error("Error resending command:", error)
+        return { result: false, message: "Network error" }
+    }
+}
+
+export async function getDataLatLongResponseControlAction(tokenStr: string, groupCode: string): Promise<{ result: boolean; dataReturn?: any[]; message?: string }> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) {
+        return { result: false, message: "Server configuration error" }
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLightSmartSolar/getDataLatLongResponseControl`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                token: tokenStr,
+                group_code: JSON.stringify([groupCode])
+            })
+        })
+
+        const resData: GetDataLatLongResponseControlResponse = await response.json()
+
+        if (response.ok && resData.result) {
+            return { result: true, dataReturn: resData.dataReturn }
+        }
+
+        return { result: false, message: "API failure" }
+    } catch (error) {
+        console.error("Error checking command status:", error)
         return { result: false, message: "Network error" }
     }
 }

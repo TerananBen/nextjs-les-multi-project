@@ -287,3 +287,45 @@ export async function deleteImsiGroupConfigAction(data: {
         return { result: false, message: "Network error" }
     }
 }
+
+export async function addRtuToGroupAction(data: {
+    group_code: string;
+    group_name: string;
+    imsi: string;
+}): Promise<{ result: boolean; message?: string }> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) {
+        return { result: false, message: "Server configuration error" }
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLight/addRtuToGroup`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+        })
+
+        if (!response.ok) {
+            return { result: false, message: `API error: ${response.status}` }
+        }
+
+        const resData = await response.json()
+
+        if (resData.result && resData.dataReturn === true) {
+            return { result: true }
+        }
+
+        return { result: false, message: "API returned failure" }
+
+    } catch (error) {
+        console.error("Error adding device to group:", error)
+        return { result: false, message: "Network error" }
+    }
+}
+
+

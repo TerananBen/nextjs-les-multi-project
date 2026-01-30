@@ -100,7 +100,7 @@ export function GroupConfigClient() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                         placeholder={t("searchPlaceholder")}
-                        className="pl-9 h-12 rounded-xl bg-white border-gray-200 shadow-sm"
+                        className="pl-9 h-9 rounded-lg bg-white border-gray-200 shadow-sm"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
@@ -109,7 +109,7 @@ export function GroupConfigClient() {
                 {/* Add Group Button */}
                 <Dialog open={isAddGroupOpen} onOpenChange={setIsAddGroupOpen}>
                     <DialogTrigger asChild>
-                        <Button className="h-12 rounded-xl px-6 bg-primary hover:bg-primary/90 text-white shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]">
+                        <Button className="h-9 rounded-lg px-4 bg-primary hover:bg-primary/90 text-white shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]">
                             <Plus className="mr-2 h-4 w-4" />
                             {t("addGroup")}
                         </Button>

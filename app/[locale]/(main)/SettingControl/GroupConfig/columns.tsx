@@ -9,7 +9,10 @@ import {
     Settings2,
     Plus,
     Trash2,
-    SquarePen
+    SquarePen,
+    FileSpreadsheet,
+    PenSquare,
+    Upload
 } from "lucide-react"
 
 export const useGroupConfigColumns = (onDeleteSuccess?: () => void) => {
@@ -45,6 +48,16 @@ export const useGroupConfigColumns = (onDeleteSuccess?: () => void) => {
             id: "addDevice",
             header: t("addDevice"),
             cell: ({ row }) => <AddDeviceCell row={row.original} />,
+        },
+        {
+            id: "addDeviceCsv",
+            header: t("addDeviceCsv"),
+            cell: ({ row }) => <AddDeviceCsvCell row={row.original} />,
+        },
+        {
+            id: "editDeviceCsv",
+            header: t("editDeviceCsv"),
+            cell: ({ row }) => <EditDeviceCsvCell row={row.original} />,
         },
         {
             id: "delete",
@@ -135,6 +148,7 @@ function DeleteCell({ row, onSuccess }: DeleteCellProps) {
 }
 
 import { AddDeviceDialog } from "./add-device-dialog"
+import { AddDeviceCsvDialog } from "./add-device-csv-dialog"
 
 function AddDeviceCell({ row }: { row: GroupConfigData }) {
     const t = useTranslations("GroupConfig.table")
@@ -153,5 +167,47 @@ function AddDeviceCell({ row }: { row: GroupConfigData }) {
             </Button>
             <AddDeviceDialog open={open} onOpenChange={setOpen} group={row} />
         </>
+    )
+}
+
+function AddDeviceCsvCell({ row }: { row: GroupConfigData }) {
+    const t = useTranslations("GroupConfig.table")
+    const [open, setOpen] = useState(false)
+
+    return (
+        <>
+            <Button
+                variant="outline"
+                size="sm"
+                className="h-8 text-green-600 border-green-200 hover:bg-green-50"
+                onClick={() => setOpen(true)}
+            >
+                <FileSpreadsheet className="mr-2 h-4 w-4" />
+                {t("addDeviceCsv")}
+            </Button>
+            <AddDeviceCsvDialog open={open} onOpenChange={setOpen} group={row} />
+        </>
+    )
+}
+
+import { EditDeviceCsvDialog } from "./edit-device-csv-dialog"
+
+function EditDeviceCsvCell({ row }: { row: GroupConfigData }) {
+    const t = useTranslations("GroupConfig.table")
+    const [open, setOpen] = useState(false)
+
+    return (
+        <div className="flex justify-center">
+            <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setOpen(true)}
+                className="h-8 w-8 text-orange-500 hover:text-orange-600 hover:bg-orange-100"
+                title={t("editDeviceCsv")}
+            >
+                <PenSquare className="h-4 w-4" />
+            </Button>
+            <EditDeviceCsvDialog open={open} onOpenChange={setOpen} group={row} />
+        </div>
     )
 }

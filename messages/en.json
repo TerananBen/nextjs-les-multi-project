@@ -233,6 +233,8 @@
             "groupName": "Group Name",
             "control": "Control",
             "addDevice": "Manage Devices",
+            "addDeviceCsv": "Add Device (CSV)",
+            "editDeviceCsv": "Edit Device (CSV)",
             "delete": "Delete"
         },
         "dialog": {
@@ -253,6 +255,36 @@
             "deleting": "Deleting...",
             "success": "Group deleted successfully",
             "error": "Failed to delete group"
+        },
+        "csvDialog": {
+            "title": "Add Devices via CSV",
+            "description": "Upload a CSV file containing Device IDs to add them to group: {groupName}",
+            "upload": "Upload",
+            "uploading": "Uploading...",
+            "success": "Devices added successfully",
+            "error": "Failed to add some devices",
+            "selectFile": "Select CSV File",
+            "totalFound": "Found {count} Device IDs",
+            "uploadSuccess": "Successfully added {count} devices",
+            "uploadPartial": "Added {success} devices, failed {failed}",
+            "cancel": "Cancel",
+            "noDeviceIdFound": "No valid Device ID found in the file",
+            "downloadTemplate": "Download Template"
+        },
+        "editCsvDialog": {
+            "title": "Edit Devices via CSV",
+            "description": "Upload a CSV file to update device info for group: {groupName}",
+            "upload": "Update",
+            "uploading": "Updating...",
+            "success": "Devices updated successfully",
+            "error": "Failed to update some devices",
+            "selectFile": "Select CSV File",
+            "totalFound": "Found {count} rows",
+            "uploadSuccess": "Successfully updated {count} devices",
+            "uploadPartial": "Updated {success} devices, failed {failed}",
+            "cancel": "Cancel",
+            "noDataFound": "No valid data found in the file",
+            "downloadTemplate": "Download Template"
         },
         "addDeviceDialog": {
             "title": "Manage Group Devices",

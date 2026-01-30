@@ -233,7 +233,9 @@
             "groupName": "ชื่อกลุ่ม",
             "control": "ควบคุม",
             "addDevice": "จัดการอุปกรณ์",
-            "delete": "ลบ"
+            "addDeviceCsv": "เพิ่มอุปกรณ์ (CSV)",
+            "editDeviceCsv": "แก้ไขอุปกรณ์ (CSV)",
+            "delete": "ลบกลุ่ม"
         },
         "dialog": {
             "title": "เพิ่มกลุ่มใหม่",
@@ -248,11 +250,41 @@
         "deleteDialog": {
             "title": "ลบกลุ่ม",
             "description": "คุณแน่ใจหรือไม่ที่จะลบกลุ่ม \"{name}\"? การกระทำนี้ไม่สามารถย้อนกลับได้",
-            "confirm": "ลบ",
+            "confirm": "ยืนยัน",
             "cancel": "ยกเลิก",
             "deleting": "กำลังลบ...",
             "success": "ลบกลุ่มสำเร็จ",
             "error": "ลบกลุ่มไม่สำเร็จ"
+        },
+        "csvDialog": {
+            "title": "เพิ่มอุปกรณ์ด้วยไฟล์ CSV",
+            "description": "อัปโหลดไฟล์ CSV ที่มี Device ID เพื่อเพิ่มเข้ากลุ่ม: {groupName}",
+            "upload": "อัปโหลด",
+            "uploading": "กำลังอัปโหลด...",
+            "success": "เพิ่มอุปกรณ์สำเร็จ",
+            "error": "เกิดข้อผิดพลาดในการเพิ่มอุปกรณ์บางรายการ",
+            "selectFile": "เลือกไฟล์ CSV",
+            "totalFound": "พบ {count} Device ID",
+            "uploadSuccess": "เพิ่มอุปกรณ์สำเร็จ {count} รายการ",
+            "uploadPartial": "สำเร็จ {success} รายการ, ล้มเหลว {failed} รายการ",
+            "cancel": "ยกเลิก",
+            "noDeviceIdFound": "ไม่พบ Device ID ในไฟล์",
+            "downloadTemplate": "ดาวน์โหลดไฟล์ตัวอย่าง"
+        },
+        "editCsvDialog": {
+            "title": "แก้ไขอุปกรณ์ด้วยไฟล์ CSV",
+            "description": "อัปโหลดไฟล์ CSV เพื่ออัปเดตข้อมูลอุปกรณ์ในกลุ่ม: {groupName}",
+            "upload": "อัปเดต",
+            "uploading": "กำลังอัปเดต...",
+            "success": "อัปเดตอุปกรณ์สำเร็จ",
+            "error": "เกิดข้อผิดพลาดในการอัปเดตอุปกรณ์บางรายการ",
+            "selectFile": "เลือกไฟล์ CSV",
+            "totalFound": "พบข้อมูล {count} รายการ",
+            "uploadSuccess": "อัปเดตอุปกรณ์สำเร็จ {count} รายการ",
+            "uploadPartial": "สำเร็จ {success} รายการ, ล้มเหลว {failed} รายการ",
+            "cancel": "ยกเลิก",
+            "noDataFound": "ไม่พบข้อมูลที่ถูกต้องในไฟล์",
+            "downloadTemplate": "ดาวน์โหลดไฟล์ตัวอย่าง"
         },
         "addDeviceDialog": {
             "title": "จัดการอุปกรณ์ในกลุ่ม",

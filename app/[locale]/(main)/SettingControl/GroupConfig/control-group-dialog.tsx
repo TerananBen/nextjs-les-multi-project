@@ -114,7 +114,7 @@ const DeviceRow = React.memo(({
     t: any
 }) => {
     return (
-        <TableRow key={item.imsi}>
+        <TableRow key={item.imsi} className="whitespace-nowrap">
             <TableCell>
                 <Checkbox
                     checked={isSelected}
@@ -365,7 +365,7 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="min-w-[70vw] max-w-[90vw] max-h-[90vh] flex flex-col">
+            <DialogContent className="w-full max-w-[95vw] sm:max-w-[90vw] h-[90vh] flex flex-col p-4 sm:p-6">
                 <DialogHeader>
                     <DialogTitle>{t("title")} - {group.group_name}</DialogTitle>
                     <DialogDescription>
@@ -374,30 +374,32 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                 </DialogHeader>
 
                 {/* Control Panel */}
-                <div className="flex flex-wrap items-center gap-4 p-4 border rounded-md bg-muted/20">
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">{t("brightness")}: {dimPercent}%</span>
-                        <Slider
-                            value={[dimPercent]}
-                            onValueChange={(vals) => setDimPercent(vals[0])}
-                            max={100}
-                            step={1}
-                            className="w-[150px]"
-                        />
-                        <Input
-                            type="number"
-                            min={0}
-                            max={100}
-                            value={dimPercent}
-                            onChange={(e) => {
-                                const val = parseInt(e.target.value)
-                                if (!isNaN(val) && val >= 0 && val <= 100) setDimPercent(val)
-                            }}
-                            className="w-[70px] h-8"
-                        />
+                <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4 p-4 border rounded-md bg-muted/20 overflow-x-auto">
+                    <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+                        <span className="text-sm font-medium whitespace-nowrap">{t("brightness")}: {dimPercent}%</span>
+                        <div className="flex items-center gap-2 flex-1 sm:flex-none justify-end">
+                            <Slider
+                                value={[dimPercent]}
+                                onValueChange={(vals) => setDimPercent(vals[0])}
+                                max={100}
+                                step={1}
+                                className="w-[100px] sm:w-[150px]"
+                            />
+                            <Input
+                                type="number"
+                                min={0}
+                                max={100}
+                                value={dimPercent}
+                                onChange={(e) => {
+                                    const val = parseInt(e.target.value)
+                                    if (!isNaN(val) && val >= 0 && val <= 100) setDimPercent(val)
+                                }}
+                                className="w-[60px] sm:w-[70px] h-8"
+                            />
+                        </div>
                     </div>
 
-                    <div className="w-px h-8 bg-border mx-2" />
+                    <div className="w-full sm:w-px h-px sm:h-8 bg-border hidden sm:block" />
 
                     <Button
                         onClick={() => handleSendCommand("1")}
@@ -439,13 +441,13 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                         </>
                     )}
 
-                    <div className="flex-1" />
+                    <div className="flex-1 sm:flex-none" />
 
-                    <div className="relative w-[200px]">
+                    <div className="relative w-full sm:w-[200px] mt-2 sm:mt-0">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder={t("searchPlaceholder")}
-                            className="pl-9 h-9"
+                            className="pl-9 h-9 w-full"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -454,7 +456,7 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                 </div>
 
                 {/* Device Table */}
-                <div className="flex-1 overflow-auto border rounded-md min-h-[300px]">
+                <div className="flex-1 overflow-auto border rounded-md min-h-0">
                     <Table>
                         <TableHeader className="bg-muted/50 sticky top-0 z-10">
                             <TableRow>

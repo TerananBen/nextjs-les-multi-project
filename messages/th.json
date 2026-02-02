@@ -345,5 +345,38 @@
                 "cmdStatus": "ผลการสั่งการ"
             }
         }
+    },
+    "MenuSettings": {
+        "menuName": "ชื่อเมนู",
+        "readable": "แสดงเมนู",
+        "writeable": "ตั้งค่า",
+        "control": "ควบคุม",
+        "totalMenu": "เมนูทั้งหมด :",
+        "rowsPerPage": "แถวต่อหน้า :",
+        "loading": "กำลังโหลด...",
+        "noData": "ไม่พบข้อมูล",
+        "searchPlaceholder": "ค้นหาด้วยชื่อเมนู",
+        "selectRole": "เลือกสิทธิ์การใช้งาน",
+        "fetchError": "โหลดข้อมูลเมนูไม่สำเร็จ",
+        "saveSuccess": "บันทึกการตั้งค่าสำเร็จ",
+        "saveError": "บันทึกการตั้งค่าไม่สำเร็จ",
+        "menuNames": {
+            "txt_list_name_V_AlertStreetLight": "การแจ้งเตือนความผิดปกติ",
+            "txt_list_name_V_Dashboard": "แสดงผลภาพรวม",
+            "txt_list_name_V_GroupConfig": "จัดกลุ่มการทํางาน",
+            "txt_list_name_V_GroupDashboard": "การใช้งานในโครงการ",
+            "txt_list_name_V_MaintenanceConfig": "แจ้งการซ่อมบำรุง",
+            "txt_list_name_V_MaintenanceDetail": "รายการซ่อมบำรุง",
+            "txt_list_name_V_MaintenanceDashboard": "ภาพรวมการดูแลรักษา",
+            "txt_list_name_V_MapDisconnect": "ตำแหน่งโคมขาดการติดต่อ",
+            "txt_list_name_V_MapGlobal": "ตำแหน่งโคมไฟ",
+            "txt_list_name_V_Personal": "เพิ่มบุคคล",
+            "txt_list_name_V_SettingMenu": "สิทธิ์การเข้าถึง",
+            "txt_list_name_V_MapChangeLamp": "รายการติดตั้ง",
+            "txt_list_name_V_SettingSchedule": "การทำงานล่วงหน้า",
+            "txt_list_name_V_StreetLight": "แบบรายโคม",
+            "txt_tb_menu_control": "ควบคุม",
+            "txt_list_name_V_SettingDevice": "ตั้งค่าอุปกรณ์"
+        }
     }
 }

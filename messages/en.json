@@ -345,5 +345,38 @@
                 "cmdStatus": "Command Result"
             }
         }
+    },
+    "MenuSettings": {
+        "menuName": "Menu Name",
+        "readable": "Readable",
+        "writeable": "Writeable",
+        "control": "Control",
+        "totalMenu": "Total Menu :",
+        "rowsPerPage": "Rows per page :",
+        "loading": "Loading...",
+        "noData": "No Data",
+        "searchPlaceholder": "Search by menu name",
+        "selectRole": "Select Role",
+        "fetchError": "Failed to fetch menu data",
+        "saveSuccess": "Settings updated successfully",
+        "saveError": "Failed to update settings",
+        "menuNames": {
+            "txt_list_name_V_AlertStreetLight": "Notification Setting",
+            "txt_list_name_V_Dashboard": "Devices & Energy",
+            "txt_list_name_V_GroupConfig": "Group Setting",
+            "txt_list_name_V_GroupDashboard": "System Status",
+            "txt_list_name_V_MaintenanceConfig": "Maintenance Config",
+            "txt_list_name_V_MaintenanceDashboard": "Maintenance Dashboard",
+            "txt_list_name_V_MaintenanceDetail": "Miantenance Detail",
+            "txt_list_name_V_MapDisconnect": "Lamp Failure Locations",
+            "txt_list_name_V_MapGlobal": "All Lamp Locations",
+            "txt_list_name_V_Personal": "Add New User",
+            "txt_list_name_V_SettingMenu": "User Access Control",
+            "txt_list_name_V_SettingSchedule": "Schedule Setting",
+            "txt_list_name_V_MapChangeLamp": "Install Lamp",
+            "txt_list_name_V_StreetLight": "Individual Setting",
+            "txt_list_name_V_SettingDevice": "Devices Setting",
+            "txt_tb_menu_control": "Control"
+        }
     }
 }

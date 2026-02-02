@@ -150,6 +150,64 @@
             "lampFailure": "โคมเสีย (จำนวน)"
         }
     },
+    "MapGlobal": {
+        "title": "แผนที่ภาพรวม",
+        "description": "ดูอุปกรณ์ทั้งหมดบนแผนที่",
+        "filters": {
+            "title": "ตัวกรอง",
+            "searchType": "ประเภทการค้นหา",
+            "searchValue": "ค่าที่ต้องการค้นหา",
+            "status": "สถานะ",
+            "group": "กลุ่ม",
+            "imsi": "เลขอุปกรณ์ (IMSI)",
+            "streetLightName": "ชื่อโคม",
+            "all": "ทั้งหมด",
+            "search": "ค้นหา",
+            "noResult": "ไม่พบข้อมูล"
+        },
+        "status": {
+            "all": "อุปกรณ์ทั้งหมด",
+            "normal": "ปกติ",
+            "powerFailure": "ระบบไฟฟ้าล้มเหลว/RTU ชำรุด",
+            "commFailure": "ระบบสื่อสารขัดข้อง",
+            "withGps": "มีสัญญาณ GPS",
+            "noGps": "ไม่มีสัญญาณ GPS"
+        }
+    },
+    "Dashboard": {
+        "filter": {
+            "searchLabel": "ค้นหา :",
+            "selectGroupPlaceholder": "-- เลือกกลุ่ม --",
+            "selectTypePlaceholder": "เลือกประเภท",
+            "types": {
+                "now": "ปัจจุบัน",
+                "day": "รายวัน",
+                "week": "รายสัปดาห์",
+                "month": "รายเดือน",
+                "quarter": "รายไตรมาส",
+                "year": "รายปี"
+            },
+            "searchButton": "ค้นหา",
+            "printButton": "พิมพ์"
+        },
+        "summary": {
+            "onlineTotal": "ออนไลน์/ทั้งหมด",
+            "lamp": "โคม",
+            "lampFailure": "โคมเสีย",
+            "onlineStatus": "สถานะออนไลน์",
+            "failureCount": "จำนวนที่เสีย",
+            "voltage": "แรงดันไฟฟ้า",
+            "volt": "โวลต์",
+            "averageVoltage": "แรงดันไฟฟ้าเฉลี่ย",
+            "energyConsumption": "การใช้พลังงาน",
+            "kwh": "กิโลวัตต์-ชั่วโมง",
+            "perMonth": "ต่อเดือน"
+        },
+        "charts": {
+            "energyConsumption": "การใช้พลังงาน (kWh)",
+            "lampFailure": "โคมเสีย (จำนวน)"
+        }
+    },
     "StreetLight": {
         "title": "ควบคุมโคมไฟถนน",
         "groupLabel": "กลุ่ม",

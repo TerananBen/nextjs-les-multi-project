@@ -150,6 +150,64 @@
             "lampFailure": "Lamp failure (unit)"
         }
     },
+    "MapGlobal": {
+        "title": "Global Map",
+        "description": "View all devices on the map",
+        "filters": {
+            "title": "Filters",
+            "searchType": "Search Type",
+            "searchValue": "Search Value",
+            "status": "Status",
+            "group": "Group",
+            "imsi": "Device ID (IMSI)",
+            "streetLightName": "Lamp Name",
+            "all": "All",
+            "search": "Search",
+            "noResult": "No results found"
+        },
+        "status": {
+            "all": "All Devices",
+            "normal": "Normal",
+            "powerFailure": "Power Failure/RTU Defect",
+            "commFailure": "Comm. Failure",
+            "withGps": "GPS Signal",
+            "noGps": "No GPS Signal"
+        }
+    },
+    "Dashboard": {
+        "filter": {
+            "searchLabel": "Search :",
+            "selectGroupPlaceholder": "-- Select Group --",
+            "selectTypePlaceholder": "Select Type",
+            "types": {
+                "now": "Now",
+                "day": "Day",
+                "week": "Week",
+                "month": "Monthly",
+                "quarter": "Quarter",
+                "year": "Year"
+            },
+            "searchButton": "Search",
+            "printButton": "Print"
+        },
+        "summary": {
+            "onlineTotal": "Online/Total",
+            "lamp": "Lamp",
+            "lampFailure": "Lamp failure",
+            "onlineStatus": "Online Status",
+            "failureCount": "Failure Count",
+            "voltage": "Voltage",
+            "volt": "Volt",
+            "averageVoltage": "Average Voltage",
+            "energyConsumption": "Energy Consumption",
+            "kwh": "kWh",
+            "perMonth": "Per Month"
+        },
+        "charts": {
+            "energyConsumption": "Energy consumption (kWh)",
+            "lampFailure": "Lamp failure (unit)"
+        }
+    },
     "StreetLight": {
         "title": "Street Light Control",
         "groupLabel": "Group",

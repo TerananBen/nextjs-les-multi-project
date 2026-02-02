@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { HistoryPowerDialog } from "./history-power-dialog"
+import { usePermission } from "@/components/providers/permission-provider"
 
 // --- Command Cell Component ---
 const CommandCell = ({
@@ -47,6 +48,11 @@ const CommandCell = ({
     imei: string
 }) => {
     const t = useTranslations("StreetLight.table")
+    const { getPermission } = usePermission()
+    // Assume StreetLight page
+    const permissions = getPermission("V_StreetLight")
+    const canControl = permissions.control
+
     const [open, setOpen] = React.useState(false)
     const [loading, setLoading] = React.useState(false)
 
@@ -90,9 +96,23 @@ const CommandCell = ({
 
     return (
         <div className="flex justify-center">
-            <Dialog open={open} onOpenChange={setOpen}>
+            <Dialog open={open} onOpenChange={(val) => {
+                if (canControl) setOpen(val)
+            }}>
                 <DialogTrigger asChild>
-                    <div className="flex w-[100px] h-[30px] rounded-full overflow-hidden shadow-sm hover:opacity-90 transition-opacity cursor-pointer">
+                    <div
+                        className={cn(
+                            "flex w-[100px] h-[30px] rounded-full overflow-hidden shadow-sm transition-opacity",
+                            canControl ? "hover:opacity-90 cursor-pointer" : "cursor-not-allowed opacity-50 grayscale"
+                        )}
+                        onClick={(e) => {
+                            if (!canControl) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                toast.error("Permission Denied");
+                            }
+                        }}
+                    >
                         {/* Percentage Side */}
                         <div className={cn(
                             "flex-1 flex items-center justify-center text-xs font-bold text-white",
@@ -313,6 +333,10 @@ export const useStreetLightColumns = () => {
                 )
             },
             cell: ({ row }) => {
+                const { getPermission } = usePermission();
+                const permissions = getPermission("V_StreetLight");
+                const canControl = permissions.control;
+
                 const [power, setPower] = React.useState(row.original.lastPower || "0");
                 const [loading, setLoading] = React.useState(false);
 
@@ -327,8 +351,6 @@ export const useStreetLightColumns = () => {
                         }
 
                         // Call Server Action
-                        // Dynamically imported to avoid Client Module errors if action not fully ready? 
-                        // No, import at top.
                         const result = await refreshStreetLightPowerAction(gatewayId, imei);
 
                         if (result.success) {
@@ -353,9 +375,13 @@ export const useStreetLightColumns = () => {
                         <Button
                             variant="default"
                             size="icon"
-                            className="h-8 w-8 bg-blue-500 hover:bg-blue-600 rounded-lg cursor-pointer"
+                            className={cn(
+                                "h-8 w-8 rounded-lg",
+                                canControl ? "bg-blue-500 hover:bg-blue-600 cursor-pointer" : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            )}
                             onClick={handleRefresh}
-                            disabled={loading}
+                            disabled={loading || !canControl}
+                            title={!canControl ? "Permission Denied" : "Refresh Power"}
                         >
                             <RefreshCcw className={cn("h-4 w-4 text-white", loading && "animate-spin")} />
                         </Button>
@@ -379,6 +405,17 @@ export const useStreetLightColumns = () => {
             cell: ({ row }) => {
                 const imei = row.original.imeI_Name
                 const deviceName = row.original.streetLightName
+                const { getPermission } = usePermission();
+                const canRead = getPermission("V_StreetLight").readable;
+
+                if (!canRead) {
+                    return (
+                        <div className="flex justify-center text-muted-foreground text-xs cursor-not-allowed">
+                            -
+                        </div>
+                    )
+                }
+
                 return (
                     <div className="flex justify-center">
                         <HistoryPowerDialog imei={imei} deviceName={deviceName} />

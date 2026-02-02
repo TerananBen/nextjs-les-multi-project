@@ -5,6 +5,7 @@ import {
     SidebarProvider,
 } from "@/components/ui/sidebar"
 import { getAuthorizedMenu } from "@/app/actions/auth"
+import { PermissionProvider } from "@/components/providers/permission-provider"
 
 export default async function MainLayout({
     children,
@@ -23,14 +24,16 @@ export default async function MainLayout({
             }
         >
             <AppSidebar variant="inset" menuItems={menuItems} />
-            <SidebarInset>
-                <SiteHeader />
-                <div className="flex flex-1 flex-col">
-                    <div className="@container/main flex flex-1 flex-col gap-2">
-                        {children}
+            <PermissionProvider initialPermissions={menuItems}>
+                <SidebarInset>
+                    <SiteHeader />
+                    <div className="flex flex-1 flex-col">
+                        <div className="@container/main flex flex-1 flex-col gap-2">
+                            {children}
+                        </div>
                     </div>
-                </div>
-            </SidebarInset>
+                </SidebarInset>
+            </PermissionProvider>
         </SidebarProvider>
     )
 }

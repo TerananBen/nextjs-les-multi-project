@@ -6,7 +6,8 @@ import {
     GroupConfigData,
     ControlGroupResponse,
     ResendCommandResponse,
-    GetDataLatLongResponseControlResponse
+    GetDataLatLongResponseControlResponse,
+    GetListDataIMSIAllResponse
 } from "@/types/group-config"
 
 const API_URL = process.env.API_URL
@@ -482,5 +483,40 @@ export async function getDataLatLongResponseControlAction(tokenStr: string, grou
         return { result: false, message: "Network error" }
     }
 }
+
+export async function getListDataIMSIAllAction(): Promise<string[]> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) {
+        return []
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLight/getListDataIMSIAll`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({})
+        })
+
+        if (!response.ok) {
+            console.error(`API error: ${response.status} ${response.statusText}`)
+            return []
+        }
+
+        const data: GetListDataIMSIAllResponse = await response.json()
+        if (data.result && Array.isArray(data.dataReturn)) {
+            return data.dataReturn
+        }
+        return []
+    } catch (error) {
+        console.error("Error fetching IMSI list:", error)
+        return []
+    }
+}
+
 
 

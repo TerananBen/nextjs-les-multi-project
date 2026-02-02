@@ -21,10 +21,24 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, Loader2, Search, Trash2, Save, Check } from "lucide-react"
+import { ChevronLeft, ChevronRight, Loader2, Search, Trash2, Save, Check, Plus, ChevronsUpDown } from "lucide-react"
 import { ConfirmButton } from "@/components/ui/confirm-button"
-import { configLatLongLampAndPoleAction, deleteImsiGroupConfigAction } from "@/app/actions/group-config"
+import { configLatLongLampAndPoleAction, deleteImsiGroupConfigAction, getListDataIMSIAllAction, addRtuToGroupAction } from "@/app/actions/group-config"
 import { toast } from "sonner"
+import {
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+} from "@/components/ui/command"
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 
 // ... imports
 
@@ -45,6 +59,12 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
     const [loading, setLoading] = React.useState(false)
     const [searchQuery, setSearchQuery] = React.useState("")
 
+    // Add Device State
+    const [availableImsis, setAvailableImsis] = React.useState<string[]>([])
+    const [selectedImsi, setSelectedImsi] = React.useState("")
+    const [isAddDeviceOpen, setIsAddDeviceOpen] = React.useState(false)
+    const [isAddingDevice, setIsAddingDevice] = React.useState(false)
+
     // Pagination State
     const [currentPage, setCurrentPage] = React.useState(1)
     const pageSize = 10
@@ -54,11 +74,14 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
             const fetchData = async () => {
                 setLoading(true)
                 try {
-                    // Fetch both group details and location data
-                    const [groupDetails, latLongData] = await Promise.all([
+                    // Fetch group details, location data, and all IMSIs
+                    const [groupDetails, latLongData, allImsis] = await Promise.all([
                         getListDataGroupDetailAction(group.group_name),
-                        getDataLatLongAction(group.group_name)
+                        getDataLatLongAction(group.group_name),
+                        getListDataIMSIAllAction()
                     ])
+
+                    if (allImsis) setAvailableImsis(allImsis)
 
                     if (groupDetails) {
                         // Merge location data into group details
@@ -160,6 +183,53 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
         }
     }
 
+    const handleAddDevice = async () => {
+        if (!selectedImsi) return
+
+        setIsAddingDevice(true)
+        try {
+            const result = await addRtuToGroupAction({
+                group_code: group.group_code,
+                group_name: group.group_name,
+                imsi: selectedImsi
+            })
+
+            if (result.result) {
+                toast.success(t("addSuccess", { defaultValue: "Device added successfully" }))
+
+                // Refresh data
+                setLoading(true)
+                const [groupDetails, latLongData] = await Promise.all([
+                    getListDataGroupDetailAction(group.group_name),
+                    getDataLatLongAction(group.group_name)
+                ])
+
+                if (groupDetails) {
+                    const mergedData: GroupDetailWithLocation[] = groupDetails.map(item => {
+                        const location = latLongData?.find(l => l.imsi === item.imsi)
+                        return {
+                            ...item,
+                            lat: location?.lat || "-",
+                            lng: location?.lng || "-"
+                        }
+                    })
+                    setData(mergedData)
+                }
+
+                setIsAddDeviceOpen(false)
+                setSelectedImsi("")
+            } else {
+                toast.error(result.message || t("addError", { defaultValue: "Failed to add device" }))
+            }
+        } catch (error) {
+            console.error("Failed to add device", error)
+            toast.error(t("addError", { defaultValue: "Failed to add device" }))
+        } finally {
+            setIsAddingDevice(false)
+            setLoading(false)
+        }
+    }
+
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="min-w-[40vw] max-w-[90vw] max-h-[80vh] flex flex-col">
@@ -170,14 +240,60 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="relative w-full">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        placeholder={t("searchPlaceholder")}
-                        className="pl-9"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
+                <div className="flex items-center gap-4 w-full">
+                    <div className="relative flex-1">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder={t("searchPlaceholder")}
+                            className="pl-9"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+
+                    <Popover open={isAddDeviceOpen} onOpenChange={setIsAddDeviceOpen}>
+                        <PopoverTrigger asChild>
+                            <Button variant="outline" role="combobox" aria-expanded={isAddDeviceOpen} className="justify-between">
+                                {selectedImsi
+                                    ? selectedImsi
+                                    : t("selectDevice", { defaultValue: "Select Device" })}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[300px] p-0">
+                            <Command>
+                                <CommandInput placeholder={t("searchDevice", { defaultValue: "Search IMSI..." })} />
+                                <CommandList>
+                                    <CommandEmpty>{t("noDeviceFound", { defaultValue: "No device found." })}</CommandEmpty>
+                                    <CommandGroup>
+                                        {availableImsis.map((imsi) => (
+                                            <CommandItem
+                                                key={imsi}
+                                                value={imsi}
+                                                onSelect={(currentValue) => {
+                                                    setSelectedImsi(currentValue === selectedImsi ? "" : currentValue)
+                                                    setIsAddDeviceOpen(false)
+                                                }}
+                                            >
+                                                <Check
+                                                    className={cn(
+                                                        "mr-2 h-4 w-4",
+                                                        selectedImsi === imsi ? "opacity-100" : "opacity-0"
+                                                    )}
+                                                />
+                                                {imsi}
+                                            </CommandItem>
+                                        ))}
+                                    </CommandGroup>
+                                </CommandList>
+                            </Command>
+                        </PopoverContent>
+                    </Popover>
+                    <Button onClick={handleAddDevice} disabled={!selectedImsi || isAddingDevice}>
+                        {isAddingDevice && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        <Plus className="mr-2 h-4 w-4" />
+                        {t("add", { defaultValue: "Add" })}
+                    </Button>
                 </div>
 
                 <div className="flex-1 overflow-auto border rounded-md min-h-[300px]">

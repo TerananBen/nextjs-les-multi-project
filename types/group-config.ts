@@ -90,3 +90,10 @@ export interface GetDataLatLongResponseControlResponse {
     dateTime: string;
     dataReturn: LatLongResponseControlData[];
 }
+
+export interface GetListDataIMSIAllResponse {
+    result: boolean;
+    apiName: string;
+    dateTime: string;
+    dataReturn: string[];
+}

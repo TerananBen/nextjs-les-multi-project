@@ -305,7 +305,13 @@
             "deleteError": "ลบข้อมูลไม่สำเร็จ",
             "deleteCancelled": "ยกเลิกการลบ",
             "close": "ปิด",
-            "noData": "ไม่พบข้อมูลอุปกรณ์"
+            "noData": "ไม่พบข้อมูลอุปกรณ์",
+            "selectDevice": "เลือกอุปกรณ์",
+            "searchDevice": "ค้นหา IMSI...",
+            "noDeviceFound": "ไม่พบอุปกรณ์",
+            "add": "เพิ่ม",
+            "addSuccess": "เพิ่มอุปกรณ์สำเร็จ",
+            "addError": "เพิ่มอุปกรณ์ไม่สำเร็จ"
         },
         "controlDialog": {
             "title": "ควบคุมกลุ่ม",

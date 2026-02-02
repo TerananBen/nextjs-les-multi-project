@@ -305,7 +305,13 @@
             "deleteError": "Failed to delete device",
             "deleteCancelled": "Delete cancelled",
             "close": "Close",
-            "noData": "No devices found"
+            "noData": "No devices found",
+            "selectDevice": "Select Device",
+            "searchDevice": "Search IMSI...",
+            "noDeviceFound": "No device found.",
+            "add": "Add",
+            "addSuccess": "Device added successfully",
+            "addError": "Failed to add device"
         },
         "controlDialog": {
             "title": "Control Group",

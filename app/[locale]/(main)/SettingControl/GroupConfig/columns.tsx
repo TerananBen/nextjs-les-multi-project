@@ -80,6 +80,9 @@ import { toast } from "sonner"
 import { useState } from "react"
 import { Loader2 } from "lucide-react"
 
+import { usePermission } from "@/components/providers/permission-provider"
+import { cn } from "@/lib/utils"
+
 interface DeleteCellProps {
     row: GroupConfigData
     onSuccess?: () => void
@@ -87,6 +90,9 @@ interface DeleteCellProps {
 
 function DeleteCell({ row, onSuccess }: DeleteCellProps) {
     const t = useTranslations("GroupConfig.deleteDialog")
+    const { getPermission } = usePermission()
+    const { writable: canDelete } = getPermission("V_GroupConfig")
+
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
 
@@ -110,11 +116,37 @@ function DeleteCell({ row, onSuccess }: DeleteCellProps) {
     }
 
     return (
-        <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialog open={open} onOpenChange={(val) => {
+            if (canDelete) setOpen(val)
+        }}>
             <AlertDialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-red-500 hover:text-red-600 hover:bg-red-50">
-                    <Trash2 className="h-4 w-4" />
-                </Button>
+                <div
+                    className={cn(
+                        "inline-flex",
+                        !canDelete && "cursor-not-allowed"
+                    )}
+                    onClick={(e) => {
+                        if (!canDelete) {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            toast.error("Permission Denied")
+                        }
+                    }}
+                >
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className={cn(
+                            "h-8 w-8",
+                            canDelete
+                                ? "text-red-500 hover:text-red-600 hover:bg-red-50"
+                                : "text-gray-400 cursor-not-allowed hover:bg-transparent"
+                        )}
+                        disabled={!canDelete}
+                    >
+                        <Trash2 className="h-4 w-4" />
+                    </Button>
+                </div>
             </AlertDialogTrigger>
             <AlertDialogContent>
                 <AlertDialogHeader>
@@ -147,6 +179,8 @@ import { ControlGroupDialog } from "./control-group-dialog"
 
 function ControlGroupCell({ row }: { row: GroupConfigData }) {
     const t = useTranslations("GroupConfig.table")
+    const { getPermission } = usePermission()
+    const { control: canControl } = getPermission("V_GroupConfig")
     const [open, setOpen] = useState(false)
 
     return (
@@ -154,8 +188,15 @@ function ControlGroupCell({ row }: { row: GroupConfigData }) {
             <Button
                 variant="outline"
                 size="sm"
-                className="h-8"
-                onClick={() => setOpen(true)}
+                className={cn(
+                    "h-8",
+                    canControl ? "" : "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
+                )}
+                onClick={() => {
+                    if (canControl) setOpen(true)
+                    else toast.error("Permission Denied")
+                }}
+                disabled={!canControl}
             >
                 <Settings2 className="mr-2 h-4 w-4" />
                 {t("control")}
@@ -171,6 +212,9 @@ import { AddDeviceCsvDialog } from "./add-device-csv-dialog"
 
 function AddDeviceCell({ row }: { row: GroupConfigData }) {
     const t = useTranslations("GroupConfig.table")
+    const { getPermission } = usePermission()
+    // Managing devices is configuration -> Writable
+    const { writable: canManage } = getPermission("V_GroupConfig")
     const [open, setOpen] = useState(false)
 
     return (
@@ -178,8 +222,17 @@ function AddDeviceCell({ row }: { row: GroupConfigData }) {
             <Button
                 variant="outline"
                 size="sm"
-                className="h-8 text-blue-600 border-blue-200 hover:bg-blue-50"
-                onClick={() => setOpen(true)}
+                className={cn(
+                    "h-8",
+                    canManage
+                        ? "text-blue-600 border-blue-200 hover:bg-blue-50"
+                        : "text-gray-400 border-gray-200 bg-gray-100 cursor-not-allowed"
+                )}
+                onClick={() => {
+                    if (canManage) setOpen(true)
+                    else toast.error("Permission Denied")
+                }}
+                disabled={!canManage}
             >
                 <SquarePen className="mr-2 h-4 w-4" />
                 {t("addDevice")}
@@ -191,6 +244,8 @@ function AddDeviceCell({ row }: { row: GroupConfigData }) {
 
 function AddDeviceCsvCell({ row }: { row: GroupConfigData }) {
     const t = useTranslations("GroupConfig.table")
+    const { getPermission } = usePermission()
+    const { writable: canManage } = getPermission("V_GroupConfig")
     const [open, setOpen] = useState(false)
 
     return (
@@ -198,8 +253,17 @@ function AddDeviceCsvCell({ row }: { row: GroupConfigData }) {
             <Button
                 variant="outline"
                 size="sm"
-                className="h-8 text-green-600 border-green-200 hover:bg-green-50"
-                onClick={() => setOpen(true)}
+                className={cn(
+                    "h-8",
+                    canManage
+                        ? "text-green-600 border-green-200 hover:bg-green-50"
+                        : "text-gray-400 border-gray-200 bg-gray-100 cursor-not-allowed"
+                )}
+                onClick={() => {
+                    if (canManage) setOpen(true)
+                    else toast.error("Permission Denied")
+                }}
+                disabled={!canManage}
             >
                 <FileSpreadsheet className="mr-2 h-4 w-4" />
                 {t("addDeviceCsv")}
@@ -213,6 +277,8 @@ import { EditDeviceCsvDialog } from "./edit-device-csv-dialog"
 
 function EditDeviceCsvCell({ row }: { row: GroupConfigData }) {
     const t = useTranslations("GroupConfig.table")
+    const { getPermission } = usePermission()
+    const { writable: canManage } = getPermission("V_GroupConfig")
     const [open, setOpen] = useState(false)
 
     return (
@@ -220,8 +286,17 @@ function EditDeviceCsvCell({ row }: { row: GroupConfigData }) {
             <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setOpen(true)}
-                className="h-8 w-8 text-orange-500 hover:text-orange-600 hover:bg-orange-100"
+                onClick={() => {
+                    if (canManage) setOpen(true)
+                    else toast.error("Permission Denied")
+                }}
+                className={cn(
+                    "h-8 w-8",
+                    canManage
+                        ? "text-orange-500 hover:text-orange-600 hover:bg-orange-100"
+                        : "text-gray-400 bg-transparent cursor-not-allowed hover:bg-transparent"
+                )}
+                disabled={!canManage}
                 title={t("editDeviceCsv")}
             >
                 <PenSquare className="h-4 w-4" />

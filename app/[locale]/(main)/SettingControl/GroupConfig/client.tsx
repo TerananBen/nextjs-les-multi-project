@@ -20,9 +20,14 @@ import {
     DialogClose,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import { usePermission } from "@/components/providers/permission-provider"
+import { cn } from "@/lib/utils"
 
 export function GroupConfigClient() {
     const t = useTranslations("GroupConfig")
+    const { getPermission } = usePermission()
+    // User requested: Add/Edit/Delete -> Writable
+    const { writable: canAdd } = getPermission("V_GroupConfig")
 
     // State
     const [data, setData] = React.useState<GroupConfigData[]>([])
@@ -107,12 +112,36 @@ export function GroupConfigClient() {
                 </div>
 
                 {/* Add Group Button */}
-                <Dialog open={isAddGroupOpen} onOpenChange={setIsAddGroupOpen}>
+                <Dialog open={isAddGroupOpen} onOpenChange={(val) => {
+                    if (canAdd) setIsAddGroupOpen(val)
+                }}>
                     <DialogTrigger asChild>
-                        <Button className="h-9 rounded-lg px-4 bg-primary hover:bg-primary/90 text-white shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]">
-                            <Plus className="mr-2 h-4 w-4" />
-                            {t("addGroup")}
-                        </Button>
+                        <div
+                            className={cn(
+                                "inline-flex",
+                                !canAdd && "cursor-not-allowed"
+                            )}
+                            onClick={(e) => {
+                                if (!canAdd) {
+                                    e.preventDefault()
+                                    e.stopPropagation()
+                                    toast.error("Permission Denied")
+                                }
+                            }}
+                        >
+                            <Button
+                                className={cn(
+                                    "h-9 rounded-lg px-4 shadow-sm transition-all",
+                                    canAdd
+                                        ? "bg-primary hover:bg-primary/90 text-white hover:scale-[1.02] active:scale-[0.98]"
+                                        : "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300"
+                                )}
+                                disabled={!canAdd}
+                            >
+                                <Plus className="mr-2 h-4 w-4" />
+                                {t("addGroup")}
+                            </Button>
+                        </div>
                     </DialogTrigger>
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>

@@ -53,14 +53,16 @@ export const useMenuSettingsColumns = (
             header: t("writeable"),
             cell: ({ row }) => {
                 const isChecked = row.original.writeable === "1"
+                const isReadable = row.original.readable === "1"
                 return (
                     <div className="flex items-center">
                         <Switch
                             checked={isChecked}
+                            disabled={!isReadable}
                             onCheckedChange={(checked) => {
                                 onToggle(row.original, 'writeable', checked ? "1" : "0")
                             }}
-                            className="data-[state=checked]:bg-green-500 cursor-pointer"
+                            className={`${isReadable ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'} data-[state=checked]:bg-green-500`}
                         />
                     </div>
                 )
@@ -71,14 +73,16 @@ export const useMenuSettingsColumns = (
             header: t("control"),
             cell: ({ row }) => {
                 const isChecked = row.original.control === "1"
+                const isReadable = row.original.readable === "1"
                 return (
                     <div className="flex items-center">
                         <Switch
                             checked={isChecked}
+                            disabled={!isReadable}
                             onCheckedChange={(checked) => {
                                 onToggle(row.original, 'control', checked ? "1" : "0")
                             }}
-                            className="data-[state=checked]:bg-green-500 cursor-pointer"
+                            className={`${isReadable ? 'cursor-pointer' : 'cursor-not-allowed opacity-50'} data-[state=checked]:bg-green-500`}
                         />
                     </div>
                 )

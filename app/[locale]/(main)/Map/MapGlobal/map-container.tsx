@@ -62,11 +62,21 @@ function getMarkerConfig(device: LatLongData, t: any): { color: MarkerColor, bad
     }
 }
 
-function getDeviceMode(device: LatLongData): string {
+function getDeviceMode(device: LatLongData, t: any): string {
     if (device.using_sensor && device.using_sensor.toLowerCase() === "false") {
-        return "Manual";
+        return t("legend.manual");
     }
-    return device.type_schedule || "Auto";
+    return device.type_schedule || t("legend.auto");
+}
+
+function formatServiceData(text: string, t: any): string {
+    if (!text) return "-";
+    // Replace known Thai keywords with localized versions
+    let formatted = text;
+    formatted = formatted.replace(/เปิด/g, t("serviceStatus.on"));
+    formatted = formatted.replace(/ปิด/g, t("serviceStatus.off"));
+    formatted = formatted.replace(/สว่าง/g, t("serviceStatus.brightness"));
+    return formatted;
 }
 
 function isValidGPS(lat: string, lng: string): boolean {
@@ -180,11 +190,11 @@ function GoogleMapComponent({ devices }: { devices: LatLongData[] }) {
                                 <p><strong>{t("popup.group")}</strong> {detail.group_name || "-"}</p>
                                 <p><strong>{t("popup.imsi")}</strong> {detail.imsi}</p>
                                 <p><strong>{t("popup.lastUpdate")}</strong> {detail.last_update}</p>
-                                <p><strong>{t("popup.lastCommand")}</strong> {detail.last_command || "-"}</p>
-                                <p><strong>{t("popup.lastStatus")}</strong> {detail.last_status}</p>
+                                <p><strong>{t("popup.lastCommand")}</strong> {formatServiceData(detail.last_command, t)}</p>
+                                <p><strong>{t("popup.lastStatus")}</strong> {formatServiceData(detail.last_status, t)}</p>
                                 <p><strong>{t("popup.govName")}</strong> {detail.number_gov || "-"}</p>
                                 <p><strong>{t("popup.name")}</strong> {detail.street_light_name || "-"}</p>
-                                <p><strong>{t("popup.mode")}</strong> {getDeviceMode(selectedDevice)}</p>
+                                <p><strong>{t("popup.mode")}</strong> {getDeviceMode(selectedDevice, t)}</p>
                                 <p><strong>{t("popup.status")}</strong> {getMarkerConfig(selectedDevice, t).statusText}</p>
                             </>
                         ) : (
@@ -245,18 +255,17 @@ function LeafletMapComponent({ offlineUrl, devices }: { offlineUrl?: string, dev
                 try {
                     const detail = await getDataDetailIMSIAction(device.imsi);
                     if (detail) {
-                        // Note: We use the *device* object from the loop for Mode check, or detail?
-                        // User requested checking "api {{URL}}/StreetLight/getDataLatLong" which is what `devices` comes from (LatLongData).
-                        // So we use `device` (LatLongData) for getDeviceMode() check as requested.
-                        const modeText = getDeviceMode(device);
+                        const modeText = getDeviceMode(device, t);
+                        const commandText = formatServiceData(detail.last_command, t);
+                        const statusText = formatServiceData(detail.last_status, t);
 
                         marker.setPopupContent(`
                             <div class="p-2 space-y-1 text-sm font-sans min-w-[200px]">
                                 <p><strong>${t("popup.group")}</strong> ${detail.group_name || "-"}</p>
                                 <p><strong>${t("popup.imsi")}</strong> ${detail.imsi}</p>
                                 <p><strong>${t("popup.lastUpdate")}</strong> ${detail.last_update}</p>
-                                <p><strong>${t("popup.lastCommand")}</strong> ${detail.last_command || "-"}</p>
-                                <p><strong>${t("popup.lastStatus")}</strong> ${detail.last_status}</p>
+                                <p><strong>${t("popup.lastCommand")}</strong> ${commandText}</p>
+                                <p><strong>${t("popup.lastStatus")}</strong> ${statusText}</p>
                                 <p><strong>${t("popup.govName")}</strong> ${detail.number_gov || "-"}</p>
                                 <p><strong>${t("popup.name")}</strong> ${detail.street_light_name || "-"}</p>
                                 <p><strong>${t("popup.mode")}</strong> ${modeText}</p>

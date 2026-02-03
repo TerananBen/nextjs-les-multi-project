@@ -186,6 +186,11 @@
             "govName": "Gov Name:",
             "mode": "Mode:"
         },
+        "serviceStatus": {
+            "on": "On",
+            "off": "Off",
+            "brightness": "Brightness"
+        },
         "legend": {
             "title": "The meaning of different colors",
             "auto": "On/Off by itself (Auto)",

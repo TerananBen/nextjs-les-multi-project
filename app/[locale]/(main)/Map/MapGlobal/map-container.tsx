@@ -145,7 +145,7 @@ function GoogleMapComponent({ devices }: { devices: LatLongData[] }) {
     const onZoomChanged = useCallback(() => {
         if (!map) return;
         const z = map.getZoom();
-        if (z) setZoom(z); // Update state to trigger re-render of markers with new size
+        if (z) setZoom(z);
     }, [map])
 
     const onUnmount = useCallback((map: google.maps.Map) => setMap(null), [])
@@ -181,29 +181,74 @@ function GoogleMapComponent({ devices }: { devices: LatLongData[] }) {
                 )
             })}
             {selectedDevice && (
-                <InfoWindow position={{ lat: parseFloat(selectedDevice.lat), lng: parseFloat(selectedDevice.lng) }} onCloseClick={() => setSelectedDevice(null)}>
-                    <div className="p-2 space-y-1 text-sm text-black min-w-[250px]">
+                <InfoWindow
+                    position={{ lat: parseFloat(selectedDevice.lat), lng: parseFloat(selectedDevice.lng) }}
+                    onCloseClick={() => setSelectedDevice(null)}
+                >
+                    <div className="text-base text-black min-w-[300px] font-sans">
                         {loadingDetail ? (
-                            <div className="flex items-center justify-center py-4"><Loader2 className="animate-spin h-5 w-5" /></div>
+                            <div className="flex flex-col items-center justify-center py-6 gap-2">
+                                <Loader2 className="animate-spin h-6 w-6 text-primary" />
+                                <span className="text-sm text-muted-foreground">{t("loading")}</span>
+                            </div>
                         ) : detail ? (
-                            <>
-                                <p><strong>{t("popup.group")}</strong> {detail.group_name || "-"}</p>
-                                <p><strong>{t("popup.imsi")}</strong> {detail.imsi}</p>
-                                <p><strong>{t("popup.lastUpdate")}</strong> {detail.last_update}</p>
-                                <p><strong>{t("popup.lastCommand")}</strong> {formatServiceData(detail.last_command, t)}</p>
-                                <p><strong>{t("popup.lastStatus")}</strong> {formatServiceData(detail.last_status, t)}</p>
-                                <p><strong>{t("popup.govName")}</strong> {detail.number_gov || "-"}</p>
-                                <p><strong>{t("popup.name")}</strong> {detail.street_light_name || "-"}</p>
-                                <p><strong>{t("popup.mode")}</strong> {getDeviceMode(selectedDevice, t)}</p>
-                                <p><strong>{t("popup.status")}</strong> {getMarkerConfig(selectedDevice, t).statusText}</p>
-                            </>
+                            <div className="flex flex-col gap-3">
+                                {/* Header: Pole Name & IMSI */}
+                                <div className="border-b pb-2">
+                                    <h3 className="font-bold text-xl text-primary leading-tight">
+                                        {detail.street_light_name || t("popup.name")}
+                                    </h3>
+                                    <p className="text-sm text-muted-foreground mt-0.5">
+                                        {t("popup.imsi")} {detail.imsi}
+                                    </p>
+                                </div>
+
+                                {/* Main Info Grid */}
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                                    <div className="flex flex-col">
+                                        <span className="text-muted-foreground font-medium">{t("popup.group")}</span>
+                                        <span className="truncate">{detail.group_name || "-"}</span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-muted-foreground font-medium">{t("popup.govName")}</span>
+                                        <span className="truncate">{detail.number_gov || "-"}</span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-muted-foreground font-medium">{t("popup.mode")}</span>
+                                        <span className={getDeviceMode(selectedDevice, t) === t("legend.manual") ? "text-orange-600 font-semibold" : "text-green-600 font-semibold"}>
+                                            {getDeviceMode(selectedDevice, t)}
+                                        </span>
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className="text-muted-foreground font-medium">{t("popup.status")}</span>
+                                        <span className="font-medium">{getMarkerConfig(selectedDevice, t).statusText}</span>
+                                    </div>
+                                </div>
+
+                                {/* Status & Command Section */}
+                                <div className="bg-slate-50 p-2 rounded-md border text-sm space-y-1.5">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-muted-foreground">{t("popup.lastCommand")}:</span>
+                                        <span className="font-medium text-right">{formatServiceData(detail.last_command, t)}</span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-muted-foreground">{t("popup.lastStatus")}:</span>
+                                        <span className="font-medium text-right">{formatServiceData(detail.last_status, t)}</span>
+                                    </div>
+                                </div>
+
+                                {/* Footer: Last Update */}
+                                <div className="text-xs text-gray-400 text-right pt-1 border-t mt-1">
+                                    {t("popup.lastUpdate")} {detail.last_update}
+                                </div>
+                            </div>
                         ) : (
-                            // Fallback if detail fetch fails
-                            <>
-                                <p><strong>{t("popup.name")}</strong> {selectedDevice.name_pole || selectedDevice.street_light_name || "N/A"}</p>
-                                <p><strong>{t("popup.imsi")}</strong> {selectedDevice.imsi}</p>
-                                <p className="text-red-500 text-xs">Failed to load details.</p>
-                            </>
+                            // Fallback
+                            <div className="space-y-2">
+                                <h3 className="font-bold text-lg">{selectedDevice.name_pole || selectedDevice.street_light_name || "N/A"}</h3>
+                                <p className="text-sm text-gray-500">{t("popup.imsi")} {selectedDevice.imsi}</p>
+                                <p className="text-red-500 text-sm">Failed to load detailed data.</p>
+                            </div>
                         )}
                     </div>
                 </InfoWindow>
@@ -249,7 +294,7 @@ function LeafletMapComponent({ offlineUrl, devices }: { offlineUrl?: string, dev
 
             const marker = L.marker([parseFloat(device.lat), parseFloat(device.lng)], { icon: markerIcon })
                 .addTo(map)
-                .bindPopup(`<div class="p-4 flex items-center justify-center"><div class="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div></div>`);
+                .bindPopup(`<div class="p-4 flex items-center justify-center"><div class="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 text-primary"></div></div>`);
 
             marker.on('popupopen', async () => {
                 try {
@@ -258,25 +303,59 @@ function LeafletMapComponent({ offlineUrl, devices }: { offlineUrl?: string, dev
                         const modeText = getDeviceMode(device, t);
                         const commandText = formatServiceData(detail.last_command, t);
                         const statusText = formatServiceData(detail.last_status, t);
+                        const isManual = modeText === t("legend.manual");
 
                         marker.setPopupContent(`
-                            <div class="p-2 space-y-1 text-sm font-sans min-w-[200px]">
-                                <p><strong>${t("popup.group")}</strong> ${detail.group_name || "-"}</p>
-                                <p><strong>${t("popup.imsi")}</strong> ${detail.imsi}</p>
-                                <p><strong>${t("popup.lastUpdate")}</strong> ${detail.last_update}</p>
-                                <p><strong>${t("popup.lastCommand")}</strong> ${commandText}</p>
-                                <p><strong>${t("popup.lastStatus")}</strong> ${statusText}</p>
-                                <p><strong>${t("popup.govName")}</strong> ${detail.number_gov || "-"}</p>
-                                <p><strong>${t("popup.name")}</strong> ${detail.street_light_name || "-"}</p>
-                                <p><strong>${t("popup.mode")}</strong> ${modeText}</p>
-                                <p><strong>${t("popup.status")}</strong> ${config.statusText}</p>
+                            <div class="font-sans min-w-[300px] text-gray-800 text-base">
+                                <div class="border-b pb-2 mb-3">
+                                    <h3 class="font-bold text-xl text-primary leading-tight m-0">
+                                        ${detail.street_light_name || t("popup.name")}
+                                    </h3>
+                                    <p class="text-sm text-gray-500 mt-1 m-0">
+                                        ${t("popup.imsi")} ${detail.imsi}
+                                    </p>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mb-3">
+                                    <div class="flex flex-col">
+                                        <span class="text-gray-500 font-medium">${t("popup.group")}</span>
+                                        <span class="truncate block w-full whitespace-nowrap overflow-hidden text-ellipsis">${detail.group_name || "-"}</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-gray-500 font-medium">${t("popup.govName")}</span>
+                                        <span class="truncate block w-full whitespace-nowrap overflow-hidden text-ellipsis">${detail.number_gov || "-"}</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-gray-500 font-medium">${t("popup.mode")}</span>
+                                        <span class="${isManual ? 'text-orange-600' : 'text-green-600'} font-semibold">${modeText}</span>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-gray-500 font-medium">${t("popup.status")}</span>
+                                        <span class="font-medium">${config.statusText}</span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-slate-50 p-2 rounded-md border border-gray-200 text-sm space-y-1.5 mb-2">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-500">${t("popup.lastCommand")}:</span>
+                                        <span class="font-medium text-right">${commandText}</span>
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-500">${t("popup.lastStatus")}:</span>
+                                        <span class="font-medium text-right">${statusText}</span>
+                                    </div>
+                                </div>
+
+                                <div class="text-xs text-gray-400 text-right pt-2 border-t border-gray-100">
+                                    ${t("popup.lastUpdate")} ${detail.last_update}
+                                </div>
                             </div>
                          `)
                     } else {
-                        marker.setPopupContent(`<div class="p-2 text-red-500">Failed to load data</div>`)
+                        marker.setPopupContent(`<div class="p-2 text-red-500 text-sm">Failed to load data</div>`)
                     }
                 } catch (e) {
-                    marker.setPopupContent(`<div class="p-2 text-red-500">Error loading data</div>`)
+                    marker.setPopupContent(`<div class="p-2 text-red-500 text-sm">Error loading data</div>`)
                 }
             })
 

@@ -9,6 +9,7 @@ import { LatLongData } from "@/app/actions/map-actions"
 import { GoogleMap, useJsApiLoader, Marker as GoogleMarker, InfoWindow } from "@react-google-maps/api"
 import { Loader2 } from "lucide-react"
 import { getLeafletIconUrl, getGoogleMapsIconHtml, MarkerColor, MarkerBadge } from "@/lib/map-icons"
+import { useTranslations } from "next-intl"
 
 // Environment Defaults
 const DEFAULT_LAT = parseFloat(process.env.NEXT_PUBLIC_LAT_PROJECT || "13.736717")
@@ -34,7 +35,7 @@ interface MapProps {
 }
 
 // Helpers
-function getMarkerConfig(device: LatLongData): { color: MarkerColor, badge: MarkerBadge, statusText: string } {
+function getMarkerConfig(device: LatLongData, t: any): { color: MarkerColor, badge: MarkerBadge, statusText: string } {
     const status = device.status;
     const isAuto = device.type_schedule !== "manual" && device.using_sensor.toLowerCase() !== "false";
     const power = parseInt(device.last_power || "0");
@@ -43,19 +44,21 @@ function getMarkerConfig(device: LatLongData): { color: MarkerColor, badge: Mark
     switch (status) {
         case "0":
         case "2":
-            return { color: 'gray', badge: isAuto ? 'A' : 'M', statusText: isAuto ? 'OFF (Auto)' : 'OFF (Manual)' };
         case "1":
-            return { color: 'green', badge: isAuto ? 'A' : 'M', statusText: isAuto ? 'ON (Auto)' : 'ON (Manual)' };
+            return {
+                color: status === "1" ? 'green' : 'gray',
+                badge: isAuto ? 'A' : 'M',
+                statusText: isAuto ? t("legend.auto") : t("legend.manual")
+            };
         case "3":
-            return { color: isPowerAbnormal ? 'green' : 'gray', badge: '⚡', statusText: 'Abnormal Power' };
+            return { color: isPowerAbnormal ? 'green' : 'gray', badge: '⚡', statusText: t("legend.abnormal") };
         case "4":
-            return { color: 'red', badge: null, statusText: 'Power/RTU Failure' };
+            return { color: 'red', badge: null, statusText: t("legend.failure") };
         case "5":
-            return { color: 'blue', badge: 'A', statusText: 'Comm. Failure' };
         case "6":
-            return { color: 'blue', badge: 'A', statusText: 'Comm. Failure' };
+            return { color: 'blue', badge: 'A', statusText: t("legend.disconnect") };
         default:
-            return { color: 'gray', badge: null, statusText: 'Unknown' };
+            return { color: 'gray', badge: null, statusText: "Unknown" };
     }
 }
 
@@ -85,6 +88,7 @@ const containerStyle = { width: '100%', height: '100%' };
 const centerDefault = { lat: DEFAULT_LAT, lng: DEFAULT_LNG };
 
 function GoogleMapComponent({ devices }: { devices: LatLongData[] }) {
+    const t = useTranslations("MapGlobal");
     const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || "", language: "th" })
     const [map, setMap] = useState<google.maps.Map | null>(null)
     const [zoom, setZoom] = useState(DEFAULT_ZOOM)
@@ -118,7 +122,7 @@ function GoogleMapComponent({ devices }: { devices: LatLongData[] }) {
         >
             {devices.map((device, idx) => {
                 if (!isValidGPS(device.lat, device.lng)) return null;
-                const config = getMarkerConfig(device);
+                const config = getMarkerConfig(device, t);
                 return (
                     <GoogleMarker
                         key={`${device.id}-${idx}`}
@@ -135,11 +139,11 @@ function GoogleMapComponent({ devices }: { devices: LatLongData[] }) {
             {selectedDevice && (
                 <InfoWindow position={{ lat: parseFloat(selectedDevice.lat), lng: parseFloat(selectedDevice.lng) }} onCloseClick={() => setSelectedDevice(null)}>
                     <div className="p-2 space-y-1 text-sm text-black">
-                        <p><strong>Name:</strong> {selectedDevice.name_pole || selectedDevice.street_light_name || "N/A"}</p>
-                        <p><strong>IMSI:</strong> {selectedDevice.imsi}</p>
-                        <p><strong>Group:</strong> {selectedDevice.group_name || "N/A"}</p>
-                        <p><strong>Status:</strong> {getMarkerConfig(selectedDevice).statusText}</p>
-                        {!isValidGPS(selectedDevice.lat, selectedDevice.lng) && <p className="text-red-500 text-xs">(Invalid GPS)</p>}
+                        <p><strong>{t("popup.name")}</strong> {selectedDevice.name_pole || selectedDevice.street_light_name || "N/A"}</p>
+                        <p><strong>{t("popup.imsi")}</strong> {selectedDevice.imsi}</p>
+                        <p><strong>{t("popup.group")}</strong> {selectedDevice.group_name || "N/A"}</p>
+                        <p><strong>{t("popup.status")}</strong> {getMarkerConfig(selectedDevice, t).statusText}</p>
+                        {!isValidGPS(selectedDevice.lat, selectedDevice.lng) && <p className="text-red-500 text-xs">{t("popup.invalidGps")}</p>}
                     </div>
                 </InfoWindow>
             )}
@@ -148,6 +152,7 @@ function GoogleMapComponent({ devices }: { devices: LatLongData[] }) {
 }
 
 function LeafletMapComponent({ offlineUrl, devices }: { offlineUrl?: string, devices: LatLongData[] }) {
+    const t = useTranslations("MapGlobal");
     const containerRef = useRef<HTMLDivElement>(null)
     const mapInstanceRef = useRef<L.Map | null>(null)
     const markersRef = useRef<L.Marker[]>([])
@@ -171,14 +176,6 @@ function LeafletMapComponent({ offlineUrl, devices }: { offlineUrl?: string, dev
         const map = mapInstanceRef.current
         if (!map) return
 
-        // Ideally we shouldn't remove/add all markers just for resizing, 
-        // but for < 1000 markers this is fast enough. 
-        // Optimization: Iterate markersRef and calling setIcon() is better.
-
-        // Let's try the efficient update approach if markersRef is populated and devices didn't change (only zoom)
-        // Complexity: matching markers directly to devices. 
-
-        // Simpler approach: Re-render all. Leaflet handles DOM well.
         markersRef.current.forEach(marker => marker.remove())
         markersRef.current = []
 
@@ -186,21 +183,21 @@ function LeafletMapComponent({ offlineUrl, devices }: { offlineUrl?: string, dev
 
         devices.forEach(device => {
             if (!isValidGPS(device.lat, device.lng)) return;
-            const config = getMarkerConfig(device);
+            const config = getMarkerConfig(device, t);
             const markerIcon = customIconLeaflet(config.color, config.badge, iconSize);
             const marker = L.marker([parseFloat(device.lat), parseFloat(device.lng)], { icon: markerIcon })
                 .bindPopup(`
                     <div class="p-2 space-y-1 text-sm font-sans">
-                        <p><strong>Name:</strong> ${device.name_pole || device.street_light_name || "N/A"}</p>
-                        <p><strong>IMSI:</strong> ${device.imsi}</p>
-                        <p><strong>Group:</strong> ${device.group_name || "N/A"}</p>
-                        <p><strong>Status:</strong> ${config.statusText}</p>
+                        <p><strong>${t("popup.name")}</strong> ${device.name_pole || device.street_light_name || "N/A"}</p>
+                        <p><strong>${t("popup.imsi")}</strong> ${device.imsi}</p>
+                        <p><strong>${t("popup.group")}</strong> ${device.group_name || "N/A"}</p>
+                        <p><strong>${t("popup.status")}</strong> ${config.statusText}</p>
                     </div>
                 `)
                 .addTo(map)
             markersRef.current.push(marker)
         })
-    }, [devices, currentZoom])
+    }, [devices, currentZoom, t])
 
     return <div ref={containerRef} className="h-full w-full" style={{ zIndex: 0 }} />
 }
@@ -223,9 +220,10 @@ export default function MapContainerComponent({ mode, onlineUrl, offlineUrl, dev
 }
 
 function MapLegend() {
+    const t = useTranslations("MapGlobal");
     return (
         <div className="absolute bottom-6 left-2 bg-white/95 text-black p-3 rounded-md shadow-lg border text-xs z-[1000] max-w-[320px]">
-            <h4 className="font-bold mb-2 text-gray-700">The meaning of different colors</h4>
+            <h4 className="font-bold mb-2 text-gray-700">{t("legend.title")}</h4>
             <div className="space-y-2 max-h-[200px] overflow-y-auto">
                 {/* Auto Mode: Green (On) | Gray (Off) */}
                 <LegendItem
@@ -233,7 +231,7 @@ function MapLegend() {
                         { color: "green", badge: "A" },
                         { color: "gray", badge: "A" }
                     ]}
-                    text="On/Off by itself (Auto)"
+                    text={t("legend.auto")}
                 />
 
                 {/* Manual Mode: Green (On) | Gray (Off) */}
@@ -242,13 +240,13 @@ function MapLegend() {
                         { color: "green", badge: "M" },
                         { color: "gray", badge: "M" }
                     ]}
-                    text="On/Off (Manual)"
+                    text={t("legend.manual")}
                 />
 
                 {/* Comm Fail (Blue A) */}
                 <LegendItem
                     icons={[{ color: "blue", badge: "A" }]}
-                    text="Disconnected (Comm Fail)"
+                    text={t("legend.disconnect")}
                 />
 
                 {/* Abnormal Power: Green Bolt | Gray Bolt */}
@@ -257,13 +255,13 @@ function MapLegend() {
                         { color: "green", badge: "⚡" },
                         { color: "gray", badge: "⚡" }
                     ]}
-                    text="Abnormal Power Value"
+                    text={t("legend.abnormal")}
                 />
 
                 {/* Failure: Red */}
                 <LegendItem
                     icons={[{ color: "red", badge: null }]}
-                    text="Power/RTU Failure"
+                    text={t("legend.failure")}
                 />
             </div>
         </div>

@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect, useCallback } from "react"
 import dynamic from "next/dynamic"
 import FilterSidebar from "./filter-sidebar"
@@ -11,6 +10,7 @@ import {
     LatLongData
 } from "@/app/actions/map-actions"
 import { Loader2 } from "lucide-react"
+import { useTranslations } from "next-intl"
 
 // Dynamic import for MapContainer to avoid SSR issues with Leaflet
 const MapContainerComponent = dynamic(() => import("./map-container"), {
@@ -19,6 +19,7 @@ const MapContainerComponent = dynamic(() => import("./map-container"), {
 })
 
 export default function MapGlobalClient() {
+    const t = useTranslations("MapGlobal")
     const [searchType, setSearchType] = useState<"group" | "imsi" | "street_light_name">("group")
     const [searchValue, setSearchValue] = useState<string>("ALL")
     const [statusFilter, setStatusFilter] = useState<string>("all")
@@ -111,7 +112,7 @@ export default function MapGlobalClient() {
                     <div className="absolute inset-0 bg-background/50 backdrop-blur-sm z-[1000] flex items-center justify-center">
                         <div className="bg-background p-4 rounded-lg shadow-lg flex items-center gap-2">
                             <Loader2 className="h-6 w-6 animate-spin text-primary" />
-                            <span className="font-medium">Loading Data...</span>
+                            <span className="font-medium">{t("loading")}</span>
                         </div>
                     </div>
                 )}

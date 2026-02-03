@@ -153,6 +153,7 @@
     "MapGlobal": {
         "title": "Global Map",
         "description": "View all devices on the map",
+        "loading": "Loading Data...",
         "filters": {
             "title": "Filters",
             "searchType": "Search Type",
@@ -172,6 +173,21 @@
             "commFailure": "Comm. Failure",
             "withGps": "GPS Signal",
             "noGps": "No GPS Signal"
+        },
+        "popup": {
+            "name": "Name:",
+            "imsi": "IMSI:",
+            "group": "Group:",
+            "status": "Status:",
+            "invalidGps": "(Invalid GPS)"
+        },
+        "legend": {
+            "title": "The meaning of different colors",
+            "auto": "On/Off by itself (Auto)",
+            "manual": "On/Off (Manual)",
+            "disconnect": "Disconnected (Comm Fail)",
+            "abnormal": "Abnormal Power Value",
+            "failure": "Power/RTU Failure"
         }
     },
     "Dashboard": {

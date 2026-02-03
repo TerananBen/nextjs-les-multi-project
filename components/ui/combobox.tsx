@@ -89,7 +89,7 @@ export function ComboboxInput({ placeholder, className }: { placeholder?: string
                 aria-expanded={context.open}
                 className={cn("w-full justify-between h-12", className)}
             >
-                {context.value || placeholder || "Select..."}
+                <span className="truncate">{context.value || placeholder || "Select..."}</span>
                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
             </Button>
         </PopoverTrigger>

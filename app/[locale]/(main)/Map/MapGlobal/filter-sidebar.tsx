@@ -1,13 +1,11 @@
 "use client"
 
 import { useTranslations } from "next-intl"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { LatLongData } from "@/app/actions/map-actions"
 import { useMemo } from "react"
-import { Search } from "lucide-react"
+import { Search, Filter, Hash, MapPin, Activity, Zap, WifiOff, Map as MapIcon, Globe, ShieldAlert } from "lucide-react"
 import {
     Combobox,
     ComboboxContent,
@@ -16,6 +14,8 @@ import {
     ComboboxItem,
     ComboboxList,
 } from "@/components/ui/combobox"
+import { Separator } from "@/components/ui/separator"
+import { Card } from "@/components/ui/card"
 
 interface FilterSidebarProps {
     searchType: "group" | "imsi" | "street_light_name"
@@ -53,113 +53,173 @@ export default function FilterSidebar({
         return { total, normal, powerFail, commFail, withGps, noGps }
     }, [devices])
 
-    // Helper to find label for Combobox display if needed, but ComboboxInput handles basic display
-    // or we pass it? The customized ComboboxInput displays context.value.
-    // If we want to show "All" instead of "ALL", we might need to handle render logic inside ComboboxInput or pass child?
-    // The current ComboboxInput implementation displays {context.value || placeholder}.
-    // If value is "ALL", it displays "ALL". Ideally we want to display t("filters.all") if value is "ALL".
-    // But ComboboxInput is generic. 
-    // Let's rely on standard behavior for now.
-
-    const getDisplayValue = () => {
-        if (searchValue === "ALL" || !searchValue) return t("filters.all")
-        const found = dataOptions.find((opt: any) => {
-            const val = typeof opt === 'string' ? opt : opt.groupName
-            return val === searchValue
-        })
-        if (found) return typeof found === 'string' ? found : found.groupName
-        return searchValue
+    // Icons mapping for visual cues
+    const getTypeIcon = () => {
+        switch (searchType) {
+            case "group": return <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
+            case "imsi": return <Hash className="h-4 w-4 mr-2 text-muted-foreground" />
+            case "street_light_name": return <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
+            default: return <Search className="h-4 w-4 mr-2 text-muted-foreground" />
+        }
     }
 
     return (
-        <div className="flex flex-col gap-2 w-full relative z-10 p-2 pb-0">
-            {/* Filter Bar Row */}
-            <div className="flex flex-col xl:flex-row gap-2 justify-between items-start xl:items-center w-full">
+        <div className="flex flex-col gap-3 w-full relative z-10 px-0 pb-0">
+            {/* Main Filter Toolbar */}
+            <Card className="p-2 shadow-sm border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+                <div className="flex flex-col xl:flex-row gap-3 justify-between items-start xl:items-center w-full">
 
-                {/* Left Side: Type & Search Value */}
-                <div className="flex flex-col md:flex-row gap-2 w-full xl:w-auto flex-1">
-                    {/* Search Type */}
-                    <div className="w-full md:w-[160px]">
-                        <Select value={searchType} onValueChange={(val: any) => setSearchType(val)}>
-                            <SelectTrigger className="h-10 rounded-xl bg-white border-gray-200 shadow-sm text-sm">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="z-[9999]">
-                                <SelectItem value="group">{t("filters.group")}</SelectItem>
-                                <SelectItem value="imsi">{t("filters.imsi")}</SelectItem>
-                                <SelectItem value="street_light_name">{t("filters.streetLightName")}</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
+                    {/* Search Section */}
+                    <div className="flex flex-col md:flex-row gap-4 w-full xl:w-auto flex-1 items-stretch md:items-center">
 
-                    {/* Search Input / Value Selector - Converted to Combobox */}
-                    <div className="flex-1 w-full relative z-[50]">
-                        <Combobox value={searchValue} onValueChange={setSearchValue}>
-                            <ComboboxInput
-                                placeholder={t("filters.all")}
-                                className="h-10 rounded-xl bg-white border-gray-200 shadow-sm text-sm w-full font-normal"
-                            />
-                            <ComboboxContent className="z-[9999]" searchPlaceholder={t("filters.search")}>
-                                <ComboboxEmpty>{t("filters.noResult")}</ComboboxEmpty>
-                                <ComboboxList>
-                                    <ComboboxItem value="ALL">
-                                        {t("filters.all")}
-                                    </ComboboxItem>
-                                    {dataOptions.map((opt: any, idx) => {
-                                        const val = typeof opt === 'string' ? opt : opt.groupName
-                                        const label = typeof opt === 'string' ? opt : opt.groupName
-                                        return (
-                                            <ComboboxItem key={idx} value={val}>
-                                                {label}
+                        {/* Search Criteria Group */}
+                        <div className="flex flex-col md:flex-row w-full md:flex-1 gap-2 items-center bg-muted/30 p-1 rounded-xl">
+                            {/* Type Selector */}
+                            <div className="w-[140px] md:w-[160px] shrink-0">
+                                <Select value={searchType} onValueChange={(val: any) => setSearchType(val)}>
+                                    <SelectTrigger className="h-10 border-0 bg-transparent shadow-none focus:ring-0 text-sm font-medium">
+                                        <div className="flex items-center">
+                                            <SelectValue />
+                                        </div>
+                                    </SelectTrigger>
+                                    <SelectContent className="z-[9999]">
+                                        <SelectItem value="group"><div className="flex items-center"><Filter className="mr-2 h-4 w-4 opacity-70" />{t("filters.group")}</div></SelectItem>
+                                        <SelectItem value="imsi"><div className="flex items-center"><Hash className="mr-2 h-4 w-4 opacity-70" />{t("filters.imsi")}</div></SelectItem>
+                                        <SelectItem value="street_light_name"><div className="flex items-center"><MapPin className="mr-2 h-4 w-4 opacity-70" />{t("filters.streetLightName")}</div></SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <Separator orientation="vertical" className="h-6 hidden md:block" />
+
+                            {/* Search Input (Combobox) */}
+                            <div className="w-full md:w-auto flex-1 min-w-0 relative z-[50]">
+                                <Combobox value={searchValue} onValueChange={setSearchValue}>
+                                    <ComboboxInput
+                                        placeholder={t("filters.all")}
+                                        className="h-10 border-0 bg-transparent shadow-none focus:ring-0 text-sm w-full font-normal px-2"
+                                    />
+                                    <ComboboxContent className="z-[9999]" searchPlaceholder={t("filters.search")}>
+                                        <ComboboxEmpty>{t("filters.noResult")}</ComboboxEmpty>
+                                        <ComboboxList>
+                                            <ComboboxItem value="ALL">
+                                                <span className="font-medium text-primary">{t("filters.all")}</span>
                                             </ComboboxItem>
-                                        )
-                                    })}
-                                </ComboboxList>
-                            </ComboboxContent>
-                        </Combobox>
-                    </div>
+                                            {dataOptions.map((opt: any, idx) => {
+                                                const val = typeof opt === 'string' ? opt : opt.groupName
+                                                const label = typeof opt === 'string' ? opt : opt.groupName
+                                                return (
+                                                    <ComboboxItem key={idx} value={val}>
+                                                        {label}
+                                                    </ComboboxItem>
+                                                )
+                                            })}
+                                        </ComboboxList>
+                                    </ComboboxContent>
+                                </Combobox>
+                            </div>
+                        </div>
 
-                    {/* Status Filter */}
-                    <div className="w-full md:w-[150px]">
-                        <Select value={statusFilter} onValueChange={setStatusFilter}>
-                            <SelectTrigger className="h-10 rounded-xl bg-white border-gray-200 shadow-sm text-sm">
-                                <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent className="z-[9999]">
-                                <SelectItem value="all">{t("status.all")}</SelectItem>
-                                <SelectItem value="3">{t("status.normal")}</SelectItem>
-                                <SelectItem value="4">{t("status.powerFailure")}</SelectItem>
-                                <SelectItem value="5">{t("status.commFailure")}</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
+                        {/* Status Filter */}
+                        <div className="w-full md:w-[240px]">
+                            <Select value={statusFilter} onValueChange={setStatusFilter}>
+                                <SelectTrigger className="h-12 md:h-12 w-full rounded-xl bg-white dark:bg-muted border-gray-200 dark:border-border shadow-sm text-sm">
+                                    <div className="flex items-center">
+                                        <Activity className="h-4 w-2 mr-2 text-muted-foreground" />
+                                        <SelectValue />
+                                    </div>
+                                </SelectTrigger>
+                                <SelectContent className="z-[9999]">
+                                    <SelectItem value="all">{t("status.all")}</SelectItem>
+                                    <SelectItem value="3">{t("status.normal")}</SelectItem>
+                                    <SelectItem value="4">{t("status.powerFailure")}</SelectItem>
+                                    <SelectItem value="5">{t("status.commFailure")}</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
 
-                    <Button onClick={onSearch} className="h-10 rounded-xl px-4 text-sm">
-                        <Search className="mr-2 h-4 w-4" />
-                        {t("filters.search")}
-                    </Button>
+                        {/* Search Button */}
+                        <Button onClick={onSearch} className="h-10 w-full md:w-14 rounded-xl p-0 ml-0 md:ml-4 shadow-md transition-all hover:shadow-lg hover:scale-[1.02] shrink-0">
+                            <Search className="h-5 w-5" />
+                        </Button>
+                    </div>
                 </div>
-            </div>
 
-            {/* Status Chips Row */}
-            <div className="flex flex-wrap gap-2 items-center">
-                <StatusChip label={t("status.all")} count={counts.total} color="bg-primary/10 text-primary border-primary/20" />
-                <StatusChip label={t("status.normal")} count={counts.normal} color="bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800" />
-                <StatusChip label={t("status.powerFailure")} count={counts.powerFail} color="bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800" />
-                <StatusChip label={t("status.commFailure")} count={counts.commFail} color="bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800" />
-                <div className="mx-1 w-px bg-border h-8 hidden xl:block" />
-                <StatusChip label={t("status.withGps")} count={counts.withGps} color="bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800" />
-                <StatusChip label={t("status.noGps")} count={counts.noGps} color="bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700" />
-            </div>
+                <Separator className="my-2 bg-border/50" />
+
+                {/* Status Summary & Chips - Designed as Stats Bar */}
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:flex lg:flex-wrap gap-2 items-stretch">
+                    {/* Main Stats */}
+                    <StatusBadge
+                        label={t("status.all")}
+                        count={counts.total}
+                        icon={<Globe className="h-3.5 w-3.5" />}
+                        className="bg-background border-border text-foreground hover:bg-muted/50"
+                    />
+                    <StatusBadge
+                        label={t("status.normal")}
+                        count={counts.normal}
+                        icon={<Zap className="h-3.5 w-3.5" />}
+                        className="bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800"
+                    />
+                    <StatusBadge
+                        label={t("status.powerFailure")}
+                        count={counts.powerFail}
+                        icon={<ShieldAlert className="h-3.5 w-3.5" />}
+                        className="bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800"
+                    />
+                    <StatusBadge
+                        label={t("status.commFailure")}
+                        count={counts.commFail}
+                        icon={<WifiOff className="h-3.5 w-3.5" />}
+                        className="bg-orange-50 text-orange-700 border-orange-200 dark:bg-orange-900/20 dark:text-orange-400 dark:border-orange-800"
+                    />
+
+                    <div className="hidden lg:block w-px bg-border/60 mx-1 h-8 self-center" />
+
+                    {/* GPS Stats */}
+                    <StatusBadge
+                        label={t("status.withGps")}
+                        count={counts.withGps}
+                        icon={<MapIcon className="h-3.5 w-3.5" />}
+                        className="bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800"
+                    />
+                    <StatusBadge
+                        label={t("status.noGps")}
+                        count={counts.noGps}
+                        icon={<MapIcon className="h-3.5 w-3.5 opacity-50" />}
+                        className="bg-gray-50 text-gray-600 border-gray-200 dark:bg-muted/40 dark:text-muted-foreground dark:border-border"
+                    />
+                </div>
+            </Card>
         </div>
     )
 }
 
-function StatusChip({ label, count, color }: { label: string, count: number, color: string }) {
+function StatusBadge({
+    label,
+    count,
+    color,
+    className,
+    icon
+}: {
+    label: string,
+    count: number,
+    color?: string, // Legacy support if needed, but moving to className
+    className?: string,
+    icon?: React.ReactNode
+}) {
     return (
-        <div className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-2 border ${color}`}>
-            <span className="font-bold">{count}</span>
-            <span className="opacity-80">{label}</span>
+        <div className={`
+            flex items-center gap-3 px-4 py-2 rounded-xl border shadow-sm transition-all hover:shadow-md cursor-default
+            min-w-[120px] lg:min-w-0 flex-1 lg:flex-none justify-between lg:justify-start
+            ${className || color}
+        `}>
+            <div className="flex items-center gap-2 overflow-hidden">
+                {icon}
+                <span className="text-xs font-semibold uppercase tracking-wider opacity-80 truncate">{label}</span>
+            </div>
+            <span className="font-bold text-lg leading-none">{count}</span>
         </div>
     )
 }

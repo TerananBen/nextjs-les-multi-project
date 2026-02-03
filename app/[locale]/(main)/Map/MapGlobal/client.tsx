@@ -98,7 +98,7 @@ export default function MapGlobalClient() {
             />
 
             {/* Map Area */}
-            <div className="flex-1 relative order-2 min-h-0">
+            <div className="flex-1 relative order-2 min-h-0 px-0 pb-0">
                 <MapContainerComponent
                     mode={mapMode}
                     onlineUrl={onlineUrl}

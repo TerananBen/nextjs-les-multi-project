@@ -321,3 +321,60 @@ export async function sendCommandMqttAction(imsi: string, commandType: "0" | "1"
         return { success: false, message: "Network Error" }
     }
 }
+
+export interface ReadDataMqttResponse {
+    result: boolean
+    apiName: string
+    dateTime: string
+    dataReturn: string
+}
+
+export async function readDataMqttAction(gatewayId: string, imsi: string): Promise<{ success: boolean, message?: string }> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+    const projectName = process.env.PROJECT_NAME
+    const waitTime = process.env.WAIT_TIME || "20"
+
+    if (!API_URL || !token || !projectName) {
+        return { success: false, message: "Configuration error" }
+    }
+
+    try {
+        console.log(`[readDataMqttAction] Calling ${API_URL}/StreetLight/readDataMqtt for IMSI: ${imsi} Gateway: ${gatewayId}`);
+        const randomToken = Math.random().toString(36).substring(2, 12); // ~10 chars
+        const msg = JSON.stringify({ Type: "GetPower", TOKEN: randomToken });
+
+        const body = {
+            topic: `${gatewayId}/${imsi}`, // According to user: "${gateway_id}/${imsi}" - wait, user said "${gateway_id}/IMEI..." but logic suggests dynamic IMSI. 
+            // User example: "topic": "${gateway_id}/IMEI000010" for a device with IMSI IMEI000010. So it is `${gatewayId}/${imsi}`.
+            message: msg,
+            subscribe: `${projectName}/${imsi}`,
+            wait_time: waitTime
+        }
+
+        const response = await fetch(`${API_URL}/StreetLight/readDataMqtt`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(body)
+        })
+
+        if (!response.ok) {
+            return { success: false, message: `API Error: ${response.status}` }
+        }
+
+        const data: ReadDataMqttResponse = await response.json()
+
+        if (data.result && data.dataReturn) {
+            // "{\"GW\":\"...\",\"SN\":\"...\",\"W\":\"...\"}"
+            return { success: true }
+        } else {
+            return { success: false, message: "Read Timeout" }
+        }
+    } catch (error) {
+        console.error("Error reading MQTT data:", error)
+        return { success: false, message: "Network Error" }
+    }
+}

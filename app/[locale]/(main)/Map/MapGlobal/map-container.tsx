@@ -5,9 +5,9 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { useMap } from "react-leaflet"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
-import { LatLongData, getDataDetailIMSIAction, ImsiDetail, sendCommandMqttAction } from "@/app/actions/map-actions"
+import { LatLongData, getDataDetailIMSIAction, ImsiDetail, sendCommandMqttAction, readDataMqttAction } from "@/app/actions/map-actions"
 import { GoogleMap, useJsApiLoader, Marker as GoogleMarker, InfoWindow } from "@react-google-maps/api"
-import { Loader2, Power, Sun } from "lucide-react"
+import { Loader2, Power, Sun, RefreshCcw } from "lucide-react"
 import { getLeafletIconUrl, getGoogleMapsIconHtml, MarkerColor, MarkerBadge } from "@/lib/map-icons"
 import { useTranslations } from "next-intl"
 import { createRoot } from "react-dom/client"
@@ -18,7 +18,7 @@ import { toast } from "sonner"
 // Environment Defaults
 const DEFAULT_LAT = parseFloat(process.env.NEXT_PUBLIC_LAT_PROJECT || "13.736717")
 const DEFAULT_LNG = parseFloat(process.env.NEXT_PUBLIC_LNG_PROJECT || "100.523186")
-const DEFAULT_ZOOM = parseInt(process.env.NEXT_PUBLIC_ZOOM_PROJECT || "14")
+const DEFAULT_ZOOM = parseInt(process.env.NEXT_PUBLIC_ZOXOM_PROJECT || "14")
 const ICON_SCALE = parseFloat(process.env.NEXT_PUBLIC_SIZE_ICON || "1")
 
 const DefaultIcon = L.icon({
@@ -119,43 +119,38 @@ function DeviceDetailPopup({ device, t, onUpdatePosition }: DeviceDetailPopupPro
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(false)
     const [sending, setSending] = useState(false)
+    const [reading, setReading] = useState(false)
     const [dimValue, setDimValue] = useState(100)
 
-    useEffect(() => {
-        let active = true
+    const fetchDetail = useCallback(async () => {
         setLoading(true)
         setError(false)
-
-        getDataDetailIMSIAction(device.imsi)
-            .then(res => {
-                if (active) {
-                    if (res) {
-                        setDetail(res)
-                        // Try to parse existing brightness if available in string, otherwise default 100
-                        // Example: "เปิด | สว่าง : 100 % (24 W)"
-                        if (res.last_status) {
-                            const match = res.last_status.match(/(\d+)\s*%/)
-                            if (match) {
-                                setDimValue(parseInt(match[1]))
-                            }
-                        }
-                    } else {
-                        setError(true)
+        try {
+            const res = await getDataDetailIMSIAction(device.imsi)
+            if (res) {
+                setDetail(res)
+                // Try to parse existing brightness if available in string, otherwise default 100
+                // Example: "เปิด | สว่าง : 100 % (24 W)"
+                if (res.last_status) {
+                    const match = res.last_status.match(/(\d+)\s*%/)
+                    if (match) {
+                        setDimValue(parseInt(match[1]))
                     }
-                    setLoading(false)
-                    if (onUpdatePosition) onUpdatePosition()
                 }
-            })
-            .catch(() => {
-                if (active) {
-                    setError(true)
-                    setLoading(false)
-                    if (onUpdatePosition) onUpdatePosition()
-                }
-            })
+            } else {
+                setError(true)
+            }
+        } catch (e) {
+            setError(true)
+        } finally {
+            setLoading(false)
+            if (onUpdatePosition) onUpdatePosition()
+        }
+    }, [device.imsi, onUpdatePosition])
 
-        return () => { active = false }
-    }, [device, onUpdatePosition])
+    useEffect(() => {
+        fetchDetail()
+    }, [fetchDetail])
 
     const handleCommand = async (commandType: "0" | "1", dim: number) => {
         setSending(true)
@@ -164,13 +159,31 @@ function DeviceDetailPopup({ device, t, onUpdatePosition }: DeviceDetailPopupPro
 
         if (res.success) {
             toast.success(t("control.success"))
-            // Optimistic update could happen here, or just wait for next fetch
+            fetchDetail() // Refresh data after command
         } else {
             toast.error(res.message || t("control.error"))
         }
     }
 
-    if (loading) {
+    const handleReadPower = async () => {
+        if (!device.gateway_id) {
+            toast.error("No Gateway ID found")
+            return
+        }
+        console.log("Triggering Read Power Action...")
+        setReading(true)
+        const res = await readDataMqttAction(device.gateway_id, device.imsi)
+        setReading(false)
+
+        if (res.success) {
+            toast.success(t("control.readSuccess"))
+            fetchDetail() // Refresh data after reading power
+        } else {
+            toast.error(res.message || t("control.readError"))
+        }
+    }
+
+    if (loading && !detail) {
         return (
             <div className="flex flex-col items-center justify-center py-6 gap-2 min-w-[300px]">
                 <Loader2 className="animate-spin h-6 w-6 text-primary" />
@@ -185,6 +198,7 @@ function DeviceDetailPopup({ device, t, onUpdatePosition }: DeviceDetailPopupPro
                 <h3 className="font-bold text-lg">{device.name_pole || device.street_light_name || "N/A"}</h3>
                 <p className="text-sm text-gray-500">{t("popup.imsi")} {device.imsi}</p>
                 <p className="text-red-500 text-sm">Failed to load detailed data.</p>
+                <Button variant="outline" size="sm" onClick={fetchDetail}><RefreshCcw className="w-4 h-4 mr-2" />Retry</Button>
             </div>
         )
     }
@@ -241,14 +255,26 @@ function DeviceDetailPopup({ device, t, onUpdatePosition }: DeviceDetailPopupPro
 
             {/* Control Section */}
             <div className="mb-3 pt-2 border-t">
-                <p className="font-semibold text-sm mb-2 text-gray-700">{t("control.title")}</p>
+                <div className="flex justify-between items-center mb-2">
+                    <p className="font-semibold text-sm text-gray-700">{t("control.title")}</p>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2 text-xs text-blue-600 hover:text-blue-800"
+                        onClick={handleReadPower}
+                        disabled={reading || sending}
+                    >
+                        {reading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <RefreshCcw className="w-3 h-3 mr-1" />}
+                        {t("control.readPower")}
+                    </Button>
+                </div>
 
                 {/* On/Off Buttons */}
                 <div className="grid grid-cols-2 gap-2 mb-3">
                     <Button
                         size="sm"
                         onClick={() => handleCommand("1", 100)}
-                        disabled={sending}
+                        disabled={sending || reading}
                         className="bg-green-600 hover:bg-green-700 text-white w-full"
                     >
                         {sending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Power className="w-4 h-4 mr-1" />}
@@ -258,7 +284,7 @@ function DeviceDetailPopup({ device, t, onUpdatePosition }: DeviceDetailPopupPro
                         size="sm"
                         variant="destructive"
                         onClick={() => handleCommand("0", 0)}
-                        disabled={sending}
+                        disabled={sending || reading}
                         className="w-full"
                     >
                         {sending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Power className="w-4 h-4 mr-1" />}
@@ -279,13 +305,13 @@ function DeviceDetailPopup({ device, t, onUpdatePosition }: DeviceDetailPopupPro
                             max={100}
                             step={1}
                             className="flex-1"
-                            disabled={sending}
+                            disabled={sending || reading}
                         />
                         <Button
                             size="icon"
                             variant="outline"
                             className="h-6 w-8 text-xs"
-                            disabled={sending}
+                            disabled={sending || reading}
                             onClick={() => handleCommand("1", dimValue)}
                         >
                             {t("control.set")}

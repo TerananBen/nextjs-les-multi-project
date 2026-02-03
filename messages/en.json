@@ -199,7 +199,11 @@
             "set": "Set",
             "success": "Command Sent Successfully",
             "error": "Command Failed",
-            "sending": "Sending..."
+            "sending": "Sending...",
+            "readPower": "Read Power",
+            "readSuccess": "Read Power Successfully",
+            "readError": "Read Power Failed",
+            "reading": "Reading..."
         },
         "legend": {
             "title": "The meaning of different colors",

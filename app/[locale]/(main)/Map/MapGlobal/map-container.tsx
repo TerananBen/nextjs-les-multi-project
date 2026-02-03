@@ -5,11 +5,15 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { useMap } from "react-leaflet"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
-import { LatLongData, getDataDetailIMSIAction, ImsiDetail } from "@/app/actions/map-actions"
+import { LatLongData, getDataDetailIMSIAction, ImsiDetail, sendCommandMqttAction } from "@/app/actions/map-actions"
 import { GoogleMap, useJsApiLoader, Marker as GoogleMarker, InfoWindow } from "@react-google-maps/api"
-import { Loader2 } from "lucide-react"
+import { Loader2, Power, Sun } from "lucide-react"
 import { getLeafletIconUrl, getGoogleMapsIconHtml, MarkerColor, MarkerBadge } from "@/lib/map-icons"
 import { useTranslations } from "next-intl"
+import { createRoot } from "react-dom/client"
+import { Slider } from "@/components/ui/slider"
+import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 
 // Environment Defaults
 const DEFAULT_LAT = parseFloat(process.env.NEXT_PUBLIC_LAT_PROJECT || "13.736717")
@@ -104,39 +108,206 @@ const customIconLeaflet = (color: MarkerColor, badge: MarkerBadge, size: number)
 const containerStyle = { width: '100%', height: '100%' };
 const centerDefault = { lat: DEFAULT_LAT, lng: DEFAULT_LNG };
 
+interface DeviceDetailPopupProps {
+    device: LatLongData
+    t: any
+    onUpdatePosition?: () => void
+}
+
+function DeviceDetailPopup({ device, t, onUpdatePosition }: DeviceDetailPopupProps) {
+    const [detail, setDetail] = useState<ImsiDetail | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(false)
+    const [sending, setSending] = useState(false)
+    const [dimValue, setDimValue] = useState(100)
+
+    useEffect(() => {
+        let active = true
+        setLoading(true)
+        setError(false)
+
+        getDataDetailIMSIAction(device.imsi)
+            .then(res => {
+                if (active) {
+                    if (res) {
+                        setDetail(res)
+                        // Try to parse existing brightness if available in string, otherwise default 100
+                        // Example: "เปิด | สว่าง : 100 % (24 W)"
+                        if (res.last_status) {
+                            const match = res.last_status.match(/(\d+)\s*%/)
+                            if (match) {
+                                setDimValue(parseInt(match[1]))
+                            }
+                        }
+                    } else {
+                        setError(true)
+                    }
+                    setLoading(false)
+                    if (onUpdatePosition) onUpdatePosition()
+                }
+            })
+            .catch(() => {
+                if (active) {
+                    setError(true)
+                    setLoading(false)
+                    if (onUpdatePosition) onUpdatePosition()
+                }
+            })
+
+        return () => { active = false }
+    }, [device, onUpdatePosition])
+
+    const handleCommand = async (commandType: "0" | "1", dim: number) => {
+        setSending(true)
+        const res = await sendCommandMqttAction(device.imsi, commandType, dim.toString())
+        setSending(false)
+
+        if (res.success) {
+            toast.success(t("control.success"))
+            // Optimistic update could happen here, or just wait for next fetch
+        } else {
+            toast.error(res.message || t("control.error"))
+        }
+    }
+
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center py-6 gap-2 min-w-[300px]">
+                <Loader2 className="animate-spin h-6 w-6 text-primary" />
+                <span className="text-sm text-muted-foreground">{t("loading")}</span>
+            </div>
+        )
+    }
+
+    if (error || !detail) {
+        return (
+            <div className="space-y-2 min-w-[300px]">
+                <h3 className="font-bold text-lg">{device.name_pole || device.street_light_name || "N/A"}</h3>
+                <p className="text-sm text-gray-500">{t("popup.imsi")} {device.imsi}</p>
+                <p className="text-red-500 text-sm">Failed to load detailed data.</p>
+            </div>
+        )
+    }
+
+    const commandText = formatServiceData(detail.last_command, t);
+    const statusText = formatServiceData(detail.last_status, t);
+    const modeText = getDeviceMode(device, t);
+    const isManual = modeText === t("legend.manual");
+    const config = getMarkerConfig(device, t);
+
+    return (
+        <div className="font-sans min-w-[300px] text-gray-800 text-base">
+            {/* Header */}
+            <div className="border-b pb-2 mb-3">
+                <h3 className="font-bold text-xl text-primary leading-tight m-0">
+                    {detail.street_light_name || t("popup.name")}
+                </h3>
+                <p className="text-sm text-gray-500 mt-1 m-0">
+                    {t("popup.imsi")} {detail.imsi}
+                </p>
+            </div>
+
+            {/* Info Grid */}
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mb-3">
+                <div className="flex flex-col">
+                    <span className="text-gray-500 font-medium">{t("popup.group")}</span>
+                    <span className="truncate block w-full whitespace-nowrap overflow-hidden text-ellipsis">{detail.group_name || "-"}</span>
+                </div>
+                <div className="flex flex-col">
+                    <span className="text-gray-500 font-medium">{t("popup.govName")}</span>
+                    <span className="truncate block w-full whitespace-nowrap overflow-hidden text-ellipsis">{detail.number_gov || "-"}</span>
+                </div>
+                <div className="flex flex-col">
+                    <span className="text-gray-500 font-medium">{t("popup.mode")}</span>
+                    <span className={`${isManual ? 'text-orange-600' : 'text-green-600'} font-semibold`}>{modeText}</span>
+                </div>
+                <div className="flex flex-col">
+                    <span className="text-gray-500 font-medium">{t("popup.status")}</span>
+                    <span className="font-medium">{config.statusText}</span>
+                </div>
+            </div>
+
+            {/* Status Box */}
+            <div className="bg-slate-50 p-2 rounded-md border border-gray-200 text-sm space-y-1.5 mb-3">
+                <div className="flex justify-between items-center">
+                    <span className="text-gray-500">{t("popup.lastCommand")}:</span>
+                    <span className="font-medium text-right">{commandText}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                    <span className="text-gray-500">{t("popup.lastStatus")}:</span>
+                    <span className="font-medium text-right">{statusText}</span>
+                </div>
+            </div>
+
+            {/* Control Section */}
+            <div className="mb-3 pt-2 border-t">
+                <p className="font-semibold text-sm mb-2 text-gray-700">{t("control.title")}</p>
+
+                {/* On/Off Buttons */}
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                    <Button
+                        size="sm"
+                        onClick={() => handleCommand("1", 100)}
+                        disabled={sending}
+                        className="bg-green-600 hover:bg-green-700 text-white w-full"
+                    >
+                        {sending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Power className="w-4 h-4 mr-1" />}
+                        {t("control.on")}
+                    </Button>
+                    <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleCommand("0", 0)}
+                        disabled={sending}
+                        className="w-full"
+                    >
+                        {sending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Power className="w-4 h-4 mr-1" />}
+                        {t("control.off")}
+                    </Button>
+                </div>
+
+                {/* Brightness Slider */}
+                <div className="space-y-2 bg-slate-50 p-2 rounded border">
+                    <div className="flex justify-between text-xs text-gray-500">
+                        <span className="flex items-center gap-1"><Sun className="w-3 h-3" /> {t("control.dim")}</span>
+                        <span>{dimValue}%</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Slider
+                            value={[dimValue]}
+                            onValueChange={(vals) => setDimValue(vals[0])}
+                            max={100}
+                            step={1}
+                            className="flex-1"
+                            disabled={sending}
+                        />
+                        <Button
+                            size="icon"
+                            variant="outline"
+                            className="h-6 w-8 text-xs"
+                            disabled={sending}
+                            onClick={() => handleCommand("1", dimValue)}
+                        >
+                            {t("control.set")}
+                        </Button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Footer */}
+            <div className="text-xs text-gray-400 text-right pt-2 border-t border-gray-100">
+                {t("popup.lastUpdate")} {detail.last_update}
+            </div>
+        </div>
+    )
+}
+
 function GoogleMapComponent({ devices }: { devices: LatLongData[] }) {
     const t = useTranslations("MapGlobal");
     const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || "", language: "th" })
     const [map, setMap] = useState<google.maps.Map | null>(null)
     const [zoom, setZoom] = useState(DEFAULT_ZOOM)
     const [selectedDevice, setSelectedDevice] = useState<LatLongData | null>(null)
-    const [detail, setDetail] = useState<ImsiDetail | null>(null)
-    const [loadingDetail, setLoadingDetail] = useState(false)
-
-    // Fetch detail when selected device changes
-    useEffect(() => {
-        if (!selectedDevice) {
-            setDetail(null)
-            return
-        }
-
-        let active = true;
-        setLoadingDetail(true)
-        setDetail(null)
-
-        getDataDetailIMSIAction(selectedDevice.imsi)
-            .then(res => {
-                if (active) {
-                    setDetail(res)
-                    setLoadingDetail(false)
-                }
-            })
-            .catch(() => {
-                if (active) setLoadingDetail(false)
-            })
-
-        return () => { active = false }
-    }, [selectedDevice])
 
     const onLoad = useCallback((map: google.maps.Map) => {
         setMap(map)
@@ -185,72 +356,7 @@ function GoogleMapComponent({ devices }: { devices: LatLongData[] }) {
                     position={{ lat: parseFloat(selectedDevice.lat), lng: parseFloat(selectedDevice.lng) }}
                     onCloseClick={() => setSelectedDevice(null)}
                 >
-                    <div className="text-base text-black min-w-[300px] font-sans">
-                        {loadingDetail ? (
-                            <div className="flex flex-col items-center justify-center py-6 gap-2">
-                                <Loader2 className="animate-spin h-6 w-6 text-primary" />
-                                <span className="text-sm text-muted-foreground">{t("loading")}</span>
-                            </div>
-                        ) : detail ? (
-                            <div className="flex flex-col gap-3">
-                                {/* Header: Pole Name & IMSI */}
-                                <div className="border-b pb-2">
-                                    <h3 className="font-bold text-xl text-primary leading-tight">
-                                        {detail.street_light_name || t("popup.name")}
-                                    </h3>
-                                    <p className="text-sm text-muted-foreground mt-0.5">
-                                        {t("popup.imsi")} {detail.imsi}
-                                    </p>
-                                </div>
-
-                                {/* Main Info Grid */}
-                                <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                                    <div className="flex flex-col">
-                                        <span className="text-muted-foreground font-medium">{t("popup.group")}</span>
-                                        <span className="truncate">{detail.group_name || "-"}</span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-muted-foreground font-medium">{t("popup.govName")}</span>
-                                        <span className="truncate">{detail.number_gov || "-"}</span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-muted-foreground font-medium">{t("popup.mode")}</span>
-                                        <span className={getDeviceMode(selectedDevice, t) === t("legend.manual") ? "text-orange-600 font-semibold" : "text-green-600 font-semibold"}>
-                                            {getDeviceMode(selectedDevice, t)}
-                                        </span>
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-muted-foreground font-medium">{t("popup.status")}</span>
-                                        <span className="font-medium">{getMarkerConfig(selectedDevice, t).statusText}</span>
-                                    </div>
-                                </div>
-
-                                {/* Status & Command Section */}
-                                <div className="bg-slate-50 p-2 rounded-md border text-sm space-y-1.5">
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-muted-foreground">{t("popup.lastCommand")}:</span>
-                                        <span className="font-medium text-right">{formatServiceData(detail.last_command, t)}</span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-muted-foreground">{t("popup.lastStatus")}:</span>
-                                        <span className="font-medium text-right">{formatServiceData(detail.last_status, t)}</span>
-                                    </div>
-                                </div>
-
-                                {/* Footer: Last Update */}
-                                <div className="text-xs text-gray-400 text-right pt-1 border-t mt-1">
-                                    {t("popup.lastUpdate")} {detail.last_update}
-                                </div>
-                            </div>
-                        ) : (
-                            // Fallback
-                            <div className="space-y-2">
-                                <h3 className="font-bold text-lg">{selectedDevice.name_pole || selectedDevice.street_light_name || "N/A"}</h3>
-                                <p className="text-sm text-gray-500">{t("popup.imsi")} {selectedDevice.imsi}</p>
-                                <p className="text-red-500 text-sm">Failed to load detailed data.</p>
-                            </div>
-                        )}
-                    </div>
+                    <DeviceDetailPopup device={selectedDevice} t={t} />
                 </InfoWindow>
             )}
         </GoogleMap>
@@ -294,68 +400,51 @@ function LeafletMapComponent({ offlineUrl, devices }: { offlineUrl?: string, dev
 
             const marker = L.marker([parseFloat(device.lat), parseFloat(device.lng)], { icon: markerIcon })
                 .addTo(map)
-                .bindPopup(`<div class="p-4 flex items-center justify-center"><div class="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900 text-primary"></div></div>`);
 
-            marker.on('popupopen', async () => {
-                try {
-                    const detail = await getDataDetailIMSIAction(device.imsi);
-                    if (detail) {
-                        const modeText = getDeviceMode(device, t);
-                        const commandText = formatServiceData(detail.last_command, t);
-                        const statusText = formatServiceData(detail.last_status, t);
-                        const isManual = modeText === t("legend.manual");
+            // Interaction logic using createRoot for React content inside Leaflet Popup
+            const container = document.createElement('div');
+            marker.bindPopup(container);
 
-                        marker.setPopupContent(`
-                            <div class="font-sans min-w-[300px] text-gray-800 text-base">
-                                <div class="border-b pb-2 mb-3">
-                                    <h3 class="font-bold text-xl text-primary leading-tight m-0">
-                                        ${detail.street_light_name || t("popup.name")}
-                                    </h3>
-                                    <p class="text-sm text-gray-500 mt-1 m-0">
-                                        ${t("popup.imsi")} ${detail.imsi}
-                                    </p>
-                                </div>
+            marker.on('popupopen', (e) => {
+                const popup = e.popup;
+                const content = popup.getContent();
 
-                                <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm mb-3">
-                                    <div class="flex flex-col">
-                                        <span class="text-gray-500 font-medium">${t("popup.group")}</span>
-                                        <span class="truncate block w-full whitespace-nowrap overflow-hidden text-ellipsis">${detail.group_name || "-"}</span>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <span class="text-gray-500 font-medium">${t("popup.govName")}</span>
-                                        <span class="truncate block w-full whitespace-nowrap overflow-hidden text-ellipsis">${detail.number_gov || "-"}</span>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <span class="text-gray-500 font-medium">${t("popup.mode")}</span>
-                                        <span class="${isManual ? 'text-orange-600' : 'text-green-600'} font-semibold">${modeText}</span>
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <span class="text-gray-500 font-medium">${t("popup.status")}</span>
-                                        <span class="font-medium">${config.statusText}</span>
-                                    </div>
-                                </div>
+                if (content instanceof HTMLElement) {
+                    const c = content as any;
+                    let root = c._reactRoot;
 
-                                <div class="bg-slate-50 p-2 rounded-md border border-gray-200 text-sm space-y-1.5 mb-2">
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-gray-500">${t("popup.lastCommand")}:</span>
-                                        <span class="font-medium text-right">${commandText}</span>
-                                    </div>
-                                    <div class="flex justify-between items-center">
-                                        <span class="text-gray-500">${t("popup.lastStatus")}:</span>
-                                        <span class="font-medium text-right">${statusText}</span>
-                                    </div>
-                                </div>
-
-                                <div class="text-xs text-gray-400 text-right pt-2 border-t border-gray-100">
-                                    ${t("popup.lastUpdate")} ${detail.last_update}
-                                </div>
-                            </div>
-                         `)
-                    } else {
-                        marker.setPopupContent(`<div class="p-2 text-red-500 text-sm">Failed to load data</div>`)
+                    if (!root) {
+                        root = createRoot(c);
+                        c._reactRoot = root;
                     }
-                } catch (e) {
-                    marker.setPopupContent(`<div class="p-2 text-red-500 text-sm">Error loading data</div>`)
+
+                    root.render(
+                        <DeviceDetailPopup
+                            device={device}
+                            t={t}
+                            onUpdatePosition={() => {
+                                // Update popup position if content size changes
+                                marker.getPopup()?.update()
+                            }}
+                        />
+                    );
+                }
+            });
+
+            marker.on('popupclose', (e) => {
+                const popup = e.popup;
+                const content = popup.getContent();
+                if (content instanceof HTMLElement) {
+                    const c = content as any;
+                    if (c._reactRoot) {
+                        // We can unmount on close to convert back to "clean" state
+                        setTimeout(() => {
+                            if (c._reactRoot) {
+                                c._reactRoot.unmount();
+                                delete c._reactRoot;
+                            }
+                        }, 100);
+                    }
                 }
             })
 

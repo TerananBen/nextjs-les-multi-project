@@ -191,6 +191,16 @@
             "off": "Off",
             "brightness": "Brightness"
         },
+        "control": {
+            "title": "Control",
+            "on": "On",
+            "off": "Off",
+            "dim": "Dim",
+            "set": "Set",
+            "success": "Command Sent Successfully",
+            "error": "Command Failed",
+            "sending": "Sending..."
+        },
         "legend": {
             "title": "The meaning of different colors",
             "auto": "On/Off by itself (Auto)",

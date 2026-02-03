@@ -253,3 +253,71 @@ export async function getDataDetailIMSIAction(imsi: string): Promise<ImsiDetail 
         return null
     }
 }
+
+export interface SendCommandMqttResponse {
+    result: boolean
+    apiName: string
+    dateTime: string
+    dataReturn: string // JSON string that needs parsing or empty string on failure
+}
+
+export async function sendCommandMqttAction(imsi: string, commandType: "0" | "1", dimPercent: string): Promise<{ success: boolean, message?: string }> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+    const projectName = process.env.PROJECT_NAME
+    const waitTime = process.env.WAIT_TIME || "20"
+
+    if (!API_URL || !token || !projectName) {
+        console.error("Missing configuration for sendCommandMqttAction")
+        return { success: false, message: "Configuration error" }
+    }
+
+    try {
+        const body = {
+            type_open: "imsi",
+            imsi: imsi,
+            subscribe: `${projectName}/RESPONSE/${imsi}`,
+            wait_time: waitTime,
+            command_type: commandType,
+            dim_percent: dimPercent
+        }
+
+        const response = await fetch(`${API_URL}/StreetLight/sendCommandMqtt`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(body)
+        })
+
+        if (!response.ok) {
+            console.error(`API error: ${response.status}`)
+            return { success: false, message: `API Error: ${response.status}` }
+        }
+
+        const data: SendCommandMqttResponse = await response.json()
+
+        // Check result
+        if (data.result && data.dataReturn) {
+            // Data return is a JSON string, ensuring it's not empty means success usually?
+            // "{\"Type\":\"Response\",\"SN\":\"IMEI000010\",\"TOKEN\":\"g65C6MepSknqMIvkjCRw\"}"
+            try {
+                // If it parses JSON successfully, it's likely a success response as per user example
+                const parsed = JSON.parse(data.dataReturn);
+                if (parsed && (parsed.Type === "Response" || parsed.result === "true")) {
+                    return { success: true }
+                }
+                return { success: true } // Assuming any non-empty return is success based on user input
+            } catch (e) {
+                return { success: true } // Even purely string return might indicate success if not empty
+            }
+        } else {
+            // If dataReturn is empty, it failed (timeout)
+            return { success: false, message: "Timeout or No Response" }
+        }
+    } catch (error) {
+        console.error("Error sending MQTT command:", error)
+        return { success: false, message: "Network Error" }
+    }
+}

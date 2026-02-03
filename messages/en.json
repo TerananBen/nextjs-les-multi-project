@@ -175,11 +175,16 @@
             "noGps": "No GPS Signal"
         },
         "popup": {
-            "name": "Name:",
-            "imsi": "IMSI:",
+            "name": "Name (Pole):",
+            "imsi": "Device ID:",
             "group": "Group:",
             "status": "Status:",
-            "invalidGps": "(Invalid GPS)"
+            "invalidGps": "(Invalid GPS)",
+            "lastUpdate": "Last Update:",
+            "lastCommand": "Last Command:",
+            "lastStatus": "Last Status:",
+            "govName": "Gov Name:",
+            "mode": "Mode:"
         },
         "legend": {
             "title": "The meaning of different colors",

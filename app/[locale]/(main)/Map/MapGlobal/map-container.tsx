@@ -5,7 +5,7 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { useMap } from "react-leaflet"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
-import { LatLongData } from "@/app/actions/map-actions"
+import { LatLongData, getDataDetailIMSIAction, ImsiDetail } from "@/app/actions/map-actions"
 import { GoogleMap, useJsApiLoader, Marker as GoogleMarker, InfoWindow } from "@react-google-maps/api"
 import { Loader2 } from "lucide-react"
 import { getLeafletIconUrl, getGoogleMapsIconHtml, MarkerColor, MarkerBadge } from "@/lib/map-icons"
@@ -62,6 +62,13 @@ function getMarkerConfig(device: LatLongData, t: any): { color: MarkerColor, bad
     }
 }
 
+function getDeviceMode(device: LatLongData): string {
+    if (device.using_sensor && device.using_sensor.toLowerCase() === "false") {
+        return "Manual";
+    }
+    return device.type_schedule || "Auto";
+}
+
 function isValidGPS(lat: string, lng: string): boolean {
     if (!lat || !lng) return false;
     if (lat === "LES" || lng === "LES") return false;
@@ -93,6 +100,33 @@ function GoogleMapComponent({ devices }: { devices: LatLongData[] }) {
     const [map, setMap] = useState<google.maps.Map | null>(null)
     const [zoom, setZoom] = useState(DEFAULT_ZOOM)
     const [selectedDevice, setSelectedDevice] = useState<LatLongData | null>(null)
+    const [detail, setDetail] = useState<ImsiDetail | null>(null)
+    const [loadingDetail, setLoadingDetail] = useState(false)
+
+    // Fetch detail when selected device changes
+    useEffect(() => {
+        if (!selectedDevice) {
+            setDetail(null)
+            return
+        }
+
+        let active = true;
+        setLoadingDetail(true)
+        setDetail(null)
+
+        getDataDetailIMSIAction(selectedDevice.imsi)
+            .then(res => {
+                if (active) {
+                    setDetail(res)
+                    setLoadingDetail(false)
+                }
+            })
+            .catch(() => {
+                if (active) setLoadingDetail(false)
+            })
+
+        return () => { active = false }
+    }, [selectedDevice])
 
     const onLoad = useCallback((map: google.maps.Map) => {
         setMap(map)
@@ -138,12 +172,29 @@ function GoogleMapComponent({ devices }: { devices: LatLongData[] }) {
             })}
             {selectedDevice && (
                 <InfoWindow position={{ lat: parseFloat(selectedDevice.lat), lng: parseFloat(selectedDevice.lng) }} onCloseClick={() => setSelectedDevice(null)}>
-                    <div className="p-2 space-y-1 text-sm text-black">
-                        <p><strong>{t("popup.name")}</strong> {selectedDevice.name_pole || selectedDevice.street_light_name || "N/A"}</p>
-                        <p><strong>{t("popup.imsi")}</strong> {selectedDevice.imsi}</p>
-                        <p><strong>{t("popup.group")}</strong> {selectedDevice.group_name || "N/A"}</p>
-                        <p><strong>{t("popup.status")}</strong> {getMarkerConfig(selectedDevice, t).statusText}</p>
-                        {!isValidGPS(selectedDevice.lat, selectedDevice.lng) && <p className="text-red-500 text-xs">{t("popup.invalidGps")}</p>}
+                    <div className="p-2 space-y-1 text-sm text-black min-w-[250px]">
+                        {loadingDetail ? (
+                            <div className="flex items-center justify-center py-4"><Loader2 className="animate-spin h-5 w-5" /></div>
+                        ) : detail ? (
+                            <>
+                                <p><strong>{t("popup.group")}</strong> {detail.group_name || "-"}</p>
+                                <p><strong>{t("popup.imsi")}</strong> {detail.imsi}</p>
+                                <p><strong>{t("popup.lastUpdate")}</strong> {detail.last_update}</p>
+                                <p><strong>{t("popup.lastCommand")}</strong> {detail.last_command || "-"}</p>
+                                <p><strong>{t("popup.lastStatus")}</strong> {detail.last_status}</p>
+                                <p><strong>{t("popup.govName")}</strong> {detail.number_gov || "-"}</p>
+                                <p><strong>{t("popup.name")}</strong> {detail.street_light_name || "-"}</p>
+                                <p><strong>{t("popup.mode")}</strong> {getDeviceMode(selectedDevice)}</p>
+                                <p><strong>{t("popup.status")}</strong> {getMarkerConfig(selectedDevice, t).statusText}</p>
+                            </>
+                        ) : (
+                            // Fallback if detail fetch fails
+                            <>
+                                <p><strong>{t("popup.name")}</strong> {selectedDevice.name_pole || selectedDevice.street_light_name || "N/A"}</p>
+                                <p><strong>{t("popup.imsi")}</strong> {selectedDevice.imsi}</p>
+                                <p className="text-red-500 text-xs">Failed to load details.</p>
+                            </>
+                        )}
                     </div>
                 </InfoWindow>
             )}
@@ -185,16 +236,41 @@ function LeafletMapComponent({ offlineUrl, devices }: { offlineUrl?: string, dev
             if (!isValidGPS(device.lat, device.lng)) return;
             const config = getMarkerConfig(device, t);
             const markerIcon = customIconLeaflet(config.color, config.badge, iconSize);
+
             const marker = L.marker([parseFloat(device.lat), parseFloat(device.lng)], { icon: markerIcon })
-                .bindPopup(`
-                    <div class="p-2 space-y-1 text-sm font-sans">
-                        <p><strong>${t("popup.name")}</strong> ${device.name_pole || device.street_light_name || "N/A"}</p>
-                        <p><strong>${t("popup.imsi")}</strong> ${device.imsi}</p>
-                        <p><strong>${t("popup.group")}</strong> ${device.group_name || "N/A"}</p>
-                        <p><strong>${t("popup.status")}</strong> ${config.statusText}</p>
-                    </div>
-                `)
                 .addTo(map)
+                .bindPopup(`<div class="p-4 flex items-center justify-center"><div class="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-900"></div></div>`);
+
+            marker.on('popupopen', async () => {
+                try {
+                    const detail = await getDataDetailIMSIAction(device.imsi);
+                    if (detail) {
+                        // Note: We use the *device* object from the loop for Mode check, or detail?
+                        // User requested checking "api {{URL}}/StreetLight/getDataLatLong" which is what `devices` comes from (LatLongData).
+                        // So we use `device` (LatLongData) for getDeviceMode() check as requested.
+                        const modeText = getDeviceMode(device);
+
+                        marker.setPopupContent(`
+                            <div class="p-2 space-y-1 text-sm font-sans min-w-[200px]">
+                                <p><strong>${t("popup.group")}</strong> ${detail.group_name || "-"}</p>
+                                <p><strong>${t("popup.imsi")}</strong> ${detail.imsi}</p>
+                                <p><strong>${t("popup.lastUpdate")}</strong> ${detail.last_update}</p>
+                                <p><strong>${t("popup.lastCommand")}</strong> ${detail.last_command || "-"}</p>
+                                <p><strong>${t("popup.lastStatus")}</strong> ${detail.last_status}</p>
+                                <p><strong>${t("popup.govName")}</strong> ${detail.number_gov || "-"}</p>
+                                <p><strong>${t("popup.name")}</strong> ${detail.street_light_name || "-"}</p>
+                                <p><strong>${t("popup.mode")}</strong> ${modeText}</p>
+                                <p><strong>${t("popup.status")}</strong> ${config.statusText}</p>
+                            </div>
+                         `)
+                    } else {
+                        marker.setPopupContent(`<div class="p-2 text-red-500">Failed to load data</div>`)
+                    }
+                } catch (e) {
+                    marker.setPopupContent(`<div class="p-2 text-red-500">Error loading data</div>`)
+                }
+            })
+
             markersRef.current.push(marker)
         })
     }, [devices, currentZoom, t])
@@ -225,7 +301,6 @@ function MapLegend() {
         <div className="absolute bottom-6 left-2 bg-white/95 text-black p-3 rounded-md shadow-lg border text-xs z-[1000] max-w-[320px]">
             <h4 className="font-bold mb-2 text-gray-700">{t("legend.title")}</h4>
             <div className="space-y-2 max-h-[200px] overflow-y-auto">
-                {/* Auto Mode: Green (On) | Gray (Off) */}
                 <LegendItem
                     icons={[
                         { color: "green", badge: "A" },
@@ -234,7 +309,6 @@ function MapLegend() {
                     text={t("legend.auto")}
                 />
 
-                {/* Manual Mode: Green (On) | Gray (Off) */}
                 <LegendItem
                     icons={[
                         { color: "green", badge: "M" },
@@ -243,13 +317,11 @@ function MapLegend() {
                     text={t("legend.manual")}
                 />
 
-                {/* Comm Fail (Blue A) */}
                 <LegendItem
                     icons={[{ color: "blue", badge: "A" }]}
                     text={t("legend.disconnect")}
                 />
 
-                {/* Abnormal Power: Green Bolt | Gray Bolt */}
                 <LegendItem
                     icons={[
                         { color: "green", badge: "⚡" },
@@ -258,7 +330,6 @@ function MapLegend() {
                     text={t("legend.abnormal")}
                 />
 
-                {/* Failure: Red */}
                 <LegendItem
                     icons={[{ color: "red", badge: null }]}
                     text={t("legend.failure")}

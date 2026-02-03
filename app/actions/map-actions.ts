@@ -201,3 +201,55 @@ export async function getDataLatLongSearchAction(
         return []
     }
 }
+
+export interface ImsiDetail {
+    imsi: string
+    group_name: string
+    last_update: string
+    last_command: string
+    last_status: string
+    number_gov: string
+    street_light_name: string
+    gateway_id: string
+}
+
+export interface GetDataDetailIMSIResponse {
+    result: boolean
+    apiName: string
+    dateTime: string
+    dataReturn: ImsiDetail
+}
+
+export async function getDataDetailIMSIAction(imsi: string): Promise<ImsiDetail | null> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) {
+        return null
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLight/getDataDetailIMSI`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ imsi })
+        })
+
+        if (!response.ok) {
+            console.error(`API error: ${response.status}`)
+            return null
+        }
+
+        const data: GetDataDetailIMSIResponse = await response.json()
+        if (data.result && data.dataReturn) {
+            return data.dataReturn
+        }
+        return null
+    } catch (error) {
+        console.error("Error fetching IMSI detail:", error)
+        return null
+    }
+}

@@ -175,11 +175,16 @@
             "noGps": "ไม่มีสัญญาณ GPS"
         },
         "popup": {
-            "name": "ชื่อ:",
-            "imsi": "IMSI:",
-            "group": "กลุ่ม:",
-            "status": "สถานะ:",
-            "invalidGps": "(ไม่มีสัญญาณ GPS)"
+            "name": "ชื่อเสา :",
+            "imsi": "รหัสอุปกรณ์ :",
+            "group": "กลุ่ม :",
+            "status": "สถานะ :",
+            "invalidGps": "(ไม่มีสัญญาณ GPS)",
+            "lastUpdate": "อัปเดตล่าสุด :",
+            "lastCommand": "คำสั่งล่าสุด :",
+            "lastStatus": "สถานะล่าสุด :",
+            "govName": "ชื่อหน่วยงาน :",
+            "mode": "โหมด :"
         },
         "legend": {
             "title": "ความหมายของสีต่างๆ",

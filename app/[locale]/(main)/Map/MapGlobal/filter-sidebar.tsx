@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { LatLongData } from "@/app/actions/map-actions"
+import { isValidGPS } from "./map-utils"
 import { useMemo } from "react"
 import { Search, Filter, Hash, MapPin, Activity, Zap, WifiOff, Map as MapIcon, Globe, ShieldAlert } from "lucide-react"
 import {
@@ -47,7 +48,7 @@ export default function FilterSidebar({
         const normal = devices.filter(d => d.status !== "4" && d.status !== "5").length
         const powerFail = devices.filter(d => d.status === "4").length
         const commFail = devices.filter(d => d.status === "5").length
-        const withGps = devices.filter(d => d.lat !== "0" && d.lng !== "0").length
+        const withGps = devices.filter(d => isValidGPS(d.lat, d.lng)).length
         const noGps = total - withGps
 
         return { total, normal, powerFail, commFail, withGps, noGps }

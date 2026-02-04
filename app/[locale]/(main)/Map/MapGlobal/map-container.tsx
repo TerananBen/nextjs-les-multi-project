@@ -7,7 +7,7 @@ import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import { LatLongData, getDataDetailIMSIAction, ImsiDetail, sendCommandMqttAction, readDataMqttAction } from "@/app/actions/map-actions"
 import { GoogleMap, useJsApiLoader, Marker as GoogleMarker, InfoWindow } from "@react-google-maps/api"
-import { Loader2, Power, Sun, RefreshCcw } from "lucide-react"
+import { Loader2, Power, Sun, RefreshCcw, ChevronDown, ChevronUp } from "lucide-react"
 import { getLeafletIconUrl, getGoogleMapsIconHtml, MarkerColor, MarkerBadge } from "@/lib/map-icons"
 import { useTranslations } from "next-intl"
 import { createRoot } from "react-dom/client"
@@ -18,7 +18,7 @@ import { toast } from "sonner"
 // Environment Defaults
 const DEFAULT_LAT = parseFloat(process.env.NEXT_PUBLIC_LAT_PROJECT || "13.736717")
 const DEFAULT_LNG = parseFloat(process.env.NEXT_PUBLIC_LNG_PROJECT || "100.523186")
-const DEFAULT_ZOOM = parseInt(process.env.NEXT_PUBLIC_ZOXOM_PROJECT || "14")
+const DEFAULT_ZOOM = parseInt(process.env.NEXT_PUBLIC_ZOOM_PROJECT || "14")
 const ICON_SCALE = parseFloat(process.env.NEXT_PUBLIC_SIZE_ICON || "1")
 
 const DefaultIcon = L.icon({
@@ -83,13 +83,7 @@ function formatServiceData(text: string, t: any): string {
     return formatted;
 }
 
-function isValidGPS(lat: string, lng: string): boolean {
-    if (!lat || !lng) return false;
-    if (lat === "LES" || lng === "LES") return false;
-    const l = parseFloat(lat);
-    const g = parseFloat(lng);
-    return !isNaN(l) && !isNaN(g) && (l !== 0 || g !== 0);
-}
+import { isValidGPS } from "./map-utils"
 
 function getIconSizeForZoom(zoom: number) {
     // Linear scaling: Zoom 10 -> 20px, Zoom 14 -> 40px, Zoom 18 -> 60px
@@ -500,44 +494,61 @@ export default function MapContainerComponent({ mode, onlineUrl, offlineUrl, dev
 
 function MapLegend() {
     const t = useTranslations("MapGlobal");
+    const [isExpanded, setIsExpanded] = useState(true);
+
     return (
-        <div className="absolute bottom-6 left-2 bg-white/95 text-black p-3 rounded-md shadow-lg border text-xs z-[1000] max-w-[320px]">
-            <h4 className="font-bold mb-2 text-gray-700">{t("legend.title")}</h4>
-            <div className="space-y-2 max-h-[200px] overflow-y-auto">
-                <LegendItem
-                    icons={[
-                        { color: "green", badge: "A" },
-                        { color: "gray", badge: "A" }
-                    ]}
-                    text={t("legend.auto")}
-                />
-
-                <LegendItem
-                    icons={[
-                        { color: "green", badge: "M" },
-                        { color: "gray", badge: "M" }
-                    ]}
-                    text={t("legend.manual")}
-                />
-
-                <LegendItem
-                    icons={[{ color: "blue", badge: "A" }]}
-                    text={t("legend.disconnect")}
-                />
-
-                <LegendItem
-                    icons={[
-                        { color: "green", badge: "⚡" },
-                        { color: "gray", badge: "⚡" }
-                    ]}
-                    text={t("legend.abnormal")}
-                />
-
-                <LegendItem
-                    icons={[{ color: "red", badge: null }]}
-                    text={t("legend.failure")}
-                />
+        <div className="absolute bottom-2 left-2 bg-white/50 text-black rounded-md shadow-lg border text-xs z-[1000] max-w-[320px] transition-all duration-300">
+            {/* Header / Toggle */}
+            <div
+                className="flex items-center justify-between p-3 cursor-pointer hover:bg-gray-50 rounded-t-md"
+                onClick={() => setIsExpanded(!isExpanded)}
+            >
+                <h4 className="font-bold text-gray-700 m-0">{t("legend.title")}</h4>
+                <Button variant="ghost" size="sm" className="h-6 w-6 p-0 hover:bg-transparent">
+                    {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
+                </Button>
             </div>
+
+            {/* Content */}
+            {isExpanded && (
+                <div className="px-3 pb-3 space-y-2 max-h-[200px] overflow-y-auto border-t">
+                    <div className="pt-2"> {/* Spacer */}
+                        <LegendItem
+                            icons={[
+                                { color: "green", badge: "A" },
+                                { color: "gray", badge: "A" }
+                            ]}
+                            text={t("legend.auto")}
+                        />
+
+                        <LegendItem
+                            icons={[
+                                { color: "green", badge: "M" },
+                                { color: "gray", badge: "M" }
+                            ]}
+                            text={t("legend.manual")}
+                        />
+
+                        <LegendItem
+                            icons={[{ color: "blue", badge: "A" }]}
+                            text={t("legend.disconnect")}
+                        />
+
+                        <LegendItem
+                            icons={[
+                                { color: "green", badge: "⚡" },
+                                { color: "gray", badge: "⚡" }
+                            ]}
+                            text={t("legend.abnormal")}
+                        />
+
+                        <LegendItem
+                            icons={[{ color: "red", badge: null }]}
+                            text={t("legend.failure")}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

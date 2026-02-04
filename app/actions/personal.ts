@@ -194,3 +194,41 @@ export async function checkPersonalUsername(personal_username: string) {
         return { result: false, message: "Network error" }
     }
 }
+
+export interface UpdatePersonalProfileParams {
+    firstname: string
+    lastname: string
+    password_confirm: string
+    password_new?: string
+}
+
+export interface EditPersonalResponse {
+    result: boolean
+    apiName: string
+    dateTime: string
+    dataReturn: boolean
+    message?: string
+}
+
+export async function updatePersonalProfile(data: UpdatePersonalProfileParams): Promise<EditPersonalResponse | { result: false, message: string }> {
+    if (!API_URL) return { result: false, message: "API URL not configured" }
+
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLight/editPersonal`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(data),
+        })
+
+        return await response.json()
+    } catch (error) {
+        console.error("Error updating personal profile:", error)
+        return { result: false, message: "Network error" }
+    }
+}

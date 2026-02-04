@@ -127,6 +127,51 @@ export async function getAuthorizedMenu(): Promise<MenuItem[]> {
     }
 }
 
+export interface User {
+    userId: string
+    firstName: string
+    lastName: string
+    userRoleId: string
+    userRole: string
+    userName: string
+}
+
+export async function getCurrentUser(): Promise<User | null> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+    const apiUrl = process.env.API_URL
+
+    if (!token || !apiUrl) {
+        return null
+    }
+
+    try {
+        const response = await fetch(`${apiUrl}/StreetLight/getDataUserPersonal`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({}),
+        })
+
+        if (!response.ok) {
+            return null
+        }
+
+        const data = await response.json()
+        if (data.result && data.dataReturn) {
+            return data.dataReturn as User
+        }
+
+        return null
+    } catch (error) {
+        console.error("Error fetching user:", error)
+        return null
+    }
+}
+
+
 export async function logout() {
     const cookieStore = await cookies()
     cookieStore.delete("jwt")

@@ -57,6 +57,10 @@
         "connectionError": "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้",
         "failedAttempts": "จำนวนครั้งที่ผิดพลาด: {count}"
     },
+    "UserMenu": {
+        "account": "บัญชีผู้ใช้",
+        "logout": "ออกจากระบบ"
+    },
     "Personal": {
         "title": "การจัดการบุคลากร",
         "subtitle": "จัดการผู้ใช้ บทบาท และสิทธิ์การเข้าถึง",
@@ -89,6 +93,8 @@
             "password": "รหัสผ่าน",
             "passwordPlaceholder": "รหัสผ่าน",
             "passwordHint": "(เว้นว่างไว้หากไม่ต้องการเปลี่ยน)",
+            "newPassword": "รหัสผ่านใหม่",
+            "confirmPassword": "ยืนยันรหัสผ่านใหม่",
             "role": "บทบาท",
             "selectRole": "เลือกบทบาท",
             "cancel": "ยกเลิก",
@@ -102,7 +108,14 @@
             "statusDescription": "คุณแน่ใจหรือไม่ที่จะเปลี่ยนสถานะของ",
             "confirm": "ยืนยัน",
             "changing": "กำลังเปลี่ยนสถานะ...",
-            "required": "จำเป็นต้องระบุ"
+            "required": "จำเป็น",
+            "currentPassword": "รหัสผ่านปัจจุบัน",
+            "currentPasswordPlaceholder": "กรอกรหัสผ่านเพื่อยืนยัน",
+            "confirmNewPassword": "ยืนยันรหัสผ่านใหม่",
+            "profileHeader": "แก้ไขโปรไฟล์",
+            "profileDescription": "อัปเดตข้อมูลส่วนตัวของคุณ คุณต้องกรอกรหัสผ่านปัจจุบันเพื่อบันทึกการเปลี่ยนแปลง",
+            "generalTab": "ทั่วไป",
+            "securityTab": "ความปลอดภัย"
         },
         "messages": {
             "successAdd": "เพิ่มผู้ใช้สำเร็จ",

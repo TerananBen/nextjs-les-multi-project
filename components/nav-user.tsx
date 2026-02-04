@@ -28,20 +28,32 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { useRouter } from "@/i18n/routing"
+import { useRouter, Link } from "@/i18n/routing"
 import { logout } from "@/app/actions/auth"
+
+import { useTranslations } from "next-intl"
 
 export function NavUser({
   user,
 }: {
   user: {
     name: string
-    email: string
-    avatar: string
+    email?: string
+    avatar?: string
+    role?: string
   }
 }) {
   const { isMobile } = useSidebar()
   const router = useRouter()
+  const t = useTranslations('UserMenu')
+
+  const getInitials = (name: string) => {
+    const parts = name.trim().split(/\s+/)
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase()
+    }
+    return name.slice(0, 2).toUpperCase()
+  }
 
   return (
     <SidebarMenu>
@@ -54,12 +66,12 @@ export function NavUser({
             >
               <Avatar className="h-8 w-8 rounded-lg grayscale">
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarFallback className="rounded-lg">{getInitials(user.name)}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
                 <span className="text-muted-foreground truncate text-xs">
-                  {user.email}
+                  {user.role || user.email}
                 </span>
               </div>
               <IconDotsVertical className="ml-auto size-4" />
@@ -75,7 +87,7 @@ export function NavUser({
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarFallback className="rounded-lg">{getInitials(user.name)}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user.name}</span>
@@ -88,16 +100,10 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <IconUserCircle />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconCreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <IconNotification />
-                Notifications
+                <Link href="/profile" className="flex items-center gap-2 w-full">
+                  <IconUserCircle />
+                  {t('account')}
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
@@ -106,7 +112,7 @@ export function NavUser({
               router.push('/login')
             }}>
               <IconLogout />
-              Log out
+              {t('logout')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

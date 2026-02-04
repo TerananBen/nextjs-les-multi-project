@@ -4,7 +4,7 @@ import {
     SidebarInset,
     SidebarProvider,
 } from "@/components/ui/sidebar"
-import { getAuthorizedMenu } from "@/app/actions/auth"
+import { getAuthorizedMenu, getCurrentUser } from "@/app/actions/auth"
 import { PermissionProvider } from "@/components/providers/permission-provider"
 
 export default async function MainLayout({
@@ -13,6 +13,14 @@ export default async function MainLayout({
     children: React.ReactNode
 }) {
     const menuItems = await getAuthorizedMenu()
+    const user = await getCurrentUser()
+
+    const sidebarUser = {
+        name: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : (user?.userName || "User"),
+        email: user?.userName || "", // We use username as distinct identifier for now if email is missing
+        role: user?.userRole,
+        avatar: "/avatars/shadcn.jpg", // Default avatar
+    }
 
     return (
         <SidebarProvider
@@ -23,7 +31,7 @@ export default async function MainLayout({
                 } as React.CSSProperties
             }
         >
-            <AppSidebar variant="inset" menuItems={menuItems} />
+            <AppSidebar variant="inset" menuItems={menuItems} user={sidebarUser} />
             <PermissionProvider initialPermissions={menuItems}>
                 <SidebarInset>
                     <SiteHeader />

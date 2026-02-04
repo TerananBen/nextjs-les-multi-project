@@ -56,13 +56,7 @@ const menuMapping: Record<string, { title: string; icon: any; url: string }> = {
   "V_SettingDevice": { title: "menu.deviceSettings", icon: IconDeviceAnalytics, url: "/dashboard/settings-device" },
 }
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-}
+
 
 // Define menu groups
 const menuGroups = [
@@ -90,9 +84,15 @@ const menuGroups = [
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   menuItems?: MenuItem[]
+  user: {
+    name: string
+    email?: string
+    avatar?: string
+    role?: string
+  }
 }
 
-export function AppSidebar({ menuItems = [], ...props }: AppSidebarProps) {
+export function AppSidebar({ menuItems = [], user, ...props }: AppSidebarProps) {
   const pathname = usePathname()
   const t = useTranslations("Sidebar")
 
@@ -167,7 +167,7 @@ export function AppSidebar({ menuItems = [], ...props }: AppSidebarProps) {
         })}
       </SidebarContent>
       <SidebarFooter className="z-20">
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   )

@@ -57,6 +57,10 @@
         "connectionError": "Failed to connect to the server",
         "failedAttempts": "Failed attempts: {count}"
     },
+    "UserMenu": {
+        "account": "Account",
+        "logout": "Log out"
+    },
     "Personal": {
         "title": "Personal Management",
         "subtitle": "Manage users, roles, and access permissions.",
@@ -89,6 +93,8 @@
             "password": "Password",
             "passwordPlaceholder": "Password",
             "passwordHint": "(Leave blank to keep current)",
+            "newPassword": "New Password",
+            "confirmPassword": "Confirm Password",
             "role": "Role",
             "selectRole": "Select a role",
             "cancel": "Cancel",
@@ -102,7 +108,14 @@
             "statusDescription": "Are you sure you want to change the status for",
             "confirm": "Confirm",
             "changing": "Changing...",
-            "required": "Required"
+            "required": "Required",
+            "currentPassword": "Current Password",
+            "currentPasswordPlaceholder": "Enter current password to save",
+            "confirmNewPassword": "Confirm New Password",
+            "profileHeader": "Edit Profile",
+            "profileDescription": "Update your personal information. You must enter your current password to save changes.",
+            "generalTab": "General",
+            "securityTab": "Security"
         },
         "messages": {
             "successAdd": "User added successfully",

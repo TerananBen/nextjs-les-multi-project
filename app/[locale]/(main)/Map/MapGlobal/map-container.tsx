@@ -14,6 +14,8 @@ import { createRoot } from "react-dom/client"
 import { Slider } from "@/components/ui/slider"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
+import { usePermission } from "@/components/providers/permission-provider"
+import { isValidGPS } from "./map-utils"
 
 // Environment Defaults
 const DEFAULT_LAT = parseFloat(process.env.NEXT_PUBLIC_LAT_PROJECT || "13.736717")
@@ -83,8 +85,6 @@ function formatServiceData(text: string, t: any): string {
     return formatted;
 }
 
-import { isValidGPS } from "./map-utils"
-
 function getIconSizeForZoom(zoom: number) {
     // Linear scaling: Zoom 10 -> 20px, Zoom 14 -> 40px, Zoom 18 -> 60px
     const size = 20 + (zoom - 10) * 5;
@@ -106,9 +106,10 @@ interface DeviceDetailPopupProps {
     device: LatLongData
     t: any
     onUpdatePosition?: () => void
+    canControl: boolean
 }
 
-function DeviceDetailPopup({ device, t, onUpdatePosition }: DeviceDetailPopupProps) {
+function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDetailPopupProps) {
     const [detail, setDetail] = useState<ImsiDetail | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(false)
@@ -147,6 +148,10 @@ function DeviceDetailPopup({ device, t, onUpdatePosition }: DeviceDetailPopupPro
     }, [fetchDetail])
 
     const handleCommand = async (commandType: "0" | "1", dim: number) => {
+        if (!canControl) {
+            toast.error(t("control.error") || "Permission Denied")
+            return
+        }
         setSending(true)
         const res = await sendCommandMqttAction(device.imsi, commandType, dim.toString())
         setSending(false)
@@ -160,6 +165,10 @@ function DeviceDetailPopup({ device, t, onUpdatePosition }: DeviceDetailPopupPro
     }
 
     const handleReadPower = async () => {
+        if (!canControl) {
+            toast.error(t("control.error") || "Permission Denied")
+            return
+        }
         if (!device.gateway_id) {
             toast.error("No Gateway ID found")
             return
@@ -254,9 +263,9 @@ function DeviceDetailPopup({ device, t, onUpdatePosition }: DeviceDetailPopupPro
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="h-6 px-2 text-xs text-blue-600 hover:text-blue-800"
+                        className={`h-6 px-2 text-xs ${!canControl ? 'text-gray-400 cursor-not-allowed hover:bg-transparent' : 'text-blue-600 hover:text-blue-800'}`}
                         onClick={handleReadPower}
-                        disabled={reading || sending}
+                        disabled={reading || sending} // Removing !canControl from disabled to allow click for toast
                     >
                         {reading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <RefreshCcw className="w-3 h-3 mr-1" />}
                         {t("control.readPower")}
@@ -269,7 +278,7 @@ function DeviceDetailPopup({ device, t, onUpdatePosition }: DeviceDetailPopupPro
                         size="sm"
                         onClick={() => handleCommand("1", 100)}
                         disabled={sending || reading}
-                        className="bg-green-600 hover:bg-green-700 text-white w-full"
+                        className={`w-full ${!canControl ? 'bg-gray-300 cursor-not-allowed hover:bg-gray-300' : 'bg-green-600 hover:bg-green-700 text-white'}`}
                     >
                         {sending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Power className="w-4 h-4 mr-1" />}
                         {t("control.on")}
@@ -279,7 +288,7 @@ function DeviceDetailPopup({ device, t, onUpdatePosition }: DeviceDetailPopupPro
                         variant="destructive"
                         onClick={() => handleCommand("0", 0)}
                         disabled={sending || reading}
-                        className="w-full"
+                        className={`w-full ${!canControl ? 'bg-gray-300 cursor-not-allowed hover:bg-gray-300 text-white' : ''}`}
                     >
                         {sending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Power className="w-4 h-4 mr-1" />}
                         {t("control.off")}
@@ -293,18 +302,23 @@ function DeviceDetailPopup({ device, t, onUpdatePosition }: DeviceDetailPopupPro
                         <span>{dimValue}%</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <Slider
-                            value={[dimValue]}
-                            onValueChange={(vals) => setDimValue(vals[0])}
-                            max={100}
-                            step={1}
-                            className="flex-1"
-                            disabled={sending || reading}
-                        />
+                        {/* Wrapper for Slider to handle permission click if needed, or just keep it disabled visually */}
+                        <div className="flex-1 relative">
+                            {/* Overlay to block slider interaction but allow click event if we wanted to warn on slider touch too */}
+                            {!canControl && <div className="absolute inset-0 z-10 cursor-not-allowed" onClick={() => toast.error(t("control.error") || "Permission Denied")}></div>}
+                            <Slider
+                                value={[dimValue]}
+                                onValueChange={(vals) => setDimValue(vals[0])}
+                                max={100}
+                                step={1}
+                                className={`${!canControl ? 'opacity-50' : ''}`}
+                                disabled={sending || reading || !canControl} // detailed interaction with slider is less critical than buttons
+                            />
+                        </div>
                         <Button
                             size="icon"
                             variant="outline"
-                            className="h-6 w-8 text-xs"
+                            className={`h-6 w-8 text-xs ${!canControl ? 'cursor-not-allowed opacity-50 hover:bg-transparent' : ''}`}
                             disabled={sending || reading}
                             onClick={() => handleCommand("1", dimValue)}
                         >
@@ -322,8 +336,11 @@ function DeviceDetailPopup({ device, t, onUpdatePosition }: DeviceDetailPopupPro
     )
 }
 
+// Google Map Component
 function GoogleMapComponent({ devices }: { devices: LatLongData[] }) {
     const t = useTranslations("MapGlobal");
+    const { getPermission } = usePermission();
+    const { control: canControl } = getPermission("V_MapGlobal");
     const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || "", language: "th" })
     const [map, setMap] = useState<google.maps.Map | null>(null)
     const [zoom, setZoom] = useState(DEFAULT_ZOOM)
@@ -376,7 +393,7 @@ function GoogleMapComponent({ devices }: { devices: LatLongData[] }) {
                     position={{ lat: parseFloat(selectedDevice.lat), lng: parseFloat(selectedDevice.lng) }}
                     onCloseClick={() => setSelectedDevice(null)}
                 >
-                    <DeviceDetailPopup device={selectedDevice} t={t} />
+                    <DeviceDetailPopup device={selectedDevice} t={t} canControl={canControl} />
                 </InfoWindow>
             )}
         </GoogleMap>
@@ -385,6 +402,8 @@ function GoogleMapComponent({ devices }: { devices: LatLongData[] }) {
 
 function LeafletMapComponent({ offlineUrl, devices }: { offlineUrl?: string, devices: LatLongData[] }) {
     const t = useTranslations("MapGlobal");
+    const { getPermission } = usePermission();
+    const { control: canControl } = getPermission("V_MapGlobal");
     const containerRef = useRef<HTMLDivElement>(null)
     const mapInstanceRef = useRef<L.Map | null>(null)
     const markersRef = useRef<L.Marker[]>([])
@@ -442,6 +461,7 @@ function LeafletMapComponent({ offlineUrl, devices }: { offlineUrl?: string, dev
                         <DeviceDetailPopup
                             device={device}
                             t={t}
+                            canControl={canControl}
                             onUpdatePosition={() => {
                                 // Update popup position if content size changes
                                 marker.getPopup()?.update()
@@ -470,7 +490,7 @@ function LeafletMapComponent({ offlineUrl, devices }: { offlineUrl?: string, dev
 
             markersRef.current.push(marker)
         })
-    }, [devices, currentZoom, t])
+    }, [devices, currentZoom, t, canControl])
 
     return <div ref={containerRef} className="h-full w-full" style={{ zIndex: 0 }} />
 }

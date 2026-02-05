@@ -524,5 +524,29 @@
             "txt_list_name_V_SettingDevice": "Devices Setting",
             "txt_tb_menu_control": "Control"
         }
+    },
+    "ScheduleSettings": {
+        "title": "Schedule Settings",
+        "table": {
+            "scheduleName": "Schedule Name",
+            "typeSchedule": "Type",
+            "edit": "Edit",
+            "feedback": "Feedback",
+            "delete": "Delete",
+            "actions": "Actions"
+        },
+        "types": {
+            "time": "Time Schedule",
+            "light": "Light Control",
+            "manual": "Manual / Sensor Off"
+        },
+        "buttons": {
+            "edit": "Edit",
+            "feedback": "Feedback"
+        },
+        "totalItems": "Total Items :",
+        "rowsPerPage": "Rows per page :",
+        "loading": "Loading...",
+        "noData": "No result."
     }
 }

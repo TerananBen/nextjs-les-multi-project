@@ -524,5 +524,29 @@
             "txt_tb_menu_control": "ควบคุม",
             "txt_list_name_V_SettingDevice": "ตั้งค่าอุปกรณ์"
         }
+    },
+    "ScheduleSettings": {
+        "title": "ตั้งค่าตารางเวลา",
+        "table": {
+            "scheduleName": "ชื่อการตั้งค่า",
+            "typeSchedule": "ประเภท",
+            "edit": "แก้ไข",
+            "feedback": "การตอบกลับ",
+            "delete": "ลบ",
+            "actions": "การกระทำ"
+        },
+        "types": {
+            "time": "ทำงานตามเวลา",
+            "light": "ตามแสงแวดล้อม",
+            "manual": "ปิดใช้งานเซนเซอร์"
+        },
+        "buttons": {
+            "edit": "แก้ไข",
+            "feedback": "ตอบกลับ"
+        },
+        "totalItems": "รายการทั้งหมด :",
+        "rowsPerPage": "แถวต่อหน้า :",
+        "loading": "กำลังโหลด...",
+        "noData": "ไม่พบข้อมูล"
     }
 }

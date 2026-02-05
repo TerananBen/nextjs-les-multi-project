@@ -29,14 +29,17 @@ interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
     data: TData[]
     loading?: boolean
+    onAdd?: () => void
 }
 
 export function DataTable<TData, TValue>({
     columns,
     data,
     loading = false,
+    onAdd,
 }: DataTableProps<TData, TValue>) {
     const t = useTranslations("ScheduleSettings")
+    const tButtons = useTranslations("ScheduleSettings.buttons") // assuming "add" key is in buttons
     const [pagination, setPagination] = React.useState<PaginationState>({
         pageIndex: 0,
         pageSize: 10,
@@ -106,6 +109,23 @@ export function DataTable<TData, TValue>({
                         ))}
                     </TableHeader>
                     <TableBody>
+                        {/* Render Add Row on First Page if onAdd is provided */}
+                        {onAdd && pagination.pageIndex === 0 && !loading && (
+                            <TableRow
+                                className="hover:bg-blue-50/50 cursor-pointer group transition-colors border-b-2 border-dashed border-blue-100"
+                                onClick={onAdd}
+                            >
+                                <TableCell colSpan={columns.length} className="h-14 text-center py-2">
+                                    <div className="flex items-center justify-center gap-2 text-blue-600 font-medium group-hover:text-blue-700">
+                                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                                            <span className="text-lg leading-none mb-0.5">+</span>
+                                        </div>
+                                        {tButtons("add")}
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        )}
+
                         {loading ? (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
@@ -130,14 +150,16 @@ export function DataTable<TData, TValue>({
                                 </TableRow>
                             ))
                         ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center"
-                                >
-                                    {t("noData")}
-                                </TableCell>
-                            </TableRow>
+                            !onAdd && ( // Only show No Data if we didn't render an Add row (or if we prefer showing it below add row? Standard usually hides if there's an add row, but here we can show both or just add row. If empty data, table shows add row then no data row? Let's keep no data row if absolutely no data found)
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={columns.length}
+                                        className="h-24 text-center"
+                                    >
+                                        {t("noData")}
+                                    </TableCell>
+                                </TableRow>
+                            )
                         )}
                     </TableBody>
                 </Table>

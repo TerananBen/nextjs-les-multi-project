@@ -541,12 +541,54 @@
             "manual": "Manual / Sensor Off"
         },
         "buttons": {
+            "add": "Add Schedule",
             "edit": "Edit",
             "feedback": "Feedback"
         },
         "totalItems": "Total Items :",
         "rowsPerPage": "Rows per page :",
         "loading": "Loading...",
+        "dialog": {
+            "title": "Edit Schedule",
+            "addTitle": "Add Schedule",
+            "scheduleNameLabel": "Schedule Name",
+            "addGroup": "Add Group",
+            "selectGroup": "-- Select Group --",
+            "typeLabel": "Type",
+            "groupNameHeader": "Group Name",
+            "deleteHeader": "Delete",
+            "addWork": "Add Task",
+            "workTimeHeader": "Time",
+            "brightnessHeader": "Brightness",
+            "save": "Save",
+            "saving": "Saving...",
+            "validateError": "Please fill in all required fields marked in red.",
+            "cancel": "Cancel",
+            "lightIntensitySetting": "Settings Light Intensity Open/Close Light",
+            "brightnessSetting": "% Brightness Open/Close Light",
+            "lightOpen": "Light Intensity Open",
+            "lightClose": "Light Intensity Close",
+            "lux": "Lux",
+            "percent": "%",
+            "noGroupSelected": "No groups selected",
+            "clickAddTask": "Click \"Add Task\" to create a time schedule.",
+            "brightnessThreshold": "Brightness Threshold (Lux)",
+            "outputBrightness": "Output Brightness (%)",
+            "manualModeTitle": "Manual Mode Selected",
+            "manualModeDescription": "Sensors are disabled. Lights will be controlled manually via the Control interface."
+        },
+        "validation": {
+            "groupRequired": "At least one group is required",
+            "timeSlotRequired": "At least one time slot is required",
+            "maxTimeSlots": "Maximum 12 time slots allowed",
+            "timeRequired": "Time is required",
+            "dimRequired": "Dim is required",
+            "duplicateTime": "Duplicate time",
+            "required": "Required",
+            "numericOnly": "Numeric only",
+            "luxRange": "1-4000 Lux",
+            "dimRange": "1-100%"
+        },
         "noData": "No result."
     }
 }

@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button"
 import { ArrowUpDown, Pencil, Trash2, Info } from "lucide-react"
 import { useTranslations } from "next-intl"
 
-export const useScheduleColumns = () => {
+interface UseScheduleColumnsProps {
+    onEdit: (item: ScheduleItem) => void
+}
+
+export const useScheduleColumns = ({ onEdit }: UseScheduleColumnsProps) => {
     const t = useTranslations("ScheduleSettings")
 
     const columns: ColumnDef<ScheduleItem>[] = [
@@ -56,6 +60,7 @@ export const useScheduleColumns = () => {
                     <Button
                         size="sm"
                         className="bg-blue-500 hover:bg-blue-600 text-white gap-2 px-4 shadow-sm"
+                        onClick={() => onEdit(row.original)}
                     >
                         <Pencil className="h-4 w-4" />
                         {t("table.edit")}

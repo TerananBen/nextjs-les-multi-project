@@ -29,13 +29,105 @@ export async function getDataScheduleAction(): Promise<ScheduleItem[]> {
             return []
         }
 
-        const data: ScheduleResponse = await response.json()
-        if (data.result) {
-            return data.dataReturn
+        const data: any = await response.json()
+        if (data.result && Array.isArray(data.dataReturn)) {
+            // Map raw API data to ScheduleItem structure
+            return data.dataReturn.map((item: any) => {
+                // 1. Parse Group Names from "list_group_name_code" (JSON String of ["Name$Code"])
+                let groupNames: string[] = []
+                if (item.list_group_name_code) {
+                    try {
+                        const parsed = typeof item.list_group_name_code === 'string'
+                            ? JSON.parse(item.list_group_name_code)
+                            : item.list_group_name_code
+
+                        if (Array.isArray(parsed)) {
+                            // Expecting "Name$Code" strings
+                            groupNames = parsed.map((s: string) => {
+                                if (typeof s === 'string' && s.includes('$')) {
+                                    return s.split('$')[0].trim()
+                                }
+                                return s // Fallback if just name or unexpected format
+                            })
+                        }
+                    } catch (e) {
+                        console.error("Error parsing list_group_name_code", e)
+                    }
+                }
+
+                // 2. Parse Scenes from "list_scenes_light" (JSON String)
+                let scenes: any[] = []
+                if (item.list_scenes_light) {
+                    try {
+                        const parsed = typeof item.list_scenes_light === 'string'
+                            ? JSON.parse(item.list_scenes_light)
+                            : item.list_scenes_light
+
+                        // Handle both Array (Time) and Object (Light - single object)
+                        if (Array.isArray(parsed)) {
+                            scenes = parsed
+                        } else if (parsed && typeof parsed === 'object') {
+                            scenes = [parsed]
+                        }
+                    } catch (e) {
+                        console.error("Error parsing list_scenes_light", e)
+                    }
+                }
+
+                return {
+                    scheduleName: item.name_schedule || item.scheduleName || "",
+                    typeSchedule: item.type_schedule || item.typeSchedule || "time",
+                    groupCode: item.code_name || item.groupCode || "",
+                    dataGroupName: groupNames.length > 0 ? groupNames : (item.dataGroupName || []),
+                    listScenes: scenes.length > 0 ? scenes : (item.listScenes || []),
+                    // Other fields as fallback
+                    dataGroupCode: item.dataGroupCode || [],
+                    listDays: item.listDays || []
+                } as ScheduleItem
+            })
         }
         return []
     } catch (error) {
         console.error("Error fetching schedule data:", error)
         return []
+    }
+}
+
+export async function saveScheduleSettingsAction(payload: any): Promise<{ success: boolean; message?: string }> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) {
+        return { success: false, message: "Server configuration error" }
+    }
+
+    // Default fields requested by user
+    // Note: User specified payload structure doesn't include project_name/user_id anymore.
+    // We pass payload directly as everything is expected to be in it.
+    const requestBody = payload;
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLight/settingScheduleMultiSensorLocal`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(requestBody)
+        })
+
+        if (!response.ok) {
+            console.error(`API error: ${response.status} ${response.statusText}`)
+            return { success: false, message: `API Error: ${response.status}` }
+        }
+
+        const data = await response.json()
+        if (data.result) {
+            return { success: true }
+        }
+        return { success: false, message: "API returned false result" }
+    } catch (error) {
+        console.error("Error saving schedule:", error)
+        return { success: false, message: "Network error" }
     }
 }

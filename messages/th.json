@@ -541,12 +541,56 @@
             "manual": "ปิดใช้งานเซนเซอร์"
         },
         "buttons": {
+            "add": "เพิ่มการตั้งค่า",
             "edit": "แก้ไข",
             "feedback": "ตอบกลับ"
         },
         "totalItems": "รายการทั้งหมด :",
         "rowsPerPage": "แถวต่อหน้า :",
         "loading": "กำลังโหลด...",
+        "dialog": {
+            "title": "รายละเอียดการตั้งค่า",
+            "addTitle": "เพิ่ม การตั้งค่า",
+            "scheduleNameLabel": "ชื่อการตั้งค่า",
+            "addGroup": "เพิ่มกลุ่ม",
+            "selectGroup": "-- เลือก กลุ่ม --",
+            "typeLabel": "ประเภท",
+            "groupNameHeader": "ชื่อกลุ่ม",
+            "deleteHeader": "ลบ",
+            "addWork": "เพิ่มงาน",
+            "workTimeHeader": "เวลาทำงาน",
+            "brightnessHeader": "ความสว่าง",
+            "save": "บันทึก",
+            "saving": "กำลังบันทึก...",
+            "saveSuccess": "บันทึกข้อมูลเรียบร้อยแล้ว",
+            "saveError": "เกิดข้อผิดพลาดในการบันทึก",
+            "validateError": "กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน",
+            "cancel": "ยกเลิก",
+            "lightIntensitySetting": "ตั้งค่า ความเข้มแสง เปิด/ปิด ไฟ",
+            "brightnessSetting": "% ความสว่าง เปิด/ปิด ไฟ",
+            "lightOpen": "ความเข้มแสง เปิดไฟ",
+            "lightClose": "ความเข้มแสง ปิดไฟ",
+            "lux": "Lux",
+            "percent": "%",
+            "noGroupSelected": "ไม่ได้เลือกกลุ่ม",
+            "clickAddTask": "คลิก \"เพิ่มงาน\" เพื่อสร้างตารางเวลา",
+            "brightnessThreshold": "ค่าความเข้มแสง (Lux)",
+            "outputBrightness": "ความสว่างที่ต้องการ (%)",
+            "manualModeTitle": "เลือกโหมดกำหนดเอง (Manual)",
+            "manualModeDescription": "เซ็นเซอร์จะถูกปิดใช้งาน ไฟจะถูกควบคุมด้วยมือผ่านหน้าควบคุม"
+        },
+        "validation": {
+            "groupRequired": "กรุณาเลือกกลุ่มอย่างน้อย 1 กลุ่ม",
+            "timeSlotRequired": "กรุณาเพิ่มเวลาทำงานอย่างน้อย 1 รายการ",
+            "maxTimeSlots": "เพิ่มเวลาทำงานได้สูงสุด 12 รายการ",
+            "timeRequired": "กรุณาระบุเวลา",
+            "dimRequired": "กรุณาระบุความสว่าง",
+            "duplicateTime": "เวลาซ้ำกัน",
+            "required": "จำเป็น",
+            "numericOnly": "ตัวเลขเท่านั้น",
+            "luxRange": "1-4000 Lux",
+            "dimRange": "1-100%"
+        },
         "noData": "ไม่พบข้อมูล"
     }
 }

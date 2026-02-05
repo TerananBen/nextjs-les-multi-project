@@ -10,8 +10,19 @@ import { getListDataGroupAction } from "@/app/actions/street-light"
 import { DeviceGroup } from "@/types/street-light"
 import { EditScheduleDialog } from "./edit-dialog"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { Plus, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { deleteScheduleAction } from "@/app/actions/schedule-settings"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 export function ScheduleSettingsClient() {
     const t = useTranslations("ScheduleSettings")
@@ -23,16 +34,48 @@ export function ScheduleSettingsClient() {
     const [openDialog, setOpenDialog] = React.useState(false)
     const [selectedSchedule, setSelectedSchedule] = React.useState<ScheduleItem | null>(null)
 
+    // Delete State
+    const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false)
+    const [scheduleToDelete, setScheduleToDelete] = React.useState<ScheduleItem | null>(null)
+    const [isDeleting, setIsDeleting] = React.useState(false)
+
     const columns = useScheduleColumns({
         onEdit: (item) => {
             setSelectedSchedule(item)
             setOpenDialog(true)
+        },
+        onDelete: (item) => {
+            setScheduleToDelete(item)
+            setOpenDeleteDialog(true)
         }
     })
 
     const handleAdd = () => {
         setSelectedSchedule(null) // Ensure we are in "Add" mode
         setOpenDialog(true)
+    }
+
+    const handleDeleteConfirm = async () => {
+        if (!scheduleToDelete) return
+
+        setIsDeleting(true)
+        try {
+            const result = await deleteScheduleAction(scheduleToDelete.groupCode)
+            if (result.success) {
+                toast.success(t("deleteDialog.success"))
+                setOpenDeleteDialog(false)
+                // Refresh data
+                window.location.reload()
+            } else {
+                toast.error(t("deleteDialog.error") + (result.message ? `: ${result.message}` : ""))
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error(t("deleteDialog.error"))
+        } finally {
+            setIsDeleting(false)
+            setScheduleToDelete(null)
+        }
     }
 
     React.useEffect(() => {
@@ -68,6 +111,37 @@ export function ScheduleSettingsClient() {
                 schedule={selectedSchedule}
                 groups={groups}
             />
+
+            <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {t("deleteDialog.description", { name: scheduleToDelete?.scheduleName || "" })}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel disabled={isDeleting}>{t("deleteDialog.cancel")}</AlertDialogCancel>
+                        <AlertDialogAction
+                            onClick={(e) => {
+                                e.preventDefault()
+                                handleDeleteConfirm()
+                            }}
+                            className="bg-red-600 hover:bg-red-700 text-white"
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? (
+                                <>
+                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    {t("deleteDialog.deleting")}
+                                </>
+                            ) : (
+                                t("deleteDialog.confirm")
+                            )}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }

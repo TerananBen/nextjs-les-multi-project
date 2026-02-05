@@ -8,9 +8,10 @@ import { useTranslations } from "next-intl"
 
 interface UseScheduleColumnsProps {
     onEdit: (item: ScheduleItem) => void
+    onDelete: (item: ScheduleItem) => void
 }
 
-export const useScheduleColumns = ({ onEdit }: UseScheduleColumnsProps) => {
+export const useScheduleColumns = ({ onEdit, onDelete }: UseScheduleColumnsProps) => {
     const t = useTranslations("ScheduleSettings")
 
     const columns: ColumnDef<ScheduleItem>[] = [
@@ -98,6 +99,7 @@ export const useScheduleColumns = ({ onEdit }: UseScheduleColumnsProps) => {
                         size="icon"
                         variant="destructive"
                         className="h-9 w-9 shadow-sm"
+                        onClick={() => onDelete(row.original)}
                     >
                         <Trash2 className="h-4 w-4" />
                     </Button>

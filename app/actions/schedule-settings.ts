@@ -131,3 +131,42 @@ export async function saveScheduleSettingsAction(payload: any): Promise<{ succes
         return { success: false, message: "Network error" }
     }
 }
+
+export async function deleteScheduleAction(groupCode: string): Promise<{ success: boolean; message?: string }> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) {
+        return { success: false, message: "Server configuration error" }
+    }
+
+    try {
+        // Payload format: { "json_value": "{\"groupCode\":\"...\"}" }
+        const payload = {
+            json_value: JSON.stringify({ groupCode })
+        }
+
+        const response = await fetch(`${API_URL}/StreetLight/deleteSettingSchedule`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+        })
+
+        if (!response.ok) {
+            console.error(`API error: ${response.status} ${response.statusText}`)
+            return { success: false, message: `API Error: ${response.status}` }
+        }
+
+        const data = await response.json()
+        if (data.result) {
+            return { success: true }
+        }
+        return { success: false, message: "API returned false result" }
+    } catch (error) {
+        console.error("Error deleting schedule:", error)
+        return { success: false, message: "Network error" }
+    }
+}

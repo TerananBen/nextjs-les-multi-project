@@ -23,12 +23,12 @@ export const useScheduleColumns = ({ onEdit }: UseScheduleColumnsProps) => {
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                         className="-ml-4 hover:bg-transparent"
                     >
-                        <span className="font-semibold text-gray-900">{t("table.scheduleName")}</span>
+                        <span className="font-semibold text-foreground">{t("table.scheduleName")}</span>
                         <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
                 )
             },
-            cell: ({ row }) => <div className="font-medium text-gray-900">{row.getValue("scheduleName")}</div>,
+            cell: ({ row }) => <div className="font-medium text-foreground">{row.getValue("scheduleName")}</div>,
         },
         {
             accessorKey: "typeSchedule",
@@ -39,7 +39,7 @@ export const useScheduleColumns = ({ onEdit }: UseScheduleColumnsProps) => {
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                         className="-ml-4 hover:bg-transparent"
                     >
-                        <span className="font-semibold text-gray-900">{t("table.typeSchedule")}</span>
+                        <span className="font-semibold text-foreground">{t("table.typeSchedule")}</span>
                         <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
                 )
@@ -47,13 +47,13 @@ export const useScheduleColumns = ({ onEdit }: UseScheduleColumnsProps) => {
             cell: ({ row }) => {
                 const type = row.getValue("typeSchedule") as string
                 const label = t(`types.${type}`) || type
-                return <div className="text-gray-600">{label}</div>
+                return <div className="text-muted-foreground">{label}</div>
             },
         },
         {
             id: "edit",
             header: ({ column }) => (
-                <div className="font-semibold text-gray-900">{t("table.edit")}</div>
+                <div className="font-semibold text-foreground">{t("table.edit")}</div>
             ),
             cell: ({ row }) => {
                 return (
@@ -72,7 +72,7 @@ export const useScheduleColumns = ({ onEdit }: UseScheduleColumnsProps) => {
         {
             id: "feedback",
             header: ({ column }) => (
-                <div className="font-semibold text-gray-900">{t("table.feedback")}</div>
+                <div className="font-semibold text-foreground">{t("table.feedback")}</div>
             ),
             cell: ({ row }) => {
                 return (
@@ -90,7 +90,7 @@ export const useScheduleColumns = ({ onEdit }: UseScheduleColumnsProps) => {
         {
             id: "delete",
             header: ({ column }) => (
-                <div className="font-semibold text-gray-900">{t("table.delete")}</div>
+                <div className="font-semibold text-foreground">{t("table.delete")}</div>
             ),
             cell: ({ row }) => {
                 return (

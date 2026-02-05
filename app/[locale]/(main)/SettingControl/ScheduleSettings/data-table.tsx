@@ -95,7 +95,7 @@ export function DataTable<TData, TValue>({
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                        <TableHead key={header.id} className="font-semibold text-gray-700">
+                                        <TableHead key={header.id} className="font-semibold text-muted-foreground">
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
@@ -112,12 +112,12 @@ export function DataTable<TData, TValue>({
                         {/* Render Add Row on First Page if onAdd is provided */}
                         {onAdd && pagination.pageIndex === 0 && !loading && (
                             <TableRow
-                                className="hover:bg-blue-50/50 cursor-pointer group transition-colors border-b-2 border-dashed border-blue-100"
+                                className="hover:bg-primary/5 cursor-pointer group transition-colors border-b-2 border-dashed border-primary/20"
                                 onClick={onAdd}
                             >
                                 <TableCell colSpan={columns.length} className="h-14 text-center py-2">
-                                    <div className="flex items-center justify-center gap-2 text-blue-600 font-medium group-hover:text-blue-700">
-                                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                                    <div className="flex items-center justify-center gap-2 text-primary font-medium group-hover:text-primary/80">
+                                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                                             <span className="text-lg leading-none mb-0.5">+</span>
                                         </div>
                                         {tButtons("add")}

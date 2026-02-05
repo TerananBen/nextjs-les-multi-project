@@ -330,8 +330,8 @@ export function EditScheduleDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 gap-0 bg-gray-50/50">
-                <DialogHeader className="p-6 pb-2 bg-white border-b sticky top-0 z-10">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 gap-0">
+                <DialogHeader className="p-6 pb-2 border-b sticky top-0 z-10 bg-background">
                     <div className="flex justify-between items-center mr-8">
                         <DialogTitle className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                             {schedule ? t("title") : t("addTitle")}
@@ -339,17 +339,17 @@ export function EditScheduleDialog({
                     </div>
                 </DialogHeader>
 
-                <div className="p-6 space-y-8 bg-white min-h-[60vh]">
+                <div className="p-6 space-y-8 min-h-[60vh] bg-background">
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Schedule Name */}
                             <div className="space-y-2">
-                                <label className="text-sm font-semibold text-gray-700">
+                                <label className="text-sm font-semibold text-foreground">
                                     {t("scheduleNameLabel")} <span className="text-red-500">*</span>
                                 </label>
                                 <Input
                                     {...form.register("scheduleName")}
-                                    className={`h-10 border-gray-200 focus:border-blue-500 transition-colors bg-gray-50/50 focus:bg-white ${form.formState.errors.scheduleName ? "border-red-500" : ""}`}
+                                    className={`h-10 border-input focus:border-primary transition-colors bg-muted/50 focus:bg-background ${form.formState.errors.scheduleName ? "border-destructive" : ""}`}
                                     placeholder="Enter schedule name..."
                                 />
                                 {form.formState.errors.scheduleName && (
@@ -361,14 +361,14 @@ export function EditScheduleDialog({
 
                             {/* Type Selection */}
                             <div className="space-y-2">
-                                <label className="text-sm font-semibold text-gray-700">
+                                <label className="text-sm font-semibold text-foreground">
                                     {t("typeLabel")}
                                 </label>
                                 <Select
                                     value={typeSchedule}
                                     onValueChange={(val) => setValue("typeSchedule", val)}
                                 >
-                                    <SelectTrigger className="h-10 border-gray-200 bg-gray-50/50 focus:bg-white">
+                                    <SelectTrigger className="h-10 border-input bg-muted/50 focus:bg-background">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -383,12 +383,12 @@ export function EditScheduleDialog({
                         {/* Groups Section */}
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-sm font-semibold text-gray-900 border-l-4 border-blue-500 pl-2">
+                                <h3 className="text-sm font-semibold text-foreground border-l-4 border-primary pl-2">
                                     {t("groupNameHeader")}
                                 </h3>
                                 <div className="flex gap-2 w-full max-w-sm">
                                     <Select value={selectedGroupToAdd} onValueChange={setSelectedGroupToAdd}>
-                                        <SelectTrigger className="h-9 border-gray-200 bg-gray-50/50 focus:bg-white">
+                                        <SelectTrigger className="h-9 border-input bg-muted/50 focus:bg-background">
                                             <SelectValue placeholder={t("selectGroup")} />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -411,9 +411,9 @@ export function EditScheduleDialog({
                                 </div>
                             </div>
 
-                            <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
+                            <div className="bg-background border rounded-xl shadow-sm overflow-hidden">
                                 {watch("dataGroupName").length === 0 ? (
-                                    <div className="p-8 text-center text-gray-400 bg-gray-50 flex flex-col items-center gap-2">
+                                    <div className="p-8 text-center text-muted-foreground bg-muted/50 flex flex-col items-center gap-2">
                                         <span>No groups selected</span>
                                         {form.formState.errors.dataGroupName && (
                                             <span className="text-sm text-red-500 font-medium">
@@ -423,20 +423,20 @@ export function EditScheduleDialog({
                                     </div>
                                 ) : (
                                     <div className="divide-y">
-                                        <div className="grid grid-cols-[1fr_80px] bg-gray-50/80 p-3 font-medium text-xs text-gray-500 uppercase tracking-wider">
+                                        <div className="grid grid-cols-[1fr_80px] bg-muted/80 p-3 font-medium text-xs text-muted-foreground uppercase tracking-wider">
                                             <div>{t("groupNameHeader")}</div>
                                             <div className="text-center">{t("deleteHeader")}</div>
                                         </div>
                                         <div className="max-h-[200px] overflow-y-auto">
                                             {watch("dataGroupName").map((groupName, index) => (
-                                                <div key={index} className="grid grid-cols-[1fr_80px] p-3 items-center hover:bg-blue-50/30 transition-colors">
-                                                    <div className="text-sm text-gray-700 font-medium pl-1">{groupName}</div>
+                                                <div key={index} className="grid grid-cols-[1fr_80px] p-3 items-center hover:bg-muted/50 transition-colors">
+                                                    <div className="text-sm text-foreground font-medium pl-1">{groupName}</div>
                                                     <div className="flex justify-center">
                                                         <Button
                                                             type="button"
                                                             variant="ghost"
                                                             size="icon"
-                                                            className="h-8 w-8 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full"
+                                                            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full"
                                                             onClick={() => {
                                                                 const current = watch("dataGroupName");
                                                                 setValue("dataGroupName", current.filter((_, i) => i !== index))
@@ -454,7 +454,7 @@ export function EditScheduleDialog({
                         </div>
 
                         {/* Divider */}
-                        <div className="border-t border-gray-100" />
+                        <div className="border-t border-border" />
 
                         {/* Conditional Content Based on Type */}
 
@@ -462,7 +462,7 @@ export function EditScheduleDialog({
                         {typeSchedule === "time" && (
                             <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-sm font-semibold text-gray-900 border-l-4 border-indigo-500 pl-2">
+                                    <h3 className="text-sm font-semibold text-foreground border-l-4 border-indigo-500 pl-2">
                                         {t("workTimeHeader")}
                                     </h3>
                                     <Button
@@ -477,9 +477,9 @@ export function EditScheduleDialog({
                                     </Button>
                                 </div>
 
-                                <div className="border rounded-xl shadow-sm overflow-hidden bg-white">
+                                <div className="border rounded-xl shadow-sm overflow-hidden bg-background">
                                     {/* Table Header */}
-                                    <div className="grid grid-cols-[1fr_1fr_60px] bg-indigo-50/50 p-3 text-xs font-semibold text-indigo-900 uppercase tracking-wider border-b border-indigo-100">
+                                    <div className="grid grid-cols-[1fr_1fr_60px] bg-indigo-50/50 dark:bg-indigo-950/20 p-3 text-xs font-semibold text-indigo-900 dark:text-indigo-200 uppercase tracking-wider border-b border-indigo-100 dark:border-indigo-900">
                                         <div className="flex items-center gap-2">
                                             <Clock className="w-3 h-3" />
                                             {t("workTimeHeader")}
@@ -490,7 +490,7 @@ export function EditScheduleDialog({
 
                                     {/* Table Body */}
                                     {sceneFields.length === 0 ? (
-                                        <div className="p-8 text-center text-muted-foreground bg-gray-50/50 flex flex-col items-center gap-2">
+                                        <div className="p-8 text-center text-muted-foreground bg-muted/30 flex flex-col items-center gap-2">
                                             <span>Click "Add Task" to create a time schedule.</span>
                                             {(form.formState.errors.listScenes as any)?.message && (
                                                 <span className="text-sm text-red-500 font-medium">
@@ -499,19 +499,19 @@ export function EditScheduleDialog({
                                             )}
                                         </div>
                                     ) : (
-                                        <div className="max-h-[300px] overflow-y-auto divide-y divide-gray-100 relative">
+                                        <div className="max-h-[300px] overflow-y-auto divide-y divide-border relative">
                                             {(form.formState.errors.listScenes as any)?.message && (
-                                                <div className="sticky top-0 z-20 bg-red-50 text-red-600 text-xs font-medium p-2 text-center border-b border-red-100">
+                                                <div className="sticky top-0 z-20 bg-destructive/10 text-destructive text-xs font-medium p-2 text-center border-b border-destructive/20">
                                                     {(form.formState.errors.listScenes as any)?.message}
                                                 </div>
                                             )}
                                             {sceneFields.map((field, index) => (
-                                                <div key={field.id} className="grid grid-cols-[1fr_1fr_60px] p-3 items-start gap-4 hover:bg-indigo-50/10 transition-colors group">
+                                                <div key={field.id} className="grid grid-cols-[1fr_1fr_60px] p-3 items-start gap-4 hover:bg-muted/30 transition-colors group">
                                                     <div className="flex flex-col gap-1">
                                                         <Input
                                                             {...form.register(`listScenes.${index}.time`)}
                                                             type="time"
-                                                            className={`h-9 font-medium border-gray-200 focus:border-indigo-500 bg-white ${form.formState.errors.listScenes?.[index]?.time ? "border-red-500" : ""}`}
+                                                            className={`h-9 font-medium border-input focus:border-indigo-500 bg-background ${form.formState.errors.listScenes?.[index]?.time ? "border-destructive" : ""}`}
                                                         />
                                                         {form.formState.errors.listScenes?.[index]?.time && (
                                                             <span className="text-xs text-red-500 ml-1">
@@ -527,7 +527,7 @@ export function EditScheduleDialog({
                                                                     type="number"
                                                                     min="0"
                                                                     max="100"
-                                                                    className={`h-9 bg-white border-gray-200 focus:border-indigo-500 pr-8 ${form.formState.errors.listScenes?.[index]?.dim ? "border-red-500" : ""}`}
+                                                                    className={`h-9 bg-background border-input focus:border-indigo-500 pr-8 ${form.formState.errors.listScenes?.[index]?.dim ? "border-destructive" : ""}`}
                                                                 />
                                                                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-400 select-none">%</span>
                                                             </div>
@@ -543,7 +543,7 @@ export function EditScheduleDialog({
                                                             type="button"
                                                             variant="ghost"
                                                             size="icon"
-                                                            className="h-8 w-8 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-full transition-all"
+                                                            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full transition-all"
                                                             onClick={() => removeScene(index)}
                                                         >
                                                             <Trash2 className="h-4 w-4" />
@@ -560,25 +560,25 @@ export function EditScheduleDialog({
                         {/* TYPE: LIGHT */}
                         {typeSchedule === "light" && (
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                <h3 className="text-sm font-semibold text-gray-900 border-l-4 border-amber-500 pl-2">
+                                <h3 className="text-sm font-semibold text-foreground border-l-4 border-amber-500 pl-2">
                                     {t("lightIntensitySetting")}
                                 </h3>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     {/* Open Section */}
-                                    <div className="bg-amber-50/50 border border-amber-100 p-5 rounded-xl space-y-4">
+                                    <div className="bg-amber-50/50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900 p-5 rounded-xl space-y-4">
                                         <div className="flex items-center gap-2 mb-2">
                                             <div className="w-2 h-2 rounded-full bg-amber-500" />
-                                            <h4 className="font-semibold text-amber-900">{t("lightOpen")}</h4>
+                                            <h4 className="font-semibold text-amber-900 dark:text-amber-200">{t("lightOpen")}</h4>
                                         </div>
                                         <div className="space-y-3">
                                             <div className="space-y-1.5">
-                                                <label className="text-xs text-amber-700 font-medium">Brightness Threshold (Lux)</label>
+                                                <label className="text-xs text-amber-700 dark:text-amber-300 font-medium">Brightness Threshold (Lux)</label>
                                                 <div className="relative">
                                                     <Input
                                                         {...form.register(`listScenes.0.open_volt`)}
                                                         type="number"
-                                                        className={`pr-10 border-amber-200 focus:border-amber-500 ${form.formState.errors.listScenes?.[0]?.open_volt ? "border-red-500" : ""}`}
+                                                        className={`pr-10 border-amber-200 focus:border-amber-500 dark:bg-amber-950/30 ${form.formState.errors.listScenes?.[0]?.open_volt ? "border-destructive" : ""}`}
                                                     />
                                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-amber-400">{t("lux")}</span>
                                                 </div>
@@ -589,12 +589,12 @@ export function EditScheduleDialog({
                                                 )}
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="text-xs text-amber-700 font-medium">Output Brightness (%)</label>
+                                                <label className="text-xs text-amber-700 dark:text-amber-300 font-medium">Output Brightness (%)</label>
                                                 <div className="relative">
                                                     <Input
                                                         {...form.register(`listScenes.0.open_time`)}
                                                         type="number"
-                                                        className={`pr-10 border-amber-200 focus:border-amber-500 ${form.formState.errors.listScenes?.[0]?.open_time ? "border-red-500" : ""}`}
+                                                        className={`pr-10 border-amber-200 focus:border-amber-500 dark:bg-amber-950/30 ${form.formState.errors.listScenes?.[0]?.open_time ? "border-destructive" : ""}`}
                                                     />
                                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-amber-400">{t("percent")}</span>
                                                 </div>
@@ -608,19 +608,19 @@ export function EditScheduleDialog({
                                     </div>
 
                                     {/* Close Section */}
-                                    <div className="bg-gray-50 border border-gray-200 p-5 rounded-xl space-y-4">
+                                    <div className="bg-muted/20 border border-border p-5 rounded-xl space-y-4">
                                         <div className="flex items-center gap-2 mb-2">
                                             <div className="w-2 h-2 rounded-full bg-gray-500" />
-                                            <h4 className="font-semibold text-gray-900">{t("lightClose")}</h4>
+                                            <h4 className="font-semibold text-foreground">{t("lightClose")}</h4>
                                         </div>
                                         <div className="space-y-3">
                                             <div className="space-y-1.5">
-                                                <label className="text-xs text-gray-500 font-medium">Brightness Threshold (Lux)</label>
+                                                <label className="text-xs text-muted-foreground font-medium">Brightness Threshold (Lux)</label>
                                                 <div className="relative">
                                                     <Input
                                                         {...form.register(`listScenes.0.close_volt`)}
                                                         type="number"
-                                                        className={`pr-10 ${form.formState.errors.listScenes?.[0]?.close_volt ? "border-red-500" : ""}`}
+                                                        className={`pr-10 ${form.formState.errors.listScenes?.[0]?.close_volt ? "border-destructive" : ""}`}
                                                     />
                                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-400">{t("lux")}</span>
                                                 </div>
@@ -631,12 +631,12 @@ export function EditScheduleDialog({
                                                 )}
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="text-xs text-gray-500 font-medium">Output Brightness (%)</label>
+                                                <label className="text-xs text-muted-foreground font-medium">Output Brightness (%)</label>
                                                 <div className="relative">
                                                     <Input
                                                         {...form.register(`listScenes.0.close_time`)}
                                                         type="number"
-                                                        className={`pr-10 ${form.formState.errors.listScenes?.[0]?.close_time ? "border-red-500" : ""}`}
+                                                        className={`pr-10 ${form.formState.errors.listScenes?.[0]?.close_time ? "border-destructive" : ""}`}
                                                     />
                                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-400">{t("percent")}</span>
                                                 </div>
@@ -654,12 +654,12 @@ export function EditScheduleDialog({
 
                         {/* TYPE: MANUAL */}
                         {typeSchedule === "manual" && (
-                            <div className="p-8 bg-gray-50 rounded-xl border border-dashed flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+                            <div className="p-8 bg-muted/20 rounded-xl border border-dashed flex flex-col items-center justify-center text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-3">
                                     <span className="text-2xl">✋</span>
                                 </div>
-                                <h3 className="font-semibold text-gray-900">Manual Mode Selected</h3>
-                                <p className="text-sm text-gray-500 mt-1 max-w-xs">
+                                <h3 className="font-semibold text-foreground">Manual Mode Selected</h3>
+                                <p className="text-sm text-muted-foreground mt-1 max-w-xs">
                                     Sensors are disabled. Lights will be controlled manually via the Control interface.
                                 </p>
                             </div>
@@ -667,11 +667,11 @@ export function EditScheduleDialog({
                     </form>
                 </div>
 
-                <div className="p-6 border-t bg-gray-50 rounded-b-lg flex justify-end gap-3 sticky bottom-0 z-10">
+                <div className="p-6 border-t bg-muted/40 rounded-b-lg flex justify-end gap-3 sticky bottom-0 z-10">
                     <Button
                         type="button"
                         variant="outline"
-                        className="h-11 px-6 border-gray-300 text-gray-700 bg-white hover:bg-gray-50 shadow-sm"
+                        className="h-11 px-6 border-input text-foreground bg-background hover:bg-muted shadow-sm"
                         onClick={() => onOpenChange(false)}
                     >
                         {t("cancel")}

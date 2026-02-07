@@ -5,6 +5,9 @@ const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
   /* config options here */
+  experimental: {
+  },
+  allowedDevOrigins: ["10.0.0.10", "localhost"],
 };
 
 export default withNextIntl(nextConfig);

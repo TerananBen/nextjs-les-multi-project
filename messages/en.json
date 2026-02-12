@@ -598,6 +598,28 @@
             "deleting": "Deleting...",
             "success": "Schedule deleted successfully",
             "error": "Failed to delete schedule"
+        },
+        "responseDialog": {
+            "title": "Response Status",
+            "loading": "Loading response data...",
+            "table": {
+                "imsi": "Device Number",
+                "group": "Group",
+                "status": "Status",
+                "sendAgain": "Send Again"
+            },
+            "status": {
+                "waitResponse": "Wait Response",
+                "response": "Responded"
+            },
+            "close": "Close",
+            "reload": "Reload",
+            "resendSuccess": "Resend command successfully",
+            "resendFailed": "Resend command failed",
+            "resendError": "Error resending command",
+            "resendAll": "Resend All",
+            "resendingAll": "Resending All...",
+            "resendAllComplete": "Resend All Complete. Success: {success}, Failed: {failed}"
         }
     }
 }

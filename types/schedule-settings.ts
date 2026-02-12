@@ -41,3 +41,19 @@ export interface ScheduleSaveResponse {
     dateTime: string;
     dataReturn: boolean;
 }
+
+export interface ScheduleResponseItem {
+    imsi: string;
+    group_name: string[];
+    last_update: string;
+    time_create: string;
+    status: string;
+}
+
+export interface ResendPayload {
+    imsi: string;
+    mode: string;
+    last_update: string;
+    wait_time?: string;
+}
+

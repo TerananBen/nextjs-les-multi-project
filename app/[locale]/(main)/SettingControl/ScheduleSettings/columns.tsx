@@ -9,9 +9,10 @@ import { useTranslations } from "next-intl"
 interface UseScheduleColumnsProps {
     onEdit: (item: ScheduleItem) => void
     onDelete: (item: ScheduleItem) => void
+    onFeedback: (item: ScheduleItem) => void
 }
 
-export const useScheduleColumns = ({ onEdit, onDelete }: UseScheduleColumnsProps) => {
+export const useScheduleColumns = ({ onEdit, onDelete, onFeedback }: UseScheduleColumnsProps) => {
     const t = useTranslations("ScheduleSettings")
 
     const columns: ColumnDef<ScheduleItem>[] = [
@@ -80,6 +81,7 @@ export const useScheduleColumns = ({ onEdit, onDelete }: UseScheduleColumnsProps
                     <Button
                         size="sm"
                         className="bg-blue-500 hover:bg-blue-600 text-white gap-2 px-4 shadow-sm"
+                        onClick={() => onFeedback(row.original)}
                     >
                         <Info className="h-4 w-4" />
                         {t("table.feedback")}

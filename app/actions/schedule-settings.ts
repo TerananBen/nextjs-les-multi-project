@@ -170,3 +170,80 @@ export async function deleteScheduleAction(groupCode: string): Promise<{ success
         return { success: false, message: "Network error" }
     }
 }
+
+export async function getScheduleResponseAction(codeName: string): Promise<{ result: boolean; dataReturn: any[] }> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) {
+        return { result: false, dataReturn: [] }
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLightSmartSolar/getDataResponseSettingSchedule`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ code_name: codeName })
+        })
+
+        if (!response.ok) {
+            console.error(`API error: ${response.status} ${response.statusText}`)
+            return { result: false, dataReturn: [] }
+        }
+
+        const data = await response.json()
+        return data
+    } catch (error) {
+        console.error("Error fetching schedule response:", error)
+        return { result: false, dataReturn: [] }
+    }
+}
+
+export async function setModeResendAction(payload: any): Promise<{ success: boolean; message?: string; data?: any }> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+    const WAIT_TIME = process.env.WAIT_TIME || "30"
+
+    if (!API_URL || !token) {
+        return { success: false, message: "Server configuration error" }
+    }
+
+    const requestBody = {
+        ...payload,
+        wait_time: WAIT_TIME
+    }
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLight/setModeResend`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(requestBody)
+        })
+
+        if (!response.ok) {
+            console.error(`API error: ${response.status} ${response.statusText}`)
+            return { success: false, message: `API Error: ${response.status}` }
+        }
+
+        const data = await response.json()
+
+        if (data.result) {
+            if (data.dataReturn && data.dataReturn !== "") {
+                return { success: true, data: data }
+            } else {
+                return { success: false, message: "Timeout or No Data Return" }
+            }
+        }
+
+        return { success: false, message: "API returned false result" }
+    } catch (error) {
+        console.error("Error resending command:", error)
+        return { success: false, message: "Network error" }
+    }
+}

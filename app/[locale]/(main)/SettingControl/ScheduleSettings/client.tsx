@@ -9,6 +9,7 @@ import { toast } from "sonner"
 import { getListDataGroupAction } from "@/app/actions/street-light"
 import { DeviceGroup } from "@/types/street-light"
 import { EditScheduleDialog } from "./edit-dialog"
+import { ResponseDialog } from "./response-dialog"
 import { Button } from "@/components/ui/button"
 import { Plus, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
@@ -34,6 +35,12 @@ export function ScheduleSettingsClient() {
     const [openDialog, setOpenDialog] = React.useState(false)
     const [selectedSchedule, setSelectedSchedule] = React.useState<ScheduleItem | null>(null)
 
+    // Response Dialog State
+    const [openResponseDialog, setOpenResponseDialog] = React.useState(false)
+    const [responseScheduleCode, setResponseScheduleCode] = React.useState<string | null>(null)
+    const [responseScheduleName, setResponseScheduleName] = React.useState<string | null>(null)
+    const [responseTypeSchedule, setResponseTypeSchedule] = React.useState<string | null>(null)
+
     // Delete State
     const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false)
     const [scheduleToDelete, setScheduleToDelete] = React.useState<ScheduleItem | null>(null)
@@ -47,6 +54,12 @@ export function ScheduleSettingsClient() {
         onDelete: (item) => {
             setScheduleToDelete(item)
             setOpenDeleteDialog(true)
+        },
+        onFeedback: (item) => {
+            setResponseScheduleCode(item.groupCode) // Using groupCode as code_name as per API requirement usually
+            setResponseScheduleName(item.scheduleName)
+            setResponseTypeSchedule(item.typeSchedule)
+            setOpenResponseDialog(true)
         }
     })
 
@@ -110,6 +123,14 @@ export function ScheduleSettingsClient() {
                 onOpenChange={setOpenDialog}
                 schedule={selectedSchedule}
                 groups={groups}
+            />
+
+            <ResponseDialog
+                open={openResponseDialog}
+                onOpenChange={setOpenResponseDialog}
+                codeName={responseScheduleCode}
+                scheduleName={responseScheduleName}
+                typeSchedule={responseTypeSchedule}
             />
 
             <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>

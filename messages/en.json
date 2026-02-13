@@ -183,7 +183,9 @@
             "pickWeek": "Pick a week",
             "quarter": "Quarter",
             "weekOf": "Week of",
-            "dateRangeLimit": "Selection limited to 15 days."
+            "dateRangeLimit": "Selection limited to 15 days.",
+            "invalidDateRange": "End date must be after start date.",
+            "monthRangeLimit": "Selection limited to 12 months."
         },
         "summary": {
             "onlineTotal": "Online/Total",

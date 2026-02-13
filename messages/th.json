@@ -183,7 +183,9 @@
             "pickWeek": "เลือกสัปดาห์",
             "quarter": "ไตรมาส",
             "weekOf": "สัปดาห์ที่",
-            "dateRangeLimit": "เลือกได้ไม่เกิน 15 วัน"
+            "dateRangeLimit": "เลือกได้ไม่เกิน 15 วัน",
+            "invalidDateRange": "วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่มต้น",
+            "monthRangeLimit": "เลือกได้ไม่เกิน 12 เดือน"
         },
         "summary": {
             "onlineTotal": "ออนไลน์/ทั้งหมด",

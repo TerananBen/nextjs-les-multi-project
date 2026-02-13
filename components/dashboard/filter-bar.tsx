@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { DateRange } from "react-day-picker"
 import { GroupItem } from "@/app/actions/dashboard"
-import { Printer, Search, Calendar as CalendarIcon } from "lucide-react"
+import { Printer, Search, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react"
 import { useTranslations, useLocale } from "next-intl"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -60,6 +60,10 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
     // We'll use separate states for complex pickers to make UI handling easier
     const [selectedMonth, setSelectedMonth] = useState<string>(String(new Date().getMonth() + 1).padStart(2, '0'))
     const [selectedYear, setSelectedYear] = useState<string>(String(currentYear))
+    // State for Month picker (month range as {from, to} with 1st of month dates)
+    const [monthRange, setMonthRange] = useState<{ from?: Date; to?: Date }>({})
+    const [monthPickerYear, setMonthPickerYear] = useState(currentYear)
+
     const [selectedQuarter, setSelectedQuarter] = useState<string>("1")
 
     // Effect to update the main selectedDate string when sub-values change
@@ -79,8 +83,18 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
             } else {
                 setSelectedDate(start)
             }
-        } else if (selectedType === "Month") {
-            setSelectedDate(`${selectedYear}-${selectedMonth}`)
+        } else if (selectedType === "Month" && monthRange?.from) {
+            const startStr = format(monthRange.from, "yyyy-MM")
+            if (monthRange.to) {
+                const endStr = format(monthRange.to, "yyyy-MM")
+                if (startStr === endStr) {
+                    setSelectedDate(startStr)
+                } else {
+                    setSelectedDate(`${startStr}_${endStr}`)
+                }
+            } else {
+                setSelectedDate(startStr)
+            }
         } else if (selectedType === "Quarter") {
             setSelectedDate(`${selectedYear}-Q${selectedQuarter}`)
         } else if (selectedType === "Year") {
@@ -95,16 +109,20 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
         } else if (selectedType === "Now") {
             setSelectedDate("")
         }
-    }, [singleDate, dateRange, selectedType, selectedMonth, selectedYear, selectedQuarter])
+    }, [singleDate, dateRange, monthRange, selectedType, selectedMonth, selectedYear, selectedQuarter])
 
 
     const handleSearch = () => {
         // For "Now", date might be empty, which is fine
         if (selectedGroup && selectedType) {
             // Add validation if needed
+            // Month range validation is handled in the calendar onSelect
+
             onSearch(selectedGroup, selectedType, selectedDate)
         }
     }
+
+
 
     const renderDateInput = () => {
         if (selectedType === "Day") {
@@ -202,45 +220,126 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
         }
 
         if (selectedType === "Month") {
-            const currentMonthIdx = new Date().getMonth() // 0-11
+            const now = new Date()
+            const currentMonthDate = new Date(now.getFullYear(), now.getMonth(), 1) // 1st of current month
+            const shortMonths = Array.from({ length: 12 }, (_, i) => {
+                const d = new Date(2000, i, 1)
+                return format(d, "MMM", { locale: locale === "th" ? th : enUS })
+            })
+
+            const handleMonthClick = (monthIdx: number) => {
+                const clicked = new Date(monthPickerYear, monthIdx, 1)
+                // Don't allow future months or before project start
+                if (clicked > currentMonthDate || clicked < projectStartDate) return
+
+                if (!monthRange.from || (monthRange.from && monthRange.to)) {
+                    // Start new selection
+                    setMonthRange({ from: clicked })
+                } else {
+                    // Complete the range
+                    let from = monthRange.from
+                    let to = clicked
+                    if (to < from) {
+                        // Swap if clicked earlier
+                        ;[from, to] = [to, from]
+                    }
+                    // Validate max 12 months
+                    const diff = (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth())
+                    if (diff >= 12) {
+                        toast.error(t("monthRangeLimit"))
+                        return
+                    }
+                    setMonthRange({ from, to })
+                }
+            }
+
+            const isSelected = (monthIdx: number) => {
+                const d = new Date(monthPickerYear, monthIdx, 1)
+                if (monthRange.from && d.getTime() === monthRange.from.getTime()) return true
+                if (monthRange.to && d.getTime() === monthRange.to.getTime()) return true
+                return false
+            }
+
+            const isInRange = (monthIdx: number) => {
+                if (!monthRange.from || !monthRange.to) return false
+                const d = new Date(monthPickerYear, monthIdx, 1)
+                return d > monthRange.from && d < monthRange.to
+            }
+
+            const isDisabled = (monthIdx: number) => {
+                const d = new Date(monthPickerYear, monthIdx, 1)
+                return d > currentMonthDate || d < projectStartDate
+            }
+
             return (
-                <div className="flex gap-2">
-                    <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                        <SelectTrigger className="w-[140px]">
-                            <SelectValue placeholder="Month" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {Array.from({ length: 12 }, (_, i) => {
-                                const m = i + 1
-                                const mStr = String(m).padStart(2, '0')
-                                // Get localized month name
-                                const dateForMonth = new Date(2000, i, 1) // Any year works
-                                const monthName = format(dateForMonth, "MMMM", { locale: locale === "th" ? th : enUS })
-
-                                // Disable future months in current year
-                                const isFuture = Number(selectedYear) === currentYear && i > currentMonthIdx
-                                // Disable months before start date in start year
-                                const isBeforeStart = Number(selectedYear) === startYear && i < startMonthVal
-
-                                return (
-                                    <SelectItem key={m} value={mStr} disabled={isFuture || isBeforeStart}>{monthName}</SelectItem>
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                            variant={"outline"}
+                            className={cn(
+                                "w-auto min-w-[240px] pl-3 text-left font-normal",
+                                !monthRange.from && "text-muted-foreground"
+                            )}
+                        >
+                            {monthRange.from ? (
+                                monthRange.to ? (
+                                    <>
+                                        {format(monthRange.from, "MMM yyyy", { locale: locale === "th" ? th : enUS })} -{" "}
+                                        {format(monthRange.to, "MMM yyyy", { locale: locale === "th" ? th : enUS })}
+                                    </>
+                                ) : (
+                                    format(monthRange.from, "MMM yyyy", { locale: locale === "th" ? th : enUS })
                                 )
-                            })}
-                        </SelectContent>
-                    </Select>
-                    <Select value={selectedYear} onValueChange={setSelectedYear}>
-                        <SelectTrigger className="w-[100px]">
-                            <SelectValue placeholder="Year" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {years.map(y => (
-                                <SelectItem key={y} value={String(y)}>
-                                    {locale === "th" ? (y + 543) : y}
-                                </SelectItem>
+                            ) : (
+                                <span>{t("pickDate")}</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[280px] p-3" align="start">
+                        <div className="flex items-center justify-between mb-3">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => setMonthPickerYear(y => y - 1)}
+                                disabled={monthPickerYear <= startYear}
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <span className="text-sm font-medium">
+                                {locale === "th" ? monthPickerYear + 543 : monthPickerYear}
+                            </span>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={() => setMonthPickerYear(y => y + 1)}
+                                disabled={monthPickerYear >= currentYear}
+                            >
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
+                        </div>
+                        <div className="grid grid-cols-3 gap-1.5">
+                            {shortMonths.map((name, i) => (
+                                <Button
+                                    key={i}
+                                    variant={isSelected(i) ? "default" : "ghost"}
+                                    size="sm"
+                                    disabled={isDisabled(i)}
+                                    className={cn(
+                                        "h-9 text-sm",
+                                        isInRange(i) && "bg-accent text-accent-foreground",
+                                        isSelected(i) && "bg-primary text-primary-foreground hover:bg-primary/90"
+                                    )}
+                                    onClick={() => handleMonthClick(i)}
+                                >
+                                    {name}
+                                </Button>
                             ))}
-                        </SelectContent>
-                    </Select>
-                </div>
+                        </div>
+                    </PopoverContent>
+                </Popover>
             )
         }
 

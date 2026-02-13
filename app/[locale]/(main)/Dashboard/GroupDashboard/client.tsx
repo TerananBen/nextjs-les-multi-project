@@ -97,6 +97,60 @@ export function GroupDashboardClient({ groups, defaultGroupCode }: GroupDashboar
 
                 setData(aggregatedData)
 
+            } else if (type === "Month" && date.includes("_")) {
+                // Handle Multi-Month Range (format: YYYY-MM_YYYY-MM)
+                const [startStr, endStr] = date.split("_")
+                const [startY, startM] = startStr.split("-").map(Number)
+                const [endY, endM] = endStr.split("-").map(Number)
+
+                // Generate array of YYYY-MM strings
+                const monthArray: string[] = []
+                let y = startY, m = startM
+                while (y < endY || (y === endY && m <= endM)) {
+                    monthArray.push(`${y}-${String(m).padStart(2, '0')}`)
+                    m++
+                    if (m > 12) { m = 1; y++ }
+                }
+
+                // Fetch data for all months in parallel
+                const responses = await Promise.all(
+                    monthArray.map(monthStr =>
+                        getDataDashBoard({
+                            group_code: groupCode,
+                            select_type: "Month",
+                            select_date: monthStr
+                        })
+                    )
+                )
+
+                const validResponses = responses.filter(r => r !== null) as DashboardData[]
+
+                if (validResponses.length === 0) {
+                    setData(null)
+                    return
+                }
+
+                const firstData = validResponses[0]
+
+                const aggregatedData: DashboardData = {
+                    ...firstData,
+                    listUnitWattDay: monthArray,
+                    listAvgUnit: validResponses.map(r => parseFloat(r.toTalAvgUnit || "0")),
+                    listTotalImeiLose: validResponses.map(r => parseFloat(r.totalRTULose || "0")),
+
+                    // Summary Card Totals
+                    toTalAvgUnit: validResponses.reduce((sum, r) => sum + parseFloat(r.toTalAvgUnit || "0"), 0).toFixed(2),
+                    toTalAvgVolt: (validResponses.reduce((sum, r) => sum + parseFloat(r.toTalAvgVolt || "0"), 0) / validResponses.length).toFixed(2),
+                    totalRTULose: Math.round(validResponses.reduce((sum, r) => sum + parseFloat(r.totalRTULose || "0"), 0) / validResponses.length).toString(),
+
+                    // Clear hourly data to force "monthly" view in ChartsSection
+                    totalUnitPerHour: [],
+                    totalWattPerHour: [],
+                    totalVoltPerHour: []
+                }
+
+                setData(aggregatedData)
+
             } else {
                 // Single request (Original Logic)
                 const result = await getDataDashBoard({

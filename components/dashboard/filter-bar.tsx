@@ -10,6 +10,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
+import { DateRange } from "react-day-picker"
 import { GroupItem } from "@/app/actions/dashboard"
 import { Printer, Search, Calendar as CalendarIcon } from "lucide-react"
 import { useTranslations, useLocale } from "next-intl"
@@ -19,9 +20,10 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { format } from "date-fns"
+import { differenceInDays, format } from "date-fns"
 import { th, enUS } from "date-fns/locale"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 
 interface FilterBarProps {
     groups: GroupItem[]
@@ -34,7 +36,10 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
     const [selectedGroup, setSelectedGroup] = useState<string>("")
     const [selectedType, setSelectedType] = useState<string>("Month")
     const [selectedDate, setSelectedDate] = useState<string>("")
-    const [date, setDate] = useState<Date | undefined>(undefined)
+    // State for Week picker (Single Date)
+    const [singleDate, setSingleDate] = useState<Date | undefined>(undefined)
+    // State for Day picker (Date Range)
+    const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
 
     // Parse Project Start Date
     const projectStartDateStr = process.env.NEXT_PUBLIC_START_DATE_PROJECT || "2020-01-01"
@@ -59,15 +64,28 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
 
     // Effect to update the main selectedDate string when sub-values change
     useEffect(() => {
-        if (selectedType === "Day" && date) {
-            setSelectedDate(format(date, "yyyy-MM-dd"))
+        if (selectedType === "Day" && dateRange?.from) {
+            const start = format(dateRange.from, "yyyy-MM-dd")
+            if (dateRange.to) {
+                const end = format(dateRange.to, "yyyy-MM-dd")
+                // If same day, just send single date (optional, but cleaner for "Single Day" logic backend?)
+                // User said: "Select 1 day -> ... totalUnitPerHour".
+                // If start == end, it's 1 day.
+                if (start === end) {
+                    setSelectedDate(start)
+                } else {
+                    setSelectedDate(`${start},${end}`)
+                }
+            } else {
+                setSelectedDate(start)
+            }
         } else if (selectedType === "Month") {
             setSelectedDate(`${selectedYear}-${selectedMonth}`)
         } else if (selectedType === "Quarter") {
             setSelectedDate(`${selectedYear}-Q${selectedQuarter}`)
         } else if (selectedType === "Year") {
             setSelectedDate(selectedYear)
-        } else if (selectedType === "Week" && date) {
+        } else if (selectedType === "Week" && singleDate) {
             // Calculate week number (ISO)
             // We can use a library helper or simple format
             // The API likely expects YYYY-Www or similar. Let's assume typical format.
@@ -76,12 +94,12 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
             // Re-reading usage: "Week" usually implies sending a specific week identifier.
             // If the previous input was type="week", it sends "2024-W01".
             // We can construct this.
-            const weekVal = format(date, "I-'W'ww")
+            const weekVal = format(singleDate, "I-'W'ww")
             setSelectedDate(weekVal)
         } else if (selectedType === "Now") {
             setSelectedDate("")
         }
-    }, [date, selectedType, selectedMonth, selectedYear, selectedQuarter])
+    }, [singleDate, dateRange, selectedType, selectedMonth, selectedYear, selectedQuarter])
 
 
     const handleSearch = () => {
@@ -93,7 +111,7 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
     }
 
     const renderDateInput = () => {
-        if (selectedType === "Day" || selectedType === "Week") {
+        if (selectedType === "Day") {
             const startOfToday = new Date()
             startOfToday.setHours(0, 0, 0, 0)
 
@@ -103,16 +121,67 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
                         <Button
                             variant={"outline"}
                             className={cn(
-                                "w-[240px] pl-3 text-left font-normal",
-                                !date && "text-muted-foreground"
+                                "w-auto min-w-[240px] pl-3 text-left font-normal",
+                                !dateRange && "text-muted-foreground"
                             )}
                         >
-                            {date ? (
-                                selectedType === "Week"
-                                    ? `${t("weekOf")} ${format(date, "PPP", { locale: locale === "th" ? th : enUS })}`
-                                    : format(date, "PPP", { locale: locale === "th" ? th : enUS })
+                            {dateRange?.from ? (
+                                dateRange.to ? (
+                                    <>
+                                        {format(dateRange.from, "PPP", { locale: locale === "th" ? th : enUS })} -{" "}
+                                        {format(dateRange.to, "PPP", { locale: locale === "th" ? th : enUS })}
+                                    </>
+                                ) : (
+                                    format(dateRange.from, "PPP", { locale: locale === "th" ? th : enUS })
+                                )
                             ) : (
-                                <span>{selectedType === "Week" ? t("pickWeek") : t("pickDate")}</span>
+                                <span>{t("pickDate")}</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                            mode="range"
+                            selected={dateRange}
+                            onSelect={(val) => {
+                                // Max 15 days logic
+                                if (val?.from && val?.to) {
+                                    const days = differenceInDays(val.to, val.from)
+                                    if (days >= 15) {
+                                        toast.error(t("dateRangeLimit"))
+                                        return // Ignore selection > 15 days
+                                    }
+                                }
+                                setDateRange(val)
+                            }}
+                            locale={locale === "th" ? th : enUS}
+                            disabled={(date) => date >= startOfToday || date < projectStartDate}
+                            initialFocus
+                        />
+                    </PopoverContent>
+                </Popover>
+            )
+        }
+
+        if (selectedType === "Week") {
+            const startOfToday = new Date()
+            startOfToday.setHours(0, 0, 0, 0)
+
+            return (
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <Button
+                            variant={"outline"}
+                            className={cn(
+                                "w-auto min-w-[240px] pl-3 text-left font-normal",
+                                !singleDate && "text-muted-foreground"
+                            )}
+                        >
+                            {singleDate ? (
+                                `${t("weekOf")} ${format(singleDate, "PPP", { locale: locale === "th" ? th : enUS })}`
+                            ) : (
+                                <span>{t("pickWeek")}</span>
                             )}
                             <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                         </Button>
@@ -120,8 +189,8 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
                     <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
                             mode="single"
-                            selected={date}
-                            onSelect={setDate}
+                            selected={singleDate}
+                            onSelect={setSingleDate}
                             locale={locale === "th" ? th : enUS}
                             disabled={(date) => date >= startOfToday || date < projectStartDate}
                             initialFocus

@@ -182,7 +182,8 @@
             "pickDate": "เลือกวันที่",
             "pickWeek": "เลือกสัปดาห์",
             "quarter": "ไตรมาส",
-            "weekOf": "สัปดาห์ของวันที่"
+            "weekOf": "สัปดาห์ที่",
+            "dateRangeLimit": "เลือกได้ไม่เกิน 15 วัน"
         },
         "summary": {
             "onlineTotal": "ออนไลน์/ทั้งหมด",
@@ -200,7 +201,8 @@
         "charts": {
             "energyConsumption": "การใช้พลังงาน (kWh)",
             "lampFailure": "โคมเสีย (จำนวน)",
-            "noData": "ไม่พบข้อมูล"
+            "noData": "ไม่พบข้อมูล",
+            "time": "เวลา"
         }
     },
     "MapGlobal": {
@@ -578,7 +580,10 @@
             "lightClose": "ความเข้มแสง ปิดไฟ",
             "lux": "Lux",
             "percent": "%",
-            "noGroupSelected": "ไม่ได้เลือกกลุ่ม",
+            "errors": {
+                "noGroupSelected": "กรุณาเลือกกลุ่ม",
+                "dateRangeLimit": "เลือกได้ไม่เกิน 15 วัน"
+            },
             "clickAddTask": "คลิก \"เพิ่มงาน\" เพื่อสร้างตารางเวลา",
             "brightnessThreshold": "ค่าความเข้มแสง (Lux)",
             "outputBrightness": "ความสว่างที่ต้องการ (%)",

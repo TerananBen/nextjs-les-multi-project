@@ -182,7 +182,8 @@
             "pickDate": "Pick a date",
             "pickWeek": "Pick a week",
             "quarter": "Quarter",
-            "weekOf": "Week of"
+            "weekOf": "Week of",
+            "dateRangeLimit": "Selection limited to 15 days."
         },
         "summary": {
             "onlineTotal": "Online/Total",
@@ -198,9 +199,10 @@
             "perMonth": "Per Month"
         },
         "charts": {
-            "energyConsumption": "Energy consumption (kWh)",
-            "lampFailure": "Lamp failure (unit)",
-            "noData": "No Data"
+            "energyConsumption": "Energy Consumption (kWh)",
+            "lampFailure": "Lamp Failure (Unit)",
+            "noData": "No data available",
+            "time": "Time"
         }
     },
     "MapGlobal": {
@@ -575,8 +577,11 @@
             "lightOpen": "Light Intensity Open",
             "lightClose": "Light Intensity Close",
             "lux": "Lux",
+            "errors": {
+                "noGroupSelected": "Please select a group.",
+                "dateRangeLimit": "Selection limited to 15 days."
+            },
             "percent": "%",
-            "noGroupSelected": "No groups selected",
             "clickAddTask": "Click \"Add Task\" to create a time schedule.",
             "brightnessThreshold": "Brightness Threshold (Lux)",
             "outputBrightness": "Output Brightness (%)",

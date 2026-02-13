@@ -48,15 +48,28 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
     const listUnitWattDay = data?.listUnitWattDay || []
     const listAvgUnit = data?.listAvgUnit || []
     const listTotalImeiLose = data?.listTotalImeiLose || []
+    const totalUnitPerHour = data?.totalUnitPerHour || []
 
-    const hasEnergyData = listUnitWattDay.length > 0 && listAvgUnit.length > 0
+    const hasEnergyData = listUnitWattDay.length > 0 && (listAvgUnit.length > 0 || totalUnitPerHour.length > 0)
     const hasFailureData = listUnitWattDay.length > 0 && listTotalImeiLose.length > 0
 
+    // Check if we should show Hourly (Single Day) or Daily (Range)
+    // User requested: Select 1 day -> show totalUnitPerHour (Hourly)
+    // Select multiple days -> show listAvgUnit (Daily)
+    const isHourly = listUnitWattDay.length <= 1 && totalUnitPerHour.length > 0
+
     // Prepare data for Energy Consumption Chart
-    const energyData = listUnitWattDay.map((date, index) => ({
+    const energyDataDaily = listUnitWattDay.map((date, index) => ({
         date: date,
         value: listAvgUnit[index] || 0
     }))
+
+    const energyDataHourly = totalUnitPerHour.map((value, index) => ({
+        date: `${String(index).padStart(2, '0')}:00`,
+        value: value || 0
+    }))
+
+    const energyData = isHourly ? energyDataHourly : energyDataDaily
 
     // Prepare data for Lamp Failure Chart
     const failureData = listUnitWattDay.map((date, index) => ({
@@ -86,6 +99,7 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
                                 axisLine={false}
                                 tickMargin={10}
                                 tickFormatter={(value) => {
+                                    if (isHourly) return value // "00:00"
                                     const date = new Date(value)
                                     return date.toLocaleDateString(locale, {
                                         day: "numeric",
@@ -102,7 +116,10 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
                             />
                             <Tooltip
                                 contentStyle={{ borderRadius: "8px" }}
-                                labelFormatter={(value) => new Date(value).toLocaleDateString(locale)}
+                                labelFormatter={(value) => {
+                                    if (isHourly) return `${t("time")}: ${value}`
+                                    return new Date(value).toLocaleDateString(locale)
+                                }}
                             />
                             <Area
                                 type="monotone"

@@ -350,7 +350,7 @@ export function EditScheduleDialog({
                                 <Input
                                     {...form.register("scheduleName")}
                                     className={`h-10 border-input focus:border-primary transition-colors bg-muted/50 focus:bg-background ${form.formState.errors.scheduleName ? "border-destructive" : ""}`}
-                                    placeholder="Enter schedule name..."
+                                    placeholder={t("scheduleNamePlaceholder")}
                                 />
                                 {form.formState.errors.scheduleName && (
                                     <span className="text-xs text-red-500 font-medium">
@@ -414,7 +414,7 @@ export function EditScheduleDialog({
                             <div className="bg-background border rounded-xl shadow-sm overflow-hidden">
                                 {watch("dataGroupName").length === 0 ? (
                                     <div className="p-8 text-center text-muted-foreground bg-muted/50 flex flex-col items-center gap-2">
-                                        <span>No groups selected</span>
+                                        <span>{t("noGroupSelected")}</span>
                                         {form.formState.errors.dataGroupName && (
                                             <span className="text-sm text-red-500 font-medium">
                                                 {form.formState.errors.dataGroupName.message}
@@ -491,7 +491,7 @@ export function EditScheduleDialog({
                                     {/* Table Body */}
                                     {sceneFields.length === 0 ? (
                                         <div className="p-8 text-center text-muted-foreground bg-muted/30 flex flex-col items-center gap-2">
-                                            <span>Click "Add Task" to create a time schedule.</span>
+                                            <span>{t("clickAddTask")}</span>
                                             {(form.formState.errors.listScenes as any)?.message && (
                                                 <span className="text-sm text-red-500 font-medium">
                                                     {(form.formState.errors.listScenes as any)?.message}
@@ -573,7 +573,7 @@ export function EditScheduleDialog({
                                         </div>
                                         <div className="space-y-3">
                                             <div className="space-y-1.5">
-                                                <label className="text-xs text-amber-700 dark:text-amber-300 font-medium">Brightness Threshold (Lux)</label>
+                                                <label className="text-xs text-amber-700 dark:text-amber-300 font-medium">{t("brightnessThreshold")}</label>
                                                 <div className="relative">
                                                     <Input
                                                         {...form.register(`listScenes.0.open_volt`)}
@@ -589,7 +589,7 @@ export function EditScheduleDialog({
                                                 )}
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="text-xs text-amber-700 dark:text-amber-300 font-medium">Output Brightness (%)</label>
+                                                <label className="text-xs text-amber-700 dark:text-amber-300 font-medium">{t("outputBrightness")}</label>
                                                 <div className="relative">
                                                     <Input
                                                         {...form.register(`listScenes.0.open_time`)}
@@ -615,7 +615,7 @@ export function EditScheduleDialog({
                                         </div>
                                         <div className="space-y-3">
                                             <div className="space-y-1.5">
-                                                <label className="text-xs text-muted-foreground font-medium">Brightness Threshold (Lux)</label>
+                                                <label className="text-xs text-muted-foreground font-medium">{t("brightnessThreshold")}</label>
                                                 <div className="relative">
                                                     <Input
                                                         {...form.register(`listScenes.0.close_volt`)}
@@ -631,7 +631,7 @@ export function EditScheduleDialog({
                                                 )}
                                             </div>
                                             <div className="space-y-1.5">
-                                                <label className="text-xs text-muted-foreground font-medium">Output Brightness (%)</label>
+                                                <label className="text-xs text-muted-foreground font-medium">{t("outputBrightness")}</label>
                                                 <div className="relative">
                                                     <Input
                                                         {...form.register(`listScenes.0.close_time`)}
@@ -658,9 +658,9 @@ export function EditScheduleDialog({
                                 <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center mb-3">
                                     <span className="text-2xl">✋</span>
                                 </div>
-                                <h3 className="font-semibold text-foreground">Manual Mode Selected</h3>
+                                <h3 className="font-semibold text-foreground">{t("manualModeTitle")}</h3>
                                 <p className="text-sm text-muted-foreground mt-1 max-w-xs">
-                                    Sensors are disabled. Lights will be controlled manually via the Control interface.
+                                    {t("manualModeDescription")}
                                 </p>
                             </div>
                         )}

@@ -552,6 +552,7 @@
             "title": "Edit Schedule",
             "addTitle": "Add Schedule",
             "scheduleNameLabel": "Schedule Name",
+            "scheduleNamePlaceholder": "Enter schedule name...",
             "addGroup": "Add Group",
             "selectGroup": "-- Select Group --",
             "typeLabel": "Type",
@@ -619,7 +620,8 @@
             "resendError": "Error resending command",
             "resendAll": "Resend All",
             "resendingAll": "Resending All...",
-            "resendAllComplete": "Resend All Complete. Success: {success}, Failed: {failed}"
+            "resendAllComplete": "Resend All Complete. Success: {success}, Failed: {failed}",
+            "noData": "No data"
         }
     }
 }

@@ -159,37 +159,40 @@ export function ResponseDialog({
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
-                <DialogHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                    <div className="flex flex-col gap-1">
-                        <DialogTitle>{t("title")} - {scheduleName}</DialogTitle>
-                        <DialogDescription>
-                            {/* Summary or description if needed */}
-                        </DialogDescription>
-                    </div>
-                    <div className="flex gap-2 ml-auto mr-8">
-                        <Button
-                            variant="default"
-                            size="sm"
-                            onClick={handleResendAll}
-                            disabled={loading || isResendingAll || !data.some(item => item.status !== "respone")}
-                            className="bg-blue-600 hover:bg-blue-700 text-white"
-                        >
-                            {isResendingAll ? (
-                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            ) : (
-                                <Send className="h-4 w-4 mr-2" />
-                            )}
-                            {t("resendAll")}
-                        </Button>
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={fetchData}
-                            disabled={loading || isResendingAll}
-                        >
-                            <RotateCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-                            {t("reload")}
-                        </Button>
+                <DialogHeader className="pb-4">
+                    <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-1">
+                            <DialogTitle className="leading-snug text-xl">{t("title")} - {scheduleName}</DialogTitle>
+                            <DialogDescription className="sr-only">
+                                Feedback response status
+                            </DialogDescription>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 pt-4 border-t w-full">
+                            <Button
+                                variant="default"
+                                size="sm"
+                                onClick={handleResendAll}
+                                disabled={loading || isResendingAll || !data.some(item => item.status !== "respone")}
+                                className="bg-blue-600 hover:bg-blue-700 text-white w-full"
+                            >
+                                {isResendingAll ? (
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                ) : (
+                                    <Send className="h-4 w-4 mr-2" />
+                                )}
+                                {t("resendAll")}
+                            </Button>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={fetchData}
+                                disabled={loading || isResendingAll}
+                                className="w-full border-dashed border-2 hover:bg-accent hover:text-accent-foreground"
+                            >
+                                <RotateCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+                                {t("reload")}
+                            </Button>
+                        </div>
                     </div>
                 </DialogHeader>
 
@@ -240,7 +243,7 @@ export function ResponseDialog({
                                 ) : (
                                     <TableRow>
                                         <TableCell colSpan={4} className="text-center h-24">
-                                            No data
+                                            {t("noData")}
                                         </TableCell>
                                     </TableRow>
                                 )}

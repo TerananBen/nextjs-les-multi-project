@@ -20,7 +20,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { differenceInDays, format } from "date-fns"
+import { differenceInDays, format, startOfWeek, endOfWeek } from "date-fns"
 import { th, enUS } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
@@ -86,16 +86,12 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
         } else if (selectedType === "Year") {
             setSelectedDate(selectedYear)
         } else if (selectedType === "Week" && singleDate) {
-            // Calculate week number (ISO)
-            // We can use a library helper or simple format
-            // The API likely expects YYYY-Www or similar. Let's assume typical format.
-            // Using 'I' for ISO week year and 'w' for week of year might be safer if supported,
-            // but let's stick to simple "YYYY-MM-DD" of the start of the week or just send the date and let API handle it?
-            // Re-reading usage: "Week" usually implies sending a specific week identifier.
-            // If the previous input was type="week", it sends "2024-W01".
-            // We can construct this.
-            const weekVal = format(singleDate, "I-'W'ww")
-            setSelectedDate(weekVal)
+            // Calculate week range (Monday to Sunday)
+            const start = startOfWeek(singleDate, { weekStartsOn: 1 })
+            const end = endOfWeek(singleDate, { weekStartsOn: 1 })
+            const startStr = format(start, "yyyy-MM-dd")
+            const endStr = format(end, "yyyy-MM-dd")
+            setSelectedDate(`${startStr}_${endStr}`)
         } else if (selectedType === "Now") {
             setSelectedDate("")
         }
@@ -158,6 +154,7 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
                             locale={locale === "th" ? th : enUS}
                             disabled={(date) => date >= startOfToday || date < projectStartDate}
                             initialFocus
+                            defaultMonth={dateRange?.from}
                         />
                     </PopoverContent>
                 </Popover>
@@ -188,12 +185,16 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
                         <Calendar
-                            mode="single"
-                            selected={singleDate}
-                            onSelect={setSingleDate}
+                            mode="range"
+                            selected={singleDate ? {
+                                from: startOfWeek(singleDate, { weekStartsOn: 1 }),
+                                to: endOfWeek(singleDate, { weekStartsOn: 1 })
+                            } : undefined}
+                            onSelect={(_, date) => setSingleDate(date)}
                             locale={locale === "th" ? th : enUS}
                             disabled={(date) => date >= startOfToday || date < projectStartDate}
                             initialFocus
+                            defaultMonth={singleDate}
                         />
                     </PopoverContent>
                 </Popover>

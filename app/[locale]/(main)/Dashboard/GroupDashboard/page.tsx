@@ -1,5 +1,14 @@
 import { getListDataGroupAll } from "@/app/actions/dashboard"
 import { GroupDashboardClient } from "./client"
+import { getTranslations } from "next-intl/server"
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params
+    const t = await getTranslations({ locale, namespace: "Sidebar" })
+    return {
+        title: t("menu.groupDashboard"),
+    }
+}
 
 export default async function Page() {
     const groups = await getListDataGroupAll()

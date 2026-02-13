@@ -161,6 +161,7 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
                                 tickLine={false}
                                 axisLine={false}
                                 fontSize={12}
+                                allowDecimals={false}
                             />
                             <Tooltip
                                 cursor={{ fill: 'transparent' }}

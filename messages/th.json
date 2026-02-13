@@ -178,7 +178,11 @@
                 "year": "รายปี"
             },
             "searchButton": "ค้นหา",
-            "printButton": "พิมพ์"
+            "printButton": "พิมพ์",
+            "pickDate": "เลือกวันที่",
+            "pickWeek": "เลือกสัปดาห์",
+            "quarter": "ไตรมาส",
+            "weekOf": "สัปดาห์ของวันที่"
         },
         "summary": {
             "onlineTotal": "ออนไลน์/ทั้งหมด",
@@ -195,7 +199,8 @@
         },
         "charts": {
             "energyConsumption": "การใช้พลังงาน (kWh)",
-            "lampFailure": "โคมเสีย (จำนวน)"
+            "lampFailure": "โคมเสีย (จำนวน)",
+            "noData": "ไม่พบข้อมูล"
         }
     },
     "MapGlobal": {

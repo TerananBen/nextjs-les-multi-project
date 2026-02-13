@@ -178,7 +178,11 @@
                 "year": "Year"
             },
             "searchButton": "Search",
-            "printButton": "Print"
+            "printButton": "Print",
+            "pickDate": "Pick a date",
+            "pickWeek": "Pick a week",
+            "quarter": "Quarter",
+            "weekOf": "Week of"
         },
         "summary": {
             "onlineTotal": "Online/Total",
@@ -195,7 +199,8 @@
         },
         "charts": {
             "energyConsumption": "Energy consumption (kWh)",
-            "lampFailure": "Lamp failure (unit)"
+            "lampFailure": "Lamp failure (unit)",
+            "noData": "No Data"
         }
     },
     "MapGlobal": {

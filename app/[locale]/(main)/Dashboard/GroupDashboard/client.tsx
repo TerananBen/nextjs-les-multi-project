@@ -5,7 +5,6 @@ import { FilterBar } from "@/components/dashboard/filter-bar"
 import { SummaryCards } from "@/components/dashboard/summary-cards"
 import { ChartsSection } from "@/components/dashboard/charts-section"
 import { GroupItem, DashboardData, getDataDashBoard } from "@/app/actions/dashboard"
-import { Loader2 } from "lucide-react"
 
 interface GroupDashboardClientProps {
     groups: GroupItem[]
@@ -52,16 +51,8 @@ export function GroupDashboardClient({ groups, defaultGroupCode }: GroupDashboar
         <div className="space-y-6">
             <FilterBar groups={groups} onSearch={handleSearch} />
 
-            {loading ? (
-                <div className="flex justify-center items-center h-64">
-                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                </div>
-            ) : (
-                <>
-                    <SummaryCards data={data} />
-                    <ChartsSection data={data} />
-                </>
-            )}
+            <SummaryCards data={data} loading={loading} />
+            <ChartsSection data={data} loading={loading} />
         </div>
     )
 }

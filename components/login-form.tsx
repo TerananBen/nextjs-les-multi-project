@@ -19,7 +19,8 @@ import {
     FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { Eye, EyeOff, Loader2 } from "lucide-react"
+import { Eye, EyeOff, Loader2, ShieldAlert } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { login } from "@/app/actions/auth"
 
 const initialState = {
@@ -27,6 +28,7 @@ const initialState = {
     message: "",
     failedAttempts: null as string | null,
     errorKey: undefined as string | undefined,
+    isLocked: false,
 }
 
 export function LoginForm({
@@ -56,7 +58,13 @@ export function LoginForm({
                 <CardContent>
                     <form action={formAction}>
                         <FieldGroup>
-                            {(state.message || state.errorKey) && !state.success && (
+                            {state.isLocked && !state.success && (
+                                <Alert variant="destructive">
+                                    <ShieldAlert className="h-4 w-4" />
+                                    <AlertTitle>{t("accountLocked")}</AlertTitle>
+                                </Alert>
+                            )}
+                            {(state.message || state.errorKey) && !state.success && !state.isLocked && (
                                 <div className="text-destructive text-sm font-medium text-center">
                                     {state.errorKey ? t(state.errorKey) : state.message}
                                     {state.failedAttempts && (
@@ -111,7 +119,7 @@ export function LoginForm({
                                 </div>
                             </Field>
                             <Field>
-                                <Button type="submit" disabled={isPending}>
+                                <Button type="submit" disabled={isPending || state.isLocked}>
                                     {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                     {t("loginButton")}
                                 </Button>

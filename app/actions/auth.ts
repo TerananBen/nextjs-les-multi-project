@@ -7,6 +7,7 @@ interface LoginState {
     message?: string
     failedAttempts?: string | null
     errorKey?: string
+    isLocked?: boolean
 }
 
 export async function login(prevState: LoginState, formData: FormData): Promise<LoginState> {
@@ -62,11 +63,13 @@ export async function login(prevState: LoginState, formData: FormData): Promise<
         } else {
             // Failure (including 401)
             // The API returns { result: false, dataReturn: "denied", dataContLogin: "1", ... }
+            const isLocked = data.dataContLogin === "10"
             return {
                 success: false,
                 message: data.dataReturn, // "denied" or other error message
                 failedAttempts: data.dataContLogin, // "1", "2", etc.
-                errorKey: data.dataReturn === "denied" ? "usernameError" : undefined // Map "denied" to a specific error key if needed, or just use the message
+                errorKey: isLocked ? "accountLocked" : (data.dataReturn === "denied" ? "usernameError" : undefined),
+                isLocked
             }
         }
     } catch (error) {

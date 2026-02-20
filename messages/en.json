@@ -55,7 +55,8 @@
         "privacyLink": "Privacy Policy",
         "usernameError": "Username incorrect or does not exist",
         "connectionError": "Failed to connect to the server",
-        "failedAttempts": "Failed attempts: {count}"
+        "failedAttempts": "Failed attempts: {count}",
+        "accountLocked": "Your account has been permanently locked due to too many failed login attempts. Please contact an administrator to unlock your account."
     },
     "UserMenu": {
         "account": "Account",

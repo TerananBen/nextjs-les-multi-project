@@ -19,7 +19,7 @@ export default async function MainLayout({
         name: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : (user?.userName || "User"),
         email: user?.userName || "", // We use username as distinct identifier for now if email is missing
         role: user?.userRole,
-        avatar: "/avatars/shadcn.jpg", // Default avatar
+        avatar: "/avatars/user-avatar.svg", // Default avatar
     }
 
     return (

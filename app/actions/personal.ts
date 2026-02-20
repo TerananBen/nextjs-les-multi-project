@@ -45,7 +45,7 @@ export async function getPersonalList(): Promise<PersonalListResponse | null> {
     if (!API_URL) return null
 
     try {
-        console.log("Fetching personal list from:", `${API_URL}/StreetLight/getDataListPersonal`)
+        //console.log("Fetching personal list from:", `${API_URL}/StreetLight/getDataListPersonal`)
         const response = await fetch(`${API_URL}/StreetLight/getDataListPersonal`, {
             method: "POST",
             headers: {
@@ -55,13 +55,13 @@ export async function getPersonalList(): Promise<PersonalListResponse | null> {
             body: JSON.stringify({}),
         })
 
-        console.log("Response status:", response.status)
+        //console.log("Response status:", response.status)
         if (!response.ok) {
             console.error("Response not ok:", await response.text())
             return null
         }
         const data = await response.json()
-        console.log("API Response Data:", JSON.stringify(data, null, 2))
+        //console.log("API Response Data:", JSON.stringify(data, null, 2))
         return data
     } catch (error) {
         console.error("Error fetching personal list:", error)

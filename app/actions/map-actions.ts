@@ -340,7 +340,7 @@ export async function readDataMqttAction(gatewayId: string, imsi: string): Promi
     }
 
     try {
-        console.log(`[readDataMqttAction] Calling ${API_URL}/StreetLight/readDataMqtt for IMSI: ${imsi} Gateway: ${gatewayId}`);
+        //console.log(`[readDataMqttAction] Calling ${API_URL}/StreetLight/readDataMqtt for IMSI: ${imsi} Gateway: ${gatewayId}`);
         const randomToken = Math.random().toString(36).substring(2, 12); // ~10 chars
         const msg = JSON.stringify({ Type: "GetPower", TOKEN: randomToken });
 

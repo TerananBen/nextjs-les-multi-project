@@ -414,7 +414,7 @@ export function EditScheduleDialog({
                             <div className="bg-background border rounded-xl shadow-sm overflow-hidden">
                                 {watch("dataGroupName").length === 0 ? (
                                     <div className="p-8 text-center text-muted-foreground bg-muted/50 flex flex-col items-center gap-2">
-                                        <span>{t("noGroupSelected")}</span>
+                                        <span>{t("errors.noGroupSelected")}</span>
                                         {form.formState.errors.dataGroupName && (
                                             <span className="text-sm text-red-500 font-medium">
                                                 {form.formState.errors.dataGroupName.message}

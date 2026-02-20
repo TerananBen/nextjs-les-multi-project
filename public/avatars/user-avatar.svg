@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#8b5cf6"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="30" y1="10" x2="90" y2="110" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#fff" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="clip">
+      <rect width="128" height="128" rx="28"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#clip)">
+    <!-- Background -->
+    <rect width="128" height="128" rx="28" fill="url(#bg)"/>
+    <!-- Subtle shine overlay -->
+    <rect width="128" height="128" rx="28" fill="url(#shine)"/>
+    <!-- Head -->
+    <circle cx="64" cy="48" r="22" fill="#e0e7ff" opacity="0.95"/>
+    <!-- Body / Shoulders -->
+    <ellipse cx="64" cy="112" rx="38" ry="32" fill="#e0e7ff" opacity="0.95"/>
+    <!-- Inner head shadow for depth -->
+    <circle cx="64" cy="48" r="18" fill="#c7d2fe" opacity="0.35"/>
+    <!-- Subtle ring around head -->
+    <circle cx="64" cy="48" r="22" stroke="#a5b4fc" stroke-width="1.5" fill="none" opacity="0.5"/>
+  </g>
+</svg>

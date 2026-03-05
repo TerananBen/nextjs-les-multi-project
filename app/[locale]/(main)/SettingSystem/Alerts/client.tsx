@@ -8,6 +8,16 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { getDataAlertStreetLightAction, settingAlertStreetLightAction } from "@/app/actions/setting-system"
 import { AlertSetting } from "@/types/setting-system"
 import { Loader2, Save, MessageSquare, Mail, AlertTriangle, Clock, Battery, Zap, Activity } from "lucide-react"
@@ -18,6 +28,7 @@ export function AlertsClient() {
     const [data, setData] = useState<AlertSetting[]>([])
     const [loading, setLoading] = useState(true)
     const [isPending, startTransition] = useTransition()
+    const [showConfirmation, setShowConfirmation] = useState(false)
 
     // Specific state helpers
     const [lineTokenParts, setLineTokenParts] = useState({ token: "", groupId: "" })
@@ -402,11 +413,36 @@ export function AlertsClient() {
                     )}
 
                     <div className="flex justify-end">
-                        <Button disabled={isPending} onClick={handleSave} size="lg" className="w-full xl:w-auto min-w-[150px]">
+                        <Button disabled={isPending} onClick={() => setShowConfirmation(true)} size="lg" className="w-full xl:w-auto min-w-[150px]">
                             <Save className="mr-2 h-4 w-4" />
                             {t("save")}
                         </Button>
                     </div>
+
+                    <AlertDialog open={showConfirmation} onOpenChange={setShowConfirmation}>
+                        <AlertDialogContent className="font-sarabun">
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>{t("confirmSaveTitle")}</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    {t("confirmSaveDescription")}
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel disabled={isPending}>{t("cancel")}</AlertDialogCancel>
+                                <AlertDialogAction
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        handleSave()
+                                        setShowConfirmation(false)
+                                    }}
+                                    disabled={isPending}
+                                >
+                                    {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                                    {t("confirm")}
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                 </div>
             </div>
         </div>

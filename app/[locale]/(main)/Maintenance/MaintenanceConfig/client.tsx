@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
+import { getLeafletIconUrl, MarkerColor, MarkerBadge } from "@/lib/map-icons"
 
 import { MaintenanceConfigRecord, getDataListMaintenanceTotal, getListDataOperator } from "@/app/actions/maintenance"
 import { getCurrentUser } from "@/app/actions/auth"
@@ -15,8 +16,8 @@ import { getListDataGroupAction, getDataLatLongSearchAction, LatLongData } from 
 
 import dynamic from "next/dynamic"
 
-const MaintenanceMapComponent = dynamic(() => import("./maintenance-map"), { 
-    ssr: false, 
+const MaintenanceMapComponent = dynamic(() => import("./maintenance-map"), {
+    ssr: false,
     loading: () => (
         <div className="h-full w-full flex items-center justify-center bg-gray-50">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -31,6 +32,22 @@ export interface SelectedDevice extends LatLongData {
     reason: string;
 }
 
+function LegendItem({ icons, text }: { icons: { color: MarkerColor, badge: MarkerBadge }[], text: string }) {
+    return (
+        <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 min-w-[30px]">
+                {icons.map((icon, idx) => (
+                    <div key={idx} className="flex items-center">
+                        <img src={getLeafletIconUrl(icon.color, icon.badge)} className="w-6 h-6 object-contain" alt="" />
+                        {idx < icons.length - 1 && <span className="text-gray-400 mx-0.5 text-xs">|</span>}
+                    </div>
+                ))}
+            </div>
+            <span>{text}</span>
+        </div>
+    )
+}
+
 // ---------------------------------------------------------------------------
 // Add Form Component (was the main client component)
 // ---------------------------------------------------------------------------
@@ -43,7 +60,7 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
     const [itemName, setItemName] = React.useState("")
     const [operatorId, setOperatorId] = React.useState("0")
     const [reporterName, setReporterName] = React.useState("")
-    
+
     // Search States
     const [searchGroup, setSearchGroup] = React.useState("ALL")
     const [searchStatus, setSearchStatus] = React.useState("all")
@@ -55,7 +72,7 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
     // Map & Table Data
     const [devices, setDevices] = React.useState<LatLongData[]>([])
     const [selectedDevices, setSelectedDevices] = React.useState<SelectedDevice[]>([])
-    
+
     // UI States
     const [isLoadingInit, setIsLoadingInit] = React.useState(true)
     const [isSearching, setIsSearching] = React.useState(false)
@@ -74,13 +91,13 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
                     getCurrentUser(),
                     getListDataGroupAction()
                 ])
-                
+
                 setOperators(ops)
                 setGroups(grps)
                 if (user) {
                     setReporterName(`${user.firstName} ${user.lastName}`)
                 }
-                
+
                 // Fetch initial map data with default search values
                 const results = await getDataLatLongSearchAction("group", ["ALL"], "all")
                 setDevices(results)
@@ -164,23 +181,22 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
     }
 
     return (
-        <div className="flex flex-col gap-4 w-full">
-            {/* 1. Item Name */}
-            <div className="space-y-1.5">
-                <label className="text-sm font-bold text-gray-500">{tForm("itemName")}</label>
-                <Input 
-                    value={itemName} 
-                    onChange={e => setItemName(e.target.value)} 
-                    className="bg-white"
-                />
-            </div>
-
-            {/* 2. Operator & Reporter */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                    <label className="text-sm font-bold text-gray-500">{tForm("operatorName")}</label>
+        <div className="flex flex-col gap-5 w-full">
+            {/* Headers / Form Data */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                <div className="space-y-1.5 md:col-span-1">
+                    <label className="text-sm font-bold text-gray-500">{tForm("itemName")} <span className="text-red-500">*</span></label>
+                    <Input
+                        value={itemName}
+                        onChange={e => setItemName(e.target.value)}
+                        className="bg-gray-50 focus:bg-white transition-colors"
+                        placeholder="กรอกชื่อรายการซ่อม"
+                    />
+                </div>
+                <div className="space-y-1.5 md:col-span-1">
+                    <label className="text-sm font-bold text-gray-500">{tForm("operatorName")} <span className="text-red-500">*</span></label>
                     <Select value={operatorId} onValueChange={setOperatorId}>
-                        <SelectTrigger className="bg-white">
+                        <SelectTrigger className="bg-gray-50 focus:bg-white transition-colors">
                             <SelectValue placeholder={tForm("selectOperator")} />
                         </SelectTrigger>
                         <SelectContent>
@@ -191,112 +207,130 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
                         </SelectContent>
                     </Select>
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 md:col-span-1">
                     <label className="text-sm font-bold text-gray-500">{tForm("reporterName")}</label>
-                    <Input 
-                        value={reporterName} 
-                        readOnly 
-                        disabled 
-                        className="bg-gray-100 text-gray-600 cursor-not-allowed border-gray-200"
+                    <Input
+                        value={reporterName}
+                        readOnly
+                        disabled
+                        className="bg-gray-100 text-gray-500 cursor-not-allowed border-gray-200"
                     />
                 </div>
             </div>
 
-            {/* 3. Search Bar */}
-            <div className="flex flex-col md:flex-row gap-4 items-center bg-white p-4 border rounded-md">
-                <span className="text-sm font-bold text-gray-500 whitespace-nowrap">{tForm("searchBy")}</span>
-                
-                <div className="flex-1 md:flex-initial">
-                    <Select value={searchGroup} onValueChange={setSearchGroup}>
-                        <SelectTrigger className="bg-white w-full md:w-64">
-                            <SelectValue placeholder="ALL" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="ALL">ALL</SelectItem>
-                            {groups.map((group) => (
-                                <SelectItem key={group.groupCode} value={group.groupCode}>
-                                    {group.groupName}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+            {/* Map and Table Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 h-full">
+
+                {/* Left Column: Map & Search (7 columns on large screens) */}
+                <div className="flex flex-col lg:col-span-7 xl:col-span-8 h-full">
+                    {/* Unified Container */}
+                    <div className="flex flex-col flex-1 bg-white border border-gray-100 rounded-lg shadow-sm overflow-hidden min-h-[500px]">
+
+                        {/* Search Bar */}
+                        <div className="flex flex-col sm:flex-row gap-3 items-end sm:items-center bg-white p-3 border-b border-gray-100 z-10 shrink-0">
+                            <span className="text-sm font-bold text-gray-500 whitespace-nowrap hidden sm:block">{tForm("searchBy")}</span>
+                            <div className="flex-1 w-full sm:w-auto">
+                                <Select value={searchGroup} onValueChange={setSearchGroup}>
+                                    <SelectTrigger className="bg-gray-50">
+                                        <SelectValue placeholder="ALL" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="ALL">ALL</SelectItem>
+                                        {groups.map((group) => (
+                                            <SelectItem key={group.groupCode} value={group.groupCode}>
+                                                {group.groupName}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="flex-1 w-full sm:w-auto">
+                                <Select value={searchStatus} onValueChange={setSearchStatus}>
+                                    <SelectTrigger className="bg-gray-50">
+                                        <SelectValue placeholder={tForm("selectStatus")} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">-- {tMap("filters.all")} --</SelectItem>
+                                        <SelectItem value="0">{tMap("status.normal")}</SelectItem>
+                                        <SelectItem value="4">{tMap("status.powerFailure")}</SelectItem>
+                                        <SelectItem value="5">{tMap("status.commFailure")}</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <Button
+                                onClick={() => handleSearch()}
+                                disabled={isSearching}
+                                className="w-full sm:w-28 bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                            >
+                                {isSearching ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                                {tForm("search")}
+                            </Button>
+                        </div>
+
+                        {/* Map View */}
+                        <div className="flex flex-col flex-1 relative min-h-[400px]">
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2 p-2.5 bg-gray-50 border-b text-xs sm:text-sm font-medium text-gray-600 z-10 relative">
+                                <LegendItem icons={[{ color: "blue", badge: "A" }]} text={tMap("legend.disconnect")} />
+                                <LegendItem icons={[{ color: "green", badge: "⚡" }, { color: "gray", badge: "⚡" }]} text={tMap("legend.abnormal")} />
+                                <LegendItem icons={[{ color: "red", badge: null }]} text={tMap("legend.failure")} />
+                            </div>
+                            <div className="flex-1 absolute inset-0 pt-[45px] sm:pt-[45px] md:pt-[41px]">
+                                {/* The pt-[xxpx] is to offset the legend height so the map takes the full remaining space */}
+                                <MaintenanceMapComponent
+                                    mode={mapMode}
+                                    onlineUrl={onlineUrl}
+                                    offlineUrl={offlineUrl}
+                                    devices={devices}
+                                    onSelectDevice={handleSelectDeviceFromMap}
+                                    selectedImsis={selectedDevices.map(d => d.imsi)}
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="flex-1 md:flex-initial">
-                    <Select value={searchStatus} onValueChange={setSearchStatus}>
-                        <SelectTrigger className="bg-white w-full md:w-64">
-                            <SelectValue placeholder={tForm("selectStatus")} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">-- {tMap("filters.all")} --</SelectItem>
-                            <SelectItem value="0">{tMap("status.normal")}</SelectItem>
-                            <SelectItem value="4">{tMap("status.powerFailure")}</SelectItem>
-                            <SelectItem value="5">{tMap("status.commFailure")}</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
+                {/* Right Column: Selected Table (5 columns on large screens) */}
+                <div className="flex flex-col lg:col-span-5 xl:col-span-4 h-full">
+                    {/* Unified Container */}
+                    <div className="flex flex-col flex-1 bg-white border border-gray-100 rounded-lg shadow-sm overflow-hidden min-h-[400px]">
 
-                <Button 
-                    onClick={() => handleSearch()} 
-                    disabled={isSearching}
-                    className="w-full md:w-32 bg-indigo-500 hover:bg-indigo-600 text-white md:ml-auto"
-                >
-                    {isSearching ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                    {tForm("search")}
-                </Button>
+                        {/* Header for Table */}
+                        <div className="flex items-center justify-between bg-white p-3 border-b border-gray-100 z-10 shrink-0 h-auto sm:h-[65px]">
+                            {/* h-[65px] matches typical SM height of search bar with inputs + padding */}
+                            <span className="font-bold text-gray-700 text-sm">{tTable("title")}</span>
+                            <span className="text-xs font-semibold bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                                {tTable("selectedCount", { count: selectedDevices.length })}
+                            </span>
+                        </div>
+
+                        {/* Table Area */}
+                        <div className="flex-1 w-full bg-white flex flex-col h-[300px] lg:h-auto overflow-hidden">
+                            <SelectedTable
+                                items={selectedDevices}
+                                onUpdateReason={handleUpdateReason}
+                                onRemoveItem={handleRemoveDevice}
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {/* 4. Map View */}
-            <div className="rounded-md border bg-white overflow-hidden shadow-sm">
-                <div className="flex flex-wrap items-center gap-6 p-3 bg-slate-50 border-b text-sm font-medium text-gray-600">
-                    <div className="flex items-center gap-2">
-                        <img src="/images/marker-icon-red.png" className="w-5 h-8 object-contain" alt="" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} />
-                        {tMap("status.powerFailure")}
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <img src="/images/marker-icon-gray-lightning.png" className="w-5 h-8 object-contain" alt="" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} />
-                        {tMap("legend.abnormal")}
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <img src="/images/marker-icon-blue-auto.png" className="w-5 h-8 object-contain" alt="" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} />
-                        {tMap("status.commFailure")}
-                    </div>
-                </div>
-                <div className="h-[350px] relative">
-                    <MaintenanceMapComponent 
-                        mode={mapMode}
-                        onlineUrl={onlineUrl}
-                        offlineUrl={offlineUrl}
-                        devices={devices}
-                        onSelectDevice={handleSelectDeviceFromMap}
-                        selectedImsis={selectedDevices.map(d => d.imsi)}
-                    />
-                </div>
-            </div>
-
-            {/* 5. Selected Table */}
-            <div className="min-h-[150px] max-h-[300px] overflow-auto border shadow-sm rounded-md bg-white">
-                <SelectedTable 
-                    items={selectedDevices}
-                    onUpdateReason={handleUpdateReason}
-                    onRemoveItem={handleRemoveDevice}
-                />
-            </div>
-
-            {/* 6. Footer (Pagination text & Buttons) */}
-            <div className="flex items-center justify-between pt-2">
-                <div className="text-sm text-gray-500">
-                    {selectedDevices.length > 0 
+            {/* Footer Action Buttons */}
+            <div className="flex items-center justify-between pt-4 mt-2 border-t border-gray-200">
+                <div className="text-sm shadow-none p-0 text-gray-500 hidden sm:block">
+                    {selectedDevices.length > 0
                         ? tTable("showing", { start: 1, end: selectedDevices.length, total: selectedDevices.length })
                         : tTable("showing", { start: 0, end: 0, total: 0 })
                     }
                 </div>
-                <div className="flex items-center gap-2">
-                    <Button variant="ghost" onClick={onCancel} className="text-gray-600 hover:bg-gray-100 font-semibold px-6">{tTable("close")}</Button>
-                    <Button 
-                        onClick={handleSave} 
+                <div className="flex items-center gap-3 w-full sm:w-auto">
+                    <Button variant="outline" onClick={onCancel} className="flex-1 sm:flex-none text-gray-600 font-semibold px-6 border-gray-300">
+                        {tTable("close")}
+                    </Button>
+                    <Button
+                        onClick={handleSave}
                         disabled={isSaving}
-                        className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8"
+                        className="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white font-semibold px-8 shadow-sm"
                     >
                         {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                         {tTable("save")}
@@ -367,7 +401,7 @@ export function MaintenanceConfigClient() {
             </div>
 
             <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-                <DialogContent className="max-w-[90vw] md:max-w-[60vw] w-[90vw] md:w-[60vw] max-h-[90vh] overflow-y-auto p-6 bg-[#f8f9fa] border-0 outline-none focus:outline-none focus-visible:ring-0">
+                <DialogContent className="max-w-[95vw] lg:max-w-[90vw] xl:max-w-[1300px] w-full max-h-[95vh] overflow-y-auto p-4 md:p-6 bg-slate-50 border-0 outline-none focus:outline-none focus-visible:ring-0 rounded-xl">
                     <DialogHeader className="mb-2">
                         <DialogTitle className="text-xl font-bold flex items-center gap-2">
                             <span className="w-1.5 h-6 bg-blue-500 rounded-full inline-block"></span>
@@ -375,7 +409,7 @@ export function MaintenanceConfigClient() {
                         </DialogTitle>
                         <DialogDescription className="hidden">Add new maintenance task overlay</DialogDescription>
                     </DialogHeader>
-                    
+
                     {/* Only render form when dialog is open to ensure Leaflet maps init correctly */}
                     {isAddOpen && (
                         <AddMaintenanceForm onCancel={handleCloseAdd} onSuccess={handleSuccessAdd} />

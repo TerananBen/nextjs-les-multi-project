@@ -89,13 +89,13 @@ interface DeviceDetailPopupProps {
 
 function DeviceDetailPopup({ device, tMap, tConfig, onSelectDevice }: DeviceDetailPopupProps) {
     return (
-        <div className="font-sans min-w-[250px] text-gray-800 text-sm space-y-3">
-            <div className="space-y-1">
-                <p><span className="text-gray-500">{tMap("popup.group")}</span> {device.group_name || "-"}</p>
-                <p><span className="text-gray-500">{tMap("popup.imsi")}</span> {device.imsi || "-"}</p>
-                <p><span className="text-gray-500">{tMap("popup.name")}</span> {device.street_light_name || "-"}</p>
+        <div className="font-sans min-w-[250px] text-gray-800 text-sm space-y-4 p-1">
+            <div className="space-y-1.5">
+                <p><span className="text-gray-500 font-medium">{tMap("popup.group")} :</span> {device.group_name || "-"}</p>
+                <p><span className="text-gray-500 font-medium">{tMap("popup.imsi")} :</span> {device.imsi || "-"}</p>
+                <p><span className="text-gray-500 font-medium">{tMap("popup.name")} :</span> {device.street_light_name || "-"}</p>
             </div>
-            <Button 
+            <Button
                 variant="default"
                 className="w-full bg-green-500 hover:bg-green-600 text-white"
                 onClick={() => onSelectDevice(device)}
@@ -216,7 +216,7 @@ function LeafletMapComponent({ offlineUrl, devices, onSelectDevice, selectedImsi
                 .addTo(map)
 
             const container = document.createElement('div');
-            marker.bindPopup(container);
+            marker.bindPopup(container, { minWidth: 260, className: "maintenance-device-popup" });
 
             marker.on('popupopen', (e) => {
                 const popup = e.popup;
@@ -244,6 +244,13 @@ function LeafletMapComponent({ offlineUrl, devices, onSelectDevice, selectedImsi
                             />
                         </UseTranslationsProvider>
                     );
+
+                    // Force Leaflet to recalculate the popup size after React 18 async render
+                    setTimeout(() => {
+                        if (popup.isOpen()) {
+                            popup.update();
+                        }
+                    }, 50);
                 }
             });
 

@@ -778,13 +778,15 @@
             "reportIssue": "Report Issue"
         },
         "selectedTable": {
+            "title": "Selected Items",
+            "selectedCount": "{count} items",
             "poleName": "Pole Name",
             "deviceNumber": "Device Number",
             "coordinates": "Coordinates",
-            "reason": "Reason for report",
+            "reason": "Report Reason",
             "cancel": "Cancel",
-            "noData": "No data.",
-            "showing": "Showing {start} to {end} of {total} rows",
+            "noData": "No items found",
+            "showing": "Showing {start} to {end} of {total} items",
             "close": "Close",
             "save": "Save"
         }

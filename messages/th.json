@@ -780,6 +780,8 @@
             "reportIssue": "แจ้งซ่อม"
         },
         "selectedTable": {
+            "title": "รายการที่เลือก",
+            "selectedCount": "{count} รายการ",
             "poleName": "ชื่อเสา",
             "deviceNumber": "หมายเลขอุปกรณ์",
             "coordinates": "พิกัดแผนที่",
@@ -787,7 +789,7 @@
             "cancel": "ยกเลิก",
             "noData": "ไม่พบรายการ",
             "showing": "แสดง {start} ถึง {end} ของ {total} รายการ",
-            "close": "Close",
+            "close": "ปิด",
             "save": "บันทึก"
         }
     }

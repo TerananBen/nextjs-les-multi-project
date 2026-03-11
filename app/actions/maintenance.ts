@@ -242,3 +242,38 @@ export async function getDataListMaintenanceTotal(): Promise<MaintenanceConfigRe
     }
 }
 
+export interface SaveDataMaintenancePayload {
+    list_name: string
+    id_operator: string
+    id_admin: string
+    list_imsi: string
+}
+
+export async function saveAddDataMaintenanceAction(payload: SaveDataMaintenancePayload): Promise<{ success: boolean; message?: string }> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) return { success: false, message: "Authentication required" }
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLight/saveAddDataMaintenance`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(payload),
+        })
+
+        if (!response.ok) return { success: false, message: `Server error: ${response.status}` }
+
+        const data = await response.json()
+        if (data.result && data.dataReturn === true) {
+            return { success: true }
+        }
+        return { success: false, message: "Failed to save maintenance data" }
+    } catch (error) {
+        console.error("Error saving maintenance data:", error)
+        return { success: false, message: "Network error occurred" }
+    }
+}

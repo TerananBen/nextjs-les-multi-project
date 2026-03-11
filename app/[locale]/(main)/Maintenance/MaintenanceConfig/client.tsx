@@ -10,7 +10,7 @@ import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
 import { getLeafletIconUrl, MarkerColor, MarkerBadge } from "@/lib/map-icons"
 
-import { MaintenanceConfigRecord, getDataListMaintenanceTotal, getListDataOperator } from "@/app/actions/maintenance"
+import { MaintenanceConfigRecord, getDataListMaintenanceTotal, getListDataOperator, saveAddDataMaintenanceAction } from "@/app/actions/maintenance"
 import { getCurrentUser } from "@/app/actions/auth"
 import { getListDataGroupAction, getDataLatLongSearchAction, LatLongData } from "@/app/actions/map-actions"
 
@@ -60,6 +60,7 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
     const [itemName, setItemName] = React.useState("")
     const [operatorId, setOperatorId] = React.useState("0")
     const [reporterName, setReporterName] = React.useState("")
+    const [adminId, setAdminId] = React.useState("")
 
     // Search States
     const [searchGroup, setSearchGroup] = React.useState("ALL")
@@ -96,6 +97,7 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
                 setGroups(grps)
                 if (user) {
                     setReporterName(`${user.firstName} ${user.lastName}`)
+                    setAdminId(user.userId)
                 }
 
                 // Fetch initial map data with default search values
@@ -129,7 +131,7 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
             toast.info("Device already selected")
             return
         }
-        setSelectedDevices(prev => [...prev, { ...device, reason: "" }])
+        setSelectedDevices(prev => [...prev, { ...device, reason: device.status || "" }])
     }
 
     const handleUpdateReason = (imsi: string, reason: string) => {
@@ -156,15 +158,28 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
 
         setIsSaving(true)
         try {
-            // TODO: Implement Save action when API is available.
-            console.log({
-                itemName,
-                operatorId,
-                reporterName,
-                devices: selectedDevices.map(d => ({ imsi: d.imsi, reason: d.reason }))
-            })
-            toast.success("Saved successfully (Mock)")
-            onSuccess()
+            const list_imsi_arr = selectedDevices.map(d => ({
+                street_light_name: d.street_light_name || "-",
+                imsi: d.imsi,
+                lat: d.lat,
+                lng: d.lng,
+                lamp_case: d.reason || "0"
+            }))
+
+            const payload = {
+                list_name: itemName,
+                id_operator: operatorId,
+                id_admin: adminId,
+                list_imsi: JSON.stringify(list_imsi_arr)
+            }
+
+            const res = await saveAddDataMaintenanceAction(payload)
+            if (res.success) {
+                toast.success("Saved successfully")
+                onSuccess()
+            } else {
+                toast.error(res.message || "Failed to save")
+            }
         } catch (error) {
             toast.error("Failed to save")
         } finally {

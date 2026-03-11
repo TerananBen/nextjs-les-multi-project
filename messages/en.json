@@ -740,5 +740,30 @@
             "resendAllComplete": "Resend All Complete. Success: {success}, Failed: {failed}",
             "noData": "No data"
         }
+    },
+    "MaintenanceConfig": {
+        "title": "Maintenance Config",
+        "totalItems": "Total Items :",
+        "rowsPerPage": "Rows per page :",
+        "loading": "Loading...",
+        "noData": "No data.",
+        "buttons": {
+            "add": "Add Maintenance Config"
+        },
+        "table": {
+            "no": "#",
+            "listName": "List Name",
+            "operatorName": "Operator Name",
+            "repaired": "Repaired",
+            "pending": "Pending",
+            "all": "All",
+            "detail": "Detail",
+            "status": "Status",
+            "delete": "Delete"
+        },
+        "status": {
+            "pending": "Not Confirmed",
+            "confirmed": "Confirmed"
+        }
     }
 }

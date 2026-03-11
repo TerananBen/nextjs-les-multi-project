@@ -58,6 +58,16 @@ export interface MaintenanceImageRecord {
     path_img: string
 }
 
+export interface MaintenanceConfigRecord {
+    list_name: string
+    name_operator: string
+    repair_all: string
+    wait_repair: string
+    count_lamp_all: string
+    detail: string
+    confrime: string
+}
+
 export async function getListDataOperatorAndAdmin(): Promise<OperatorAndAdminData | null> {
     const cookieStore = await cookies()
     const token = cookieStore.get("jwt")?.value
@@ -170,6 +180,35 @@ export async function getLoadImage(id: string): Promise<MaintenanceImageRecord[]
         return null
     } catch (error) {
         console.error("Error fetching load image:", error)
+        return null
+    }
+}
+
+export async function getDataListMaintenanceTotal(): Promise<MaintenanceConfigRecord[] | null> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) return null
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLight/getDataListMaintenanceTotal`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({}),
+        })
+
+        if (!response.ok) return null
+
+        const data = await response.json()
+        if (data.result) {
+            return data.dataReturn
+        }
+        return null
+    } catch (error) {
+        console.error("Error fetching maintenance config list:", error)
         return null
     }
 }

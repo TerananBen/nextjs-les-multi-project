@@ -742,5 +742,30 @@
             "resendAllComplete": "ส่งซ้ำเสร็จสิ้น สำเร็จ: {success}, ล้มเหลว: {failed}",
             "noData": "ไม่พบข้อมูล"
         }
+    },
+    "MaintenanceConfig": {
+        "title": "กำหนดค่าการบำรุงรักษา",
+        "totalItems": "รายการทั้งหมด :",
+        "rowsPerPage": "แถวต่อหน้า :",
+        "loading": "กำลังโหลด...",
+        "noData": "ไม่พบข้อมูล",
+        "buttons": {
+            "add": "เพิ่มรายการซ่อม"
+        },
+        "table": {
+            "no": "#",
+            "listName": "ชื่อรายการ",
+            "operatorName": "ชื่อหัวหน้าช่าง",
+            "repaired": "ซ่อมแล้ว",
+            "pending": "รอซ่อม",
+            "all": "ทั้งหมด",
+            "detail": "รายละเอียด",
+            "status": "ยืนยันการซ่อม",
+            "delete": "ลบรายการ"
+        },
+        "status": {
+            "pending": "ยังไม่ยืนยัน",
+            "confirmed": "ยืนยันแล้ว"
+        }
     }
 }

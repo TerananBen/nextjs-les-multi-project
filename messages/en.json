@@ -539,6 +539,43 @@
             }
         }
     },
+    "MaintenanceDashboard": {
+        "title": "Maintenance Dashboard",
+        "totalItems": "Total Items :",
+        "rowsPerPage": "Rows per page :",
+        "loading": "Loading...",
+        "noData": "No data",
+        "filter": {
+            "startDate": "Start from :",
+            "endDate": "To :",
+            "technician": "Technician :",
+            "supervisor": "Supervisor :",
+            "all": "-- All --",
+            "search": "Search"
+        },
+        "summary": {
+            "reportedTitle": "Reported {count} Lamp",
+            "totalReported": "Total {count} Lamp",
+            "pendingTitle": "Pending {count} Lamp",
+            "totalPending": "Total {count} Lamp",
+            "repairedTitle": "Repaired {count} Lamp",
+            "fromRepaired": "From {count} Lamp"
+        },
+        "table": {
+            "no": "#",
+            "technician": "Technician",
+            "supervisor": "Supervisor",
+            "repaired": "Repaired",
+            "pending": "Pending",
+            "all": "All",
+            "detail": "Detail",
+            "status": "Status"
+        },
+        "status": {
+            "pending": "Pending",
+            "confirmed": "Confirmed"
+        }
+    },
     "MenuSettings": {
         "menuName": "Menu Name",
         "readable": "Readable",

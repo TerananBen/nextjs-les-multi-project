@@ -539,6 +539,43 @@
             }
         }
     },
+    "MaintenanceDashboard": {
+        "title": "แดชบอร์ดการบำรุงรักษา",
+        "totalItems": "รายการทั้งหมด :",
+        "rowsPerPage": "แถวต่อหน้า :",
+        "loading": "กำลังโหลด...",
+        "noData": "ไม่พบข้อมูล",
+        "filter": {
+            "startDate": "เริ่มต้น :",
+            "endDate": "ถึง :",
+            "technician": "ช่างซ่อม :",
+            "supervisor": "ผู้ควบคุม :",
+            "all": "-- ทั้งหมด --",
+            "search": "ค้นหา"
+        },
+        "summary": {
+            "reportedTitle": "แจ้งซ่อม {count} โคม",
+            "totalReported": "ทั้งหมด {count} โคม",
+            "pendingTitle": "รอดำเนินการ {count} โคม",
+            "totalPending": "ทั้งหมด {count} โคม",
+            "repairedTitle": "ซ่อมแล้ว {count} โคม",
+            "fromRepaired": "จาก {count} โคม"
+        },
+        "table": {
+            "no": "ลำดับ",
+            "technician": "ช่างซ่อม",
+            "supervisor": "ผู้ควบคุม",
+            "repaired": "ซ่อมแล้ว",
+            "pending": "รอดำเนินการ",
+            "all": "ทั้งหมด",
+            "detail": "รายละเอียด",
+            "status": "สถานะ"
+        },
+        "status": {
+            "pending": "รอดำเนินการ",
+            "confirmed": "ซ่อมแซมแล้ว"
+        }
+    },
     "MenuSettings": {
         "menuName": "ชื่อเมนู",
         "readable": "แสดงเมนู",

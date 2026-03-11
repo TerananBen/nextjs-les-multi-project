@@ -766,6 +766,29 @@
         "status": {
             "pending": "ยังไม่ยืนยัน",
             "confirmed": "ยืนยันแล้ว"
+        },
+        "form": {
+            "itemName": "ชื่อรายการ",
+            "operatorName": "ชื่อหัวหน้าช่าง",
+            "reporterName": "ชื่อผู้แจ้งซ่อม",
+            "selectOperator": "-- เลือก ช่าง --",
+            "searchBy": "ค้นหาด้วย :",
+            "selectStatus": "-- เลือก สถานะ --",
+            "search": "ค้นหา"
+        },
+        "map": {
+            "reportIssue": "แจ้งซ่อม"
+        },
+        "selectedTable": {
+            "poleName": "ชื่อเสา",
+            "deviceNumber": "หมายเลขอุปกรณ์",
+            "coordinates": "พิกัดแผนที่",
+            "reason": "สาเหตุการแจ้ง",
+            "cancel": "ยกเลิก",
+            "noData": "ไม่พบรายการ",
+            "showing": "แสดง {start} ถึง {end} ของ {total} รายการ",
+            "close": "Close",
+            "save": "บันทึก"
         }
     }
 }

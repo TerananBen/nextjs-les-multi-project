@@ -97,6 +97,35 @@ export async function getListDataOperatorAndAdmin(): Promise<OperatorAndAdminDat
     }
 }
 
+export async function getListDataOperator(): Promise<UserOption[]> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) return []
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLight/getListDataOperator`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({}),
+        })
+
+        if (!response.ok) return []
+
+        const data = await response.json()
+        if (data.result && data.dataReturn) {
+            return data.dataReturn
+        }
+        return []
+    } catch (error) {
+        console.error("Error fetching operator list:", error)
+        return []
+    }
+}
+
 export async function getDataListAllMaintenanceDashboard(params: MaintenanceDashboardParams): Promise<MaintenanceDashboardData | null> {
     const cookieStore = await cookies()
     const token = cookieStore.get("jwt")?.value

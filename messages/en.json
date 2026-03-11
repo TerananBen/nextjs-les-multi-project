@@ -764,6 +764,29 @@
         "status": {
             "pending": "Not Confirmed",
             "confirmed": "Confirmed"
+        },
+        "form": {
+            "itemName": "Item Name",
+            "operatorName": "Operator Name",
+            "reporterName": "Reporter Name",
+            "selectOperator": "-- Select Operator --",
+            "searchBy": "Search By :",
+            "selectStatus": "-- Select Status --",
+            "search": "Search"
+        },
+        "map": {
+            "reportIssue": "Report Issue"
+        },
+        "selectedTable": {
+            "poleName": "Pole Name",
+            "deviceNumber": "Device Number",
+            "coordinates": "Coordinates",
+            "reason": "Reason for report",
+            "cancel": "Cancel",
+            "noData": "No data.",
+            "showing": "Showing {start} to {end} of {total} rows",
+            "close": "Close",
+            "save": "Save"
         }
     }
 }

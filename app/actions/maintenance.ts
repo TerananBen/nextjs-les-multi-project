@@ -40,6 +40,24 @@ export interface MaintenanceDashboardData {
     list_imsi_all: MaintenanceRecord[]
 }
 
+export interface MaintenanceDetailRecord {
+    imsi_befor: string
+    imsi_after: string
+    lat: string
+    lng: string
+    time_stamp: string
+    street_light_name: string
+    lamp_case: string
+    lamp_status: string
+    maintenance_case: string
+}
+
+export interface MaintenanceImageRecord {
+    id_list: string
+    id_img: string
+    path_img: string
+}
+
 export async function getListDataOperatorAndAdmin(): Promise<OperatorAndAdminData | null> {
     const cookieStore = await cookies()
     const token = cookieStore.get("jwt")?.value
@@ -97,3 +115,62 @@ export async function getDataListAllMaintenanceDashboard(params: MaintenanceDash
         return null
     }
 }
+
+export async function getDetailDataMaintenance(id: string): Promise<MaintenanceDetailRecord[] | null> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) return null
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLight/getDetailDataMaintenance`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ id }),
+        })
+
+        if (!response.ok) return null
+
+        const data = await response.json()
+        if (data.result) {
+            return data.dataReturn
+        }
+        return null
+    } catch (error) {
+        console.error("Error fetching detail data maintenance:", error)
+        return null
+    }
+}
+
+export async function getLoadImage(id: string): Promise<MaintenanceImageRecord[] | null> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) return null
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLight/getLoadImage`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({ id }),
+        })
+
+        if (!response.ok) return null
+
+        const data = await response.json()
+        if (data.result) {
+            return data.dataReturn
+        }
+        return null
+    } catch (error) {
+        console.error("Error fetching load image:", error)
+        return null
+    }
+}
+

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { useTranslations } from "next-intl"
 import { ArrowUpDown, Info } from "lucide-react"
 
-export const useMaintenanceColumns = () => {
+export const useMaintenanceColumns = (onOpenDetail: (detailId: string) => void) => {
     const t = useTranslations("MaintenanceDashboard")
 
     const columns: ColumnDef<MaintenanceRecord>[] = [
@@ -88,7 +88,7 @@ export const useMaintenanceColumns = () => {
                     <Button 
                         size="sm" 
                         className="h-8 w-8 p-0 bg-blue-500 hover:bg-blue-600 text-white"
-                        onClick={() => console.log("Detail clicked", row.original.detail)}
+                        onClick={() => onOpenDetail(row.original.detail)}
                     >
                         <Info className="h-4 w-4" />
                     </Button>

@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button"
 import { DataTable } from "./data-table"
 import { useMaintenanceColumns } from "./columns"
+import { DetailDialog } from "./detail-dialog"
 import { Search, Info, AlertCircle, Clock, CheckCircle, CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
 import { Calendar } from "@/components/ui/calendar"
@@ -31,7 +32,8 @@ interface ClientProps {
 
 export default function MaintenanceDashboardClient({ initialUsersData }: ClientProps) {
     const t = useTranslations("MaintenanceDashboard")
-    const columns = useMaintenanceColumns()
+    const [selectedDetailId, setSelectedDetailId] = useState<string | null>(null)
+    const columns = useMaintenanceColumns(setSelectedDetailId)
     const [dateStart, setDateStart] = useState<Date | undefined>(undefined)
     const [dateEnd, setDateEnd] = useState<Date | undefined>(undefined)
     const [technician, setTechnician] = useState("ALL")
@@ -210,6 +212,12 @@ export default function MaintenanceDashboardClient({ initialUsersData }: ClientP
                 columns={columns}
                 data={data?.list_imsi_all || []}
                 loading={isLoading}
+            />
+
+            {/* Detail Modal */}
+            <DetailDialog 
+                detailId={selectedDetailId} 
+                onClose={() => setSelectedDetailId(null)} 
             />
         </div>
     )

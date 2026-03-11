@@ -574,6 +574,36 @@
         "status": {
             "pending": "รอดำเนินการ",
             "confirmed": "ซ่อมแซมแล้ว"
+        },
+        "detail": {
+            "title": "รายละเอียดการซ่อมบำรุง",
+            "legend": {
+                "powerFailure": "ปัญหาไฟฟ้า/RTU",
+                "abnormalVoltage": "แรงดันไฟฟ้าผิดปกติ",
+                "networkFailure": "เครือข่ายขัดข้อง"
+            },
+            "table": {
+                "poleNumber": "หมายเลขเสา",
+                "oldDeviceId": "รหัสอุปกรณ์เดิม",
+                "newDeviceId": "รหัสอุปกรณ์ใหม่",
+                "gps": "พิกัด (GPS)",
+                "reportCause": "สาเหตุที่แจ้ง",
+                "maintenance": "การซ่อมบำรุง",
+                "status": "สถานะ"
+            },
+            "status": {
+                "repaired": "ซ่อมแล้ว",
+                "pending": "รอดำเนินการ",
+                "confirmed": "ซ่อมแซมแล้ว"
+            },
+            "maintenanceCase": {
+                "1": "เปลี่ยน RTU",
+                "2": "เปลี่ยนโคมทั้หมด",
+                "3": "ซ่อมโคม",
+                "unknown": "ไม่ทราบ"
+            },
+            "repairImage": "รูปภาพรายงานการซ่อม",
+            "close": "ปิด"
         }
     },
     "MenuSettings": {

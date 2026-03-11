@@ -574,6 +574,36 @@
         "status": {
             "pending": "Pending",
             "confirmed": "Confirmed"
+        },
+        "detail": {
+            "title": "Maintenance detail",
+            "legend": {
+                "powerFailure": "Power/RTU failure",
+                "abnormalVoltage": "Abnormal voltage",
+                "networkFailure": "Network failure"
+            },
+            "table": {
+                "poleNumber": "Pole number",
+                "oldDeviceId": "Old Device Id",
+                "newDeviceId": "New Device Id",
+                "gps": "GPS",
+                "reportCause": "Report cause",
+                "maintenance": "Maintenance",
+                "status": "Status"
+            },
+            "status": {
+                "repaired": "Repaired",
+                "pending": "Pending",
+                "confirmed": "Confirmed"
+            },
+            "maintenanceCase": {
+                "1": "Change RTU",
+                "2": "Change Lamp",
+                "3": "Repair Lamp",
+                "unknown": "Unknown"
+            },
+            "repairImage": "Repair report image",
+            "close": "Close"
         }
     },
     "MenuSettings": {

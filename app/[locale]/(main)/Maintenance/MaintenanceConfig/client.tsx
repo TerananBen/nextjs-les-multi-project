@@ -27,6 +27,7 @@ const MaintenanceMapComponent = dynamic(() => import("./maintenance-map"), {
 import { SelectedTable } from "./selected-table"
 import { useMaintenanceColumns } from "./columns"
 import { DataTable } from "./data-table"
+import { DetailDialog } from "@/app/[locale]/(main)/Maintenance/MaintenanceDashboard/detail-dialog"
 
 export interface SelectedDevice extends LatLongData {
     reason: string;
@@ -367,6 +368,7 @@ export function MaintenanceConfigClient() {
     const [data, setData] = React.useState<MaintenanceConfigRecord[]>([])
     const [loading, setLoading] = React.useState(true)
     const [isAddOpen, setIsAddOpen] = React.useState(false)
+    const [detailId, setDetailId] = React.useState<string | null>(null)
 
     const fetchData = async () => {
         setLoading(true)
@@ -387,8 +389,7 @@ export function MaintenanceConfigClient() {
 
     const columns = useMaintenanceColumns({
         onDetail: (item) => {
-            console.log("Detail clicked", item)
-            // Implementation pending
+            setDetailId(item.detail)
         },
         onStatusChange: (item) => {
             console.log("Status clicked", item)
@@ -435,6 +436,7 @@ export function MaintenanceConfigClient() {
                     )}
                 </DialogContent>
             </Dialog>
+            <DetailDialog detailId={detailId} onClose={() => setDetailId(null)} />
         </div>
     )
 }

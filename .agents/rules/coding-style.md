@@ -5,8 +5,9 @@ trigger: always_on
 # Coding Style: Next.js & shadcn/ui (IoT Dashboard)
 
 ## 0. AI Output (Token Saving)
-- **No Yapping**: Output ONLY code. Zero explanations.
-- **Diff Only**: Output only modified lines/blocks. DO NOT rewrite the entire file.
+- **Do Not Return Code**: You MUST NOT output any code snippets, blocks, or partial modifications in your response text. Doing so wastes tokens. 
+- **Direct Modification**: ALWAYS use your tool (replace_file_content, multi_replace_file_content, etc.) to mutate or create files directly. 
+- **No Yapping**: Zero explanations, just tool execution.
 
 ## 1. Next.js 14 (App Router)
 - **Paradigm**: Server Components (RSC) by default. Use `"use client"` ONLY at the leaf nodes (for hooks, events, or shadcn interactive components).

@@ -16,7 +16,7 @@ import { Label } from "@/components/ui/label"
 import { GroupConfigData } from "@/types/group-config"
 import { addRtuToGroupAction } from "@/app/actions/group-config"
 import { toast } from "sonner"
-import { Loader2, FileSpreadsheet, Upload, CheckCircle2, AlertCircle } from "lucide-react"
+import { Loader2, FileSpreadsheet, Upload } from "lucide-react"
 
 interface AddDeviceCsvDialogProps {
     open: boolean

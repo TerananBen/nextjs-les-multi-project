@@ -26,37 +26,6 @@ export function HeaderBreadcrumb() {
         segments.shift()
     }
 
-    // Map segments to readable labels
-    // We try to find a translation for "Sidebar.[segment]" or fallback to title case
-    const getBreadcrumbLabel = (segment: string) => {
-        // Try to match Sidebar keys first, then fallback to direct translation or raw text
-        // We normalize the segment to allow matching keys like "group-dashboard" -> "GroupDashboard"? 
-        // Or just simple mapping.
-
-        // Simple normalization: dashboard -> Dashboard, group-dashboard -> GroupDashboard ??
-        // Actually the keys in Sidebar are "dashboard", "documents", "settings".
-        // "GroupDashboard" key exists at root level in previous turn.
-
-        const key = `Sidebar.${segment.toLowerCase()}`
-        try {
-            // This is a naive check. efficient way is to rely on t() to return key if missing?
-            // But next-intl throws or returns path depending on config.
-            // Let's manually map for known routes or just use the segment key if available
-
-            if (segment.toLowerCase() === 'dashboard') return t('Sidebar.dashboard')
-            if (segment.toLowerCase() === 'settings') return t('Sidebar.settings')
-
-            // For GroupDashboard, we used "GroupDashboard" as namespace. 
-            // We probably don't have a Breadcrumb specific translation yet.
-            // Let's use a Title Case formatter for unknown segments for now, or check specific keys.
-            if (segment === 'GroupDashboard' || segment === 'group-dashboard') return "Group Dashboard"
-
-            return segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ')
-        } catch (e) {
-            return segment
-        }
-    }
-
     // Custom manual mapping for better UX if needed
     const breadcrumbItems = segments.map((segment, index) => {
         const isLast = index === segments.length - 1
@@ -87,7 +56,7 @@ export function HeaderBreadcrumb() {
 
                 {breadcrumbItems.length > 0 && <BreadcrumbSeparator />}
 
-                {breadcrumbItems.map((item, index) => (
+                {breadcrumbItems.map((item) => (
                     <Fragment key={item.href}>
                         <BreadcrumbItem>
                             {item.isLast ? (

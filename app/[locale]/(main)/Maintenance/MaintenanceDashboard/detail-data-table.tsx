@@ -33,6 +33,7 @@ export function DetailDataTable<TData, TValue>({
 }: DetailDataTableProps<TData, TValue>) {
     const t = useTranslations("MaintenanceDashboard")
 
+    // eslint-disable-next-line react-hooks/incompatible-library
     const table = useReactTable({
         data,
         columns,

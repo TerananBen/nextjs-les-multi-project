@@ -2,25 +2,19 @@
 
 import * as React from "react"
 import {
-  IconAlertTriangle,
-  IconDashboard,
-  IconSettings,
-  IconTool,
-  IconMap,
   IconUser,
   IconBulb,
   IconListDetails,
-  IconPlugConnected,
   IconCalendarTime,
   IconDeviceAnalytics,
   IconReplace,
   IconBriefcase,
   IconBell,
   IconMap2,
+  IconSettings,
+  IconTool,
 } from "@tabler/icons-react"
 import { useTranslations } from "next-intl"
-
-import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import {
   Sidebar,
@@ -38,7 +32,7 @@ import { MenuItem } from "@/app/actions/auth"
 import { Link, usePathname } from "@/i18n/routing"
 
 // Map menu_name to icon and title
-const menuMapping: Record<string, { title: string; icon: any; url: string }> = {
+const menuMapping: Record<string, { title: string; icon: React.ElementType; url: string }> = {
   "V_Dashboard": { title: "menu.overview", icon: IconBriefcase, url: "/Dashboard/Dashboard" },
   "V_AlertStreetLight": { title: "menu.alerts", icon: IconBell, url: "/SettingSystem/Alerts" },
   "V_GroupConfig": { title: "menu.groupConfig", icon: IconSettings, url: "/SettingControl/GroupConfig" },
@@ -116,6 +110,7 @@ export function AppSidebar({ menuItems = [], user, ...props }: AppSidebarProps) 
         {/* Logo Area */}
         <div className="flex flex-col items-center">
           {sidebarLogo ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img src={sidebarLogo} alt="L&E" className="h-10 object-contain" />
           ) : (
             <div className="bg-white/20 p-2 rounded text-lg font-bold border-2 border-white">L&E</div>

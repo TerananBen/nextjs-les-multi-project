@@ -450,7 +450,7 @@ export async function resendCommandOnOffAction(tokenStr: string): Promise<{ resu
     }
 }
 
-export async function getDataLatLongResponseControlAction(tokenStr: string, groupCode: string): Promise<{ result: boolean; dataReturn?: any[]; message?: string }> {
+export async function getDataLatLongResponseControlAction(tokenStr: string, groupCode: string): Promise<{ result: boolean; dataReturn?: unknown[]; message?: string }> {
     const cookieStore = await cookies()
     const token = cookieStore.get("jwt")?.value
 

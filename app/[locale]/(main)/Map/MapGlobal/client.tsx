@@ -72,7 +72,7 @@ export default function MapGlobalClient() {
     // Load initial map data on mount (optional - maybe default to all?)
     useEffect(() => {
         handleSearch()
-    }, []) // Run once on mount
+    }, [handleSearch]) // Run once on mount and when handleSearch changes
 
     const currentOptions = () => {
         switch (searchType) {

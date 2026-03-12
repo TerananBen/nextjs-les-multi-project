@@ -1,9 +1,25 @@
 "use server"
 
 import { cookies } from "next/headers"
-import { ScheduleResponse, ScheduleItem } from "@/types/schedule-settings"
+import { ScheduleItem } from "@/types/schedule-settings"
 
 const API_URL = process.env.API_URL
+
+interface RawScheduleItem {
+    list_group_name_code?: string | string[];
+    list_scenes_light?: string | unknown[] | Record<string, unknown>;
+    name_schedule?: string;
+    scheduleName?: string;
+    type_schedule?: string;
+    typeSchedule?: string;
+    code_name?: string;
+    groupCode?: string;
+    dataGroupName?: string[];
+    listScenes?: unknown[];
+    dataGroupCode?: string[];
+    listDays?: string[];
+    [key: string]: unknown;
+}
 
 export async function getDataScheduleAction(): Promise<ScheduleItem[]> {
     const cookieStore = await cookies()
@@ -29,10 +45,10 @@ export async function getDataScheduleAction(): Promise<ScheduleItem[]> {
             return []
         }
 
-        const data: any = await response.json()
+        const data: { result: boolean, dataReturn: RawScheduleItem[] } = await response.json()
         if (data.result && Array.isArray(data.dataReturn)) {
             // Map raw API data to ScheduleItem structure
-            return data.dataReturn.map((item: any) => {
+            return data.dataReturn.map((item: RawScheduleItem) => {
                 // 1. Parse Group Names from "list_group_name_code" (JSON String of ["Name$Code"])
                 let groupNames: string[] = []
                 if (item.list_group_name_code) {
@@ -56,7 +72,7 @@ export async function getDataScheduleAction(): Promise<ScheduleItem[]> {
                 }
 
                 // 2. Parse Scenes from "list_scenes_light" (JSON String)
-                let scenes: any[] = []
+                let scenes: unknown[] = []
                 if (item.list_scenes_light) {
                     try {
                         const parsed = typeof item.list_scenes_light === 'string'
@@ -93,7 +109,7 @@ export async function getDataScheduleAction(): Promise<ScheduleItem[]> {
     }
 }
 
-export async function saveScheduleSettingsAction(payload: any): Promise<{ success: boolean; message?: string }> {
+export async function saveScheduleSettingsAction(payload: unknown): Promise<{ success: boolean; message?: string }> {
     const cookieStore = await cookies()
     const token = cookieStore.get("jwt")?.value
 
@@ -171,7 +187,7 @@ export async function deleteScheduleAction(groupCode: string): Promise<{ success
     }
 }
 
-export async function getScheduleResponseAction(codeName: string): Promise<{ result: boolean; dataReturn: any[] }> {
+export async function getScheduleResponseAction(codeName: string): Promise<{ result: boolean; dataReturn: unknown[] }> {
     const cookieStore = await cookies()
     const token = cookieStore.get("jwt")?.value
 
@@ -202,7 +218,7 @@ export async function getScheduleResponseAction(codeName: string): Promise<{ res
     }
 }
 
-export async function setModeResendAction(payload: any): Promise<{ success: boolean; message?: string; data?: any }> {
+export async function setModeResendAction(payload: Record<string, unknown>): Promise<{ success: boolean; message?: string; data?: unknown }> {
     const cookieStore = await cookies()
     const token = cookieStore.get("jwt")?.value
     const WAIT_TIME = process.env.WAIT_TIME || "30"

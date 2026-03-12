@@ -40,6 +40,7 @@ function LegendItem({ icons, text }: { icons: { color: MarkerColor, badge: Marke
             <div className="flex items-center gap-1 min-w-[30px]">
                 {icons.map((icon, idx) => (
                     <div key={idx} className="flex items-center">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={getLeafletIconUrl(icon.color, icon.badge)} className="w-6 h-6 object-contain" alt="" />
                         {idx < icons.length - 1 && <span className="text-gray-400 mx-0.5 text-xs">|</span>}
                     </div>
@@ -114,7 +115,7 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
             }
         }
         initData()
-    }, [])
+    }, [tMessages])
 
     const handleSearch = async () => {
         setIsSearching(true)
@@ -183,7 +184,7 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
             } else {
                 toast.error(res.message || tMessages("saveError"))
             }
-        } catch (error) {
+        } catch {
             toast.error(tMessages("saveError"))
         } finally {
             setIsSaving(false)
@@ -379,7 +380,7 @@ export function MaintenanceConfigClient() {
     const [deletingId, setDeletingId] = React.useState<string | null>(null)
     const [isDeleting, setIsDeleting] = React.useState(false)
 
-    const fetchData = async () => {
+    const fetchData = React.useCallback(async () => {
         setLoading(true)
         try {
             const result = await getDataListMaintenanceTotal()
@@ -390,11 +391,11 @@ export function MaintenanceConfigClient() {
         } finally {
             setLoading(false)
         }
-    }
+    }, [tMessages])
 
     React.useEffect(() => {
         fetchData()
-    }, [])
+    }, [fetchData])
 
     const [isConfirming, setIsConfirming] = React.useState(false)
 

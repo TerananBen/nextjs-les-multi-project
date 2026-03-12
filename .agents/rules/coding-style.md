@@ -25,3 +25,9 @@ trigger: always_on
 - **Typing**: Strict TS. Use `interface` for data models (e.g., IoT Device schemas). **FORBIDDEN**: `any`.
 - **Functions**: Use Arrow functions. Prefer early returns to avoid deep nesting.
 - **Imports**: Order logically: React/Next -> 3rd party -> `@/components` -> `@/lib` -> relative.
+
+## 4. Strict Linting & Error Prevention (CRITICAL)
+You must write code that passes strict ESLint rules without triggering warnings or errors:
+- **`react-hooks/exhaustive-deps`**: ALWAYS include ALL referenced variables, functions, and state inside the dependency array for `useEffect`, `useCallback`, and `useMemo`. If a dependency causes infinite loops, refactor the logic (e.g., use functional state updates `setCount(c => c + 1)`) instead of omitting it.
+- **`prefer-const`**: ALWAYS use `const` for variable declarations by default. Only use `let` if you explicitly need to reassign the variable later. NEVER use `var`.
+- **`@typescript-eslint/no-explicit-any`**: NEVER use `any`. You must define proper TypeScript types/interfaces for all variables, props, and API responses. If a type is truly unknown, use `unknown` and perform type narrowing.

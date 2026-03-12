@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { useTranslations } from "next-intl"
 import { MaintenanceDetailListRecord } from "@/app/actions/maintenance"
 import { useMaintenanceDetailColumns } from "./columns"
 import { DataTable } from "./data-table"
@@ -11,7 +10,6 @@ interface MaintenanceDetailClientProps {
 }
 
 export function MaintenanceDetailClient({ initialData }: MaintenanceDetailClientProps) {
-    const t = useTranslations("MaintenanceDetail")
     const columns = useMaintenanceDetailColumns()
 
     const [data] = React.useState<MaintenanceDetailListRecord[]>(initialData)

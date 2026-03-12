@@ -9,6 +9,15 @@ const nextConfig: NextConfig = {
   experimental: {
   },
   allowedDevOrigins: ["10.0.0.10", "localhost"],
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: '192.167.5.46',
+        port: '8012',
+      },
+    ],
+  },
 };
 
 export default withNextIntl(nextConfig);

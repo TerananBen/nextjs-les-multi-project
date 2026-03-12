@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { FilterBar } from "@/components/dashboard/filter-bar"
 import { SummaryCards } from "@/components/dashboard/summary-cards"
 import { ChartsSection } from "@/components/dashboard/charts-section"
@@ -23,13 +23,8 @@ export function GroupDashboardClient({ groups, defaultGroupCode }: GroupDashboar
     // but FilterBar manages its own state. We might need to lift state up or use refs.
     // For now, let's just trigger the fetch.
 
-    useEffect(() => {
-        if (defaultGroupCode) {
-            handleSearch(defaultGroupCode, "Now", currentMonth)
-        }
-    }, [defaultGroupCode])
 
-    const handleSearch = async (groupCode: string, type: string, date: string) => {
+    const handleSearch = useCallback(async (groupCode: string, type: string, date: string) => {
         setLoading(true)
         setData(null)
         try {
@@ -41,7 +36,7 @@ export function GroupDashboardClient({ groups, defaultGroupCode }: GroupDashboar
                 const dateArray: string[] = []
 
                 // Generate array of dates
-                let curr = new Date(startDate)
+                const curr = new Date(startDate)
                 while (curr <= endDate) {
                     dateArray.push(curr.toISOString().split('T')[0])
                     curr.setDate(curr.getDate() + 1)
@@ -155,7 +150,7 @@ export function GroupDashboardClient({ groups, defaultGroupCode }: GroupDashboar
                 // Single request (Original Logic)
                 const result = await getDataDashBoard({
                     group_code: groupCode,
-                    select_type: type as any,
+                    select_type: type as Parameters<typeof getDataDashBoard>[0]["select_type"],
                     select_date: date
                 })
 
@@ -176,7 +171,13 @@ export function GroupDashboardClient({ groups, defaultGroupCode }: GroupDashboar
         } finally {
             setLoading(false)
         }
-    }
+    }, [])
+
+    useEffect(() => {
+        if (defaultGroupCode) {
+            handleSearch(defaultGroupCode, "Now", currentMonth)
+        }
+    }, [defaultGroupCode, currentMonth, handleSearch])
 
     return (
         <div className="space-y-6">

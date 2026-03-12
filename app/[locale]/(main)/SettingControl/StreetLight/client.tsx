@@ -6,11 +6,9 @@ import { DeviceGroup, StreetLightDevice } from "@/types/street-light"
 import { getListDataGroupAction, searchStreetLightFromGroupAction } from "@/app/actions/street-light"
 import { useStreetLightColumns } from "./columns"
 import { DataTable } from "./data-table"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
-import { Search, Check, ChevronsUpDown } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Search } from "lucide-react"
 import {
     Combobox,
     ComboboxContent,

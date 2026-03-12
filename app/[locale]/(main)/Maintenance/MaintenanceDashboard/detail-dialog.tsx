@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl"
 import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Lightbulb, Loader2, X, Image as ImageIcon } from "lucide-react"
 import { MaintenanceDetailRecord, MaintenanceImageRecord, getDetailDataMaintenance, getLoadImage } from "@/app/actions/maintenance"
@@ -130,10 +131,11 @@ export function DetailDialog({ detailId, onClose }: DetailDialogProps) {
                                         className="relative group rounded-lg overflow-hidden border shadow-sm aspect-video bg-slate-100 cursor-pointer transition-all hover:shadow-md"
                                         onClick={() => setPreviewImage(img.path_img)}
                                     >
-                                        <img
+                                        <Image
                                             src={img.path_img}
                                             alt={`Repair image ${img.id_img}`}
-                                            className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+                                            fill
+                                            className="object-cover transition-transform duration-300 group-hover:scale-105"
                                             onError={(e) => {
                                                 const target = e.target as HTMLImageElement;
                                                 target.onerror = null;
@@ -174,11 +176,14 @@ export function DetailDialog({ detailId, onClose }: DetailDialogProps) {
                     <DialogTitle className="sr-only">Image Preview</DialogTitle>
                     <div className="relative flex justify-center items-center w-full h-full">
                         {previewImage && (
-                            <img
-                                src={previewImage}
-                                alt="Preview Fullscreen"
-                                className="max-h-[90vh] max-w-[90vw] object-contain rounded-md"
-                            />
+                            <div className="relative w-full h-full min-h-[50vh]">
+                                <Image
+                                    src={previewImage}
+                                    alt="Preview Fullscreen"
+                                    fill
+                                    className="object-contain rounded-md"
+                                />
+                            </div>
                         )}
                         <Button
                             variant="ghost"

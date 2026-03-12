@@ -3,18 +3,13 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { StreetLightDevice } from "@/types/street-light"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { useTranslations } from "next-intl"
 import {
     Lightbulb,
     RefreshCcw,
-    FileText,
     Sun,
     Moon,
-    MapPin,
-    MousePointer2,
     Layers,
-    X,
     ArrowUpDown
 } from "lucide-react"
 import {
@@ -62,7 +57,7 @@ const CommandCell = ({
     const isOn = initialCommand?.[0] === "1"
     const initialDim = parseInt(initialCommand?.[1] || "0", 10)
 
-    const [dimLevel, setDimLevel] = React.useState(initialDim)
+    const [dimLevel, setDimLevel] = React.useState<number | string>(initialDim)
 
     // Update local state if prop changes (optional, but good for table updates)
     React.useEffect(() => {
@@ -78,7 +73,7 @@ const CommandCell = ({
             // So if we are sending, we send Command "1" (On) with the Dim Level.
             // But if Dim is 0, maybe we should send "0"? 
             // Let's stick to: If > 0 send "1", else "0".
-            const commandType = dimLevel > 0 ? "1" : "0"
+            const commandType = Number(dimLevel) > 0 ? "1" : "0"
 
             const result = await sendStreetLightCommandAction(imei, commandType, dimLevel.toString())
             if (result.success) {
@@ -87,7 +82,7 @@ const CommandCell = ({
             } else {
                 toast.error(t("commandFailed"))
             }
-        } catch (error) {
+        } catch {
             toast.error(t("refreshError"))
         } finally {
             setLoading(false)
@@ -148,8 +143,7 @@ const CommandCell = ({
                                             const val = e.target.value
                                             // Allow empty for typing
                                             if (val === "") {
-                                                // @ts-ignore - temporary cast for transition valid number
-                                                setDimLevel("" as any)
+                                                setDimLevel("")
                                                 return
                                             }
                                             const num = parseInt(val, 10)
@@ -160,7 +154,7 @@ const CommandCell = ({
                                             }
                                         }}
                                         onBlur={() => {
-                                            if (dimLevel === "" as any) setDimLevel(0)
+                                            if (dimLevel === "") setDimLevel(0)
                                         }}
                                         className="w-16 h-8 text-right font-bold text-primary"
                                     />
@@ -190,6 +184,97 @@ const CommandCell = ({
                     </div>
                 </DialogContent>
             </Dialog>
+        </div>
+    )
+}
+
+// --- Power Cell Component ---
+const PowerCell = ({
+    lastPower,
+    gatewayId,
+    imei
+}: {
+    lastPower?: string,
+    gatewayId?: string,
+    imei: string
+}) => {
+    const t = useTranslations("StreetLight.table")
+    const { getPermission } = usePermission();
+    const permissions = getPermission("V_StreetLight");
+    const canControl = permissions.control;
+
+    const [power, setPower] = React.useState(lastPower || "0");
+    const [loading, setLoading] = React.useState(false);
+
+    const handleRefresh = async () => {
+        setLoading(true);
+        try {
+            if (!gatewayId || !imei) {
+                toast.error(t("errorConfigMissing"));
+                return;
+            }
+
+            // Call Server Action
+            const result = await refreshStreetLightPowerAction(gatewayId, imei);
+
+            if (result.success) {
+                setPower(result.power);
+                toast.success(t("refreshSuccess"));
+            } else {
+                toast.error(t("refreshFailed"));
+            }
+        } catch {
+            toast.error(t("refreshError"));
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div className="flex items-center justify-center gap-2">
+            <div className="flex items-center gap-2 bg-muted/50 px-3 py-1.5 rounded-md min-w-[100px] justify-between">
+                <Lightbulb className="h-4 w-4 text-blue-500" />
+                <span className="text-sm font-medium">{power} W</span>
+            </div>
+            <Button
+                variant="default"
+                size="icon"
+                className={cn(
+                    "h-8 w-8 rounded-lg",
+                    canControl ? "bg-blue-500 hover:bg-blue-600 cursor-pointer" : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                )}
+                onClick={handleRefresh}
+                disabled={loading || !canControl}
+                title={!canControl ? "Permission Denied" : "Refresh Power"}
+            >
+                <RefreshCcw className={cn("h-4 w-4 text-white", loading && "animate-spin")} />
+            </Button>
+        </div>
+    )
+}
+
+// --- History Cell Component ---
+const HistoryCell = ({
+    imei,
+    deviceName
+}: {
+    imei: string,
+    deviceName?: string
+}) => {
+    const { getPermission } = usePermission();
+    const canRead = getPermission("V_StreetLight").readable;
+
+    if (!canRead) {
+        return (
+            <div className="flex justify-center text-muted-foreground text-xs cursor-not-allowed">
+                -
+            </div>
+        )
+    }
+
+    return (
+        <div className="flex justify-center">
+            <HistoryPowerDialog imei={imei} deviceName={deviceName} />
         </div>
     )
 }
@@ -333,59 +418,12 @@ export const useStreetLightColumns = () => {
                 )
             },
             cell: ({ row }) => {
-                const { getPermission } = usePermission();
-                const permissions = getPermission("V_StreetLight");
-                const canControl = permissions.control;
-
-                const [power, setPower] = React.useState(row.original.lastPower || "0");
-                const [loading, setLoading] = React.useState(false);
-
-                const handleRefresh = async () => {
-                    setLoading(true);
-                    try {
-                        const gatewayId = row.original.gatewayId;
-                        const imei = row.original.imeI_Name;
-                        if (!gatewayId || !imei) {
-                            toast.error(t("errorConfigMissing"));
-                            return;
-                        }
-
-                        // Call Server Action
-                        const result = await refreshStreetLightPowerAction(gatewayId, imei);
-
-                        if (result.success) {
-                            setPower(result.power);
-                            toast.success(t("refreshSuccess"));
-                        } else {
-                            toast.error(t("refreshFailed"));
-                        }
-                    } catch (error) {
-                        toast.error(t("refreshError"));
-                    } finally {
-                        setLoading(false);
-                    }
-                };
-
                 return (
-                    <div className="flex items-center justify-center gap-2">
-                        <div className="flex items-center gap-2 bg-muted/50 px-3 py-1.5 rounded-md min-w-[100px] justify-between">
-                            <Lightbulb className="h-4 w-4 text-blue-500" />
-                            <span className="text-sm font-medium">{power} W</span>
-                        </div>
-                        <Button
-                            variant="default"
-                            size="icon"
-                            className={cn(
-                                "h-8 w-8 rounded-lg",
-                                canControl ? "bg-blue-500 hover:bg-blue-600 cursor-pointer" : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            )}
-                            onClick={handleRefresh}
-                            disabled={loading || !canControl}
-                            title={!canControl ? "Permission Denied" : "Refresh Power"}
-                        >
-                            <RefreshCcw className={cn("h-4 w-4 text-white", loading && "animate-spin")} />
-                        </Button>
-                    </div>
+                    <PowerCell 
+                        lastPower={row.original.lastPower}
+                        gatewayId={row.original.gatewayId}
+                        imei={row.original.imeI_Name}
+                    />
                 )
             }
         },
@@ -403,23 +441,11 @@ export const useStreetLightColumns = () => {
             id: "logPower",
             header: t("logPower"),
             cell: ({ row }) => {
-                const imei = row.original.imeI_Name
-                const deviceName = row.original.streetLightName
-                const { getPermission } = usePermission();
-                const canRead = getPermission("V_StreetLight").readable;
-
-                if (!canRead) {
-                    return (
-                        <div className="flex justify-center text-muted-foreground text-xs cursor-not-allowed">
-                            -
-                        </div>
-                    )
-                }
-
                 return (
-                    <div className="flex justify-center">
-                        <HistoryPowerDialog imei={imei} deviceName={deviceName} />
-                    </div>
+                    <HistoryCell 
+                        imei={row.original.imeI_Name}
+                        deviceName={row.original.streetLightName}
+                    />
                 )
             }
         },

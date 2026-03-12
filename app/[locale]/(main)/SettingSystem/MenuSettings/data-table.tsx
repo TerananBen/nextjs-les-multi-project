@@ -40,6 +40,7 @@ export function DataTable<TData, TValue>({
         pageSize: 20, // Default 20 as per image "แถวต่อหน้า : 20"
     })
 
+    // eslint-disable-next-line react-hooks/incompatible-library
     const table = useReactTable({
         data,
         columns,

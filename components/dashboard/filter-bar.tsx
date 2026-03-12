@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
     Select,
@@ -9,7 +9,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
 import { DateRange } from "react-day-picker"
 import { GroupItem } from "@/app/actions/dashboard"
 import { Printer, Search, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react"
@@ -35,7 +34,6 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
     const locale = useLocale()
     const [selectedGroup, setSelectedGroup] = useState<string>("")
     const [selectedType, setSelectedType] = useState<string>("Month")
-    const [selectedDate, setSelectedDate] = useState<string>("")
     // State for Week picker (Single Date)
     const [singleDate, setSingleDate] = useState<Date | undefined>(undefined)
     // State for Day picker (Date Range)
@@ -56,9 +54,7 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
     const yearCount = Math.max(1, currentYear - startYear + 1)
     const years = Array.from({ length: yearCount }, (_, i) => currentYear - i)
 
-    // Update selectedDate based on type and local state
     // We'll use separate states for complex pickers to make UI handling easier
-    const [selectedMonth, setSelectedMonth] = useState<string>(String(new Date().getMonth() + 1).padStart(2, '0'))
     const [selectedYear, setSelectedYear] = useState<string>(String(currentYear))
     // State for Month picker (month range as {from, to} with 1st of month dates)
     const [monthRange, setMonthRange] = useState<{ from?: Date; to?: Date }>({})
@@ -66,59 +62,47 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
 
     const [selectedQuarter, setSelectedQuarter] = useState<string>("1")
 
-    // Effect to update the main selectedDate string when sub-values change
-    useEffect(() => {
-        if (selectedType === "Day" && dateRange?.from) {
-            const start = format(dateRange.from, "yyyy-MM-dd")
-            if (dateRange.to) {
-                const end = format(dateRange.to, "yyyy-MM-dd")
-                // If same day, just send single date (optional, but cleaner for "Single Day" logic backend?)
-                // User said: "Select 1 day -> ... totalUnitPerHour".
-                // If start == end, it's 1 day.
-                if (start === end) {
-                    setSelectedDate(start)
-                } else {
-                    setSelectedDate(`${start},${end}`)
-                }
-            } else {
-                setSelectedDate(start)
-            }
-        } else if (selectedType === "Month" && monthRange?.from) {
-            const startStr = format(monthRange.from, "yyyy-MM")
-            if (monthRange.to) {
-                const endStr = format(monthRange.to, "yyyy-MM")
-                if (startStr === endStr) {
-                    setSelectedDate(startStr)
-                } else {
-                    setSelectedDate(`${startStr}_${endStr}`)
-                }
-            } else {
-                setSelectedDate(startStr)
-            }
-        } else if (selectedType === "Quarter") {
-            setSelectedDate(`${selectedYear}-Q${selectedQuarter}`)
-        } else if (selectedType === "Year") {
-            setSelectedDate(selectedYear)
-        } else if (selectedType === "Week" && singleDate) {
-            // Calculate week range (Monday to Sunday)
-            const start = startOfWeek(singleDate, { weekStartsOn: 1 })
-            const end = endOfWeek(singleDate, { weekStartsOn: 1 })
-            const startStr = format(start, "yyyy-MM-dd")
-            const endStr = format(end, "yyyy-MM-dd")
-            setSelectedDate(`${startStr}_${endStr}`)
-        } else if (selectedType === "Now") {
-            setSelectedDate("")
-        }
-    }, [singleDate, dateRange, monthRange, selectedType, selectedMonth, selectedYear, selectedQuarter])
-
-
     const handleSearch = () => {
-        // For "Now", date might be empty, which is fine
         if (selectedGroup && selectedType) {
-            // Add validation if needed
-            // Month range validation is handled in the calendar onSelect
+            let searchDate = ""
 
-            onSearch(selectedGroup, selectedType, selectedDate)
+            if (selectedType === "Day" && dateRange?.from) {
+                const start = format(dateRange.from, "yyyy-MM-dd")
+                if (dateRange.to) {
+                    const end = format(dateRange.to, "yyyy-MM-dd")
+                    if (start === end) {
+                        searchDate = start
+                    } else {
+                        searchDate = `${start},${end}`
+                    }
+                } else {
+                    searchDate = start
+                }
+            } else if (selectedType === "Month" && monthRange?.from) {
+                const startStr = format(monthRange.from, "yyyy-MM")
+                if (monthRange.to) {
+                    const endStr = format(monthRange.to, "yyyy-MM")
+                    if (startStr === endStr) {
+                        searchDate = startStr
+                    } else {
+                        searchDate = `${startStr}_${endStr}`
+                    }
+                } else {
+                    searchDate = startStr
+                }
+            } else if (selectedType === "Quarter") {
+                searchDate = `${selectedYear}-Q${selectedQuarter}`
+            } else if (selectedType === "Year") {
+                searchDate = selectedYear
+            } else if (selectedType === "Week" && singleDate) {
+                const start = startOfWeek(singleDate, { weekStartsOn: 1 })
+                const end = endOfWeek(singleDate, { weekStartsOn: 1 })
+                const startStr = format(start, "yyyy-MM-dd")
+                const endStr = format(end, "yyyy-MM-dd")
+                searchDate = `${startStr}_${endStr}`
+            }
+
+            onSearch(selectedGroup, selectedType, searchDate)
         }
     }
 

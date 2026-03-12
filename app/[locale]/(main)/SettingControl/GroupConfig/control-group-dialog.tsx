@@ -69,7 +69,7 @@ function formatTimestamp(timestamp: string): string {
             const minutes = date.getMinutes().toString().padStart(2, '0');
             const seconds = date.getSeconds().toString().padStart(2, '0');
             return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-        } catch (e) {
+        } catch {
             return timestamp;
         }
     }
@@ -97,7 +97,7 @@ function parseCustomDate(dateStr: string): Date | null {
             }
         }
         return new Date(dateStr) // Fallback
-    } catch (e) {
+    } catch {
         return null;
     }
 }
@@ -105,13 +105,11 @@ function parseCustomDate(dateStr: string): Date | null {
 const DeviceRow = React.memo(({
     item,
     isSelected,
-    onSelect,
-    t
+    onSelect
 }: {
     item: DeviceStatus,
     isSelected: boolean,
-    onSelect: (imsi: string, checked: boolean) => void,
-    t: any
+    onSelect: (imsi: string, checked: boolean) => void
 }) => {
     return (
         <TableRow key={item.imsi} className="whitespace-nowrap">
@@ -225,7 +223,7 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
         } finally {
             setLoading(false)
         }
-    }, [group.group_name])
+    }, [group.group_name, t])
 
     React.useEffect(() => {
         if (open) {
@@ -246,8 +244,9 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
             if (result.result && result.dataReturn) {
                 let successCount = 0;
                 let failCount = 0;
+                const statusData = result.dataReturn as LatLongResponseControlData[]
                 setData(prev => prev.map(item => {
-                    const statusItem = result.dataReturn?.find(r => r.imsi === item.imsi)
+                    const statusItem = statusData?.find(r => r.imsi === item.imsi)
                     if (statusItem) {
                         if (statusItem.status === "1") successCount++;
                         if (statusItem.status === "0") failCount++;
@@ -358,7 +357,7 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
             } else {
                 toast.error(t("resendFailed"))
             }
-        } catch (error) {
+        } catch {
             toast.error(t("resendError"))
         }
     }
@@ -493,7 +492,6 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                                         item={item}
                                         isSelected={selectedImsis.has(item.imsi)}
                                         onSelect={handleSelectRow}
-                                        t={t}
                                     />
                                 ))
                             ) : (

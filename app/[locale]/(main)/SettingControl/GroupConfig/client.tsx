@@ -39,7 +39,7 @@ export function GroupConfigClient() {
     const [newGroupName, setNewGroupName] = React.useState("")
     const [isAdding, setIsAdding] = React.useState(false)
 
-    const fetchData = async () => {
+    const fetchData = React.useCallback(async () => {
         setLoading(true)
         try {
             const result = await getListDataGroupAllAction()
@@ -52,7 +52,7 @@ export function GroupConfigClient() {
         } finally {
             setLoading(false)
         }
-    }
+    }, [t])
 
     // Columns
     const columns = useGroupConfigColumns(fetchData)
@@ -60,7 +60,7 @@ export function GroupConfigClient() {
     // Fetch Data on Mount
     React.useEffect(() => {
         fetchData()
-    }, [])
+    }, [fetchData])
 
     const handleAddGroup = async () => {
         if (!newGroupName.trim()) {

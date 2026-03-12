@@ -1,8 +1,6 @@
 "use client"
 
 import { useEffect, useState, useCallback, useRef } from "react"
-// react-leaflet imports kept as legacy reference or if needed by other components, though current impl uses Vanilla L
-import { useMap } from "react-leaflet"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import { LatLongData, getDataDetailIMSIAction, ImsiDetail, sendCommandMqttAction, readDataMqttAction } from "@/app/actions/map-actions"
@@ -41,7 +39,7 @@ interface MapProps {
 }
 
 // Helpers
-function getMarkerConfig(device: LatLongData, t: any): { color: MarkerColor, badge: MarkerBadge, statusText: string } {
+function getMarkerConfig(device: LatLongData, t: (key: string) => string): { color: MarkerColor, badge: MarkerBadge, statusText: string } {
     const status = device.status;
     const isAuto = device.type_schedule !== "manual" && device.using_sensor.toLowerCase() !== "false";
     const power = parseInt(device.last_power || "0");
@@ -68,14 +66,14 @@ function getMarkerConfig(device: LatLongData, t: any): { color: MarkerColor, bad
     }
 }
 
-function getDeviceMode(device: LatLongData, t: any): string {
+function getDeviceMode(device: LatLongData, t: (key: string) => string): string {
     if (device.using_sensor && device.using_sensor.toLowerCase() === "false") {
         return t("legend.manual");
     }
     return device.type_schedule || t("legend.auto");
 }
 
-function formatServiceData(text: string, t: any): string {
+function formatServiceData(text: string, t: (key: string) => string): string {
     if (!text) return "-";
     // Replace known Thai keywords with localized versions
     let formatted = text;
@@ -104,7 +102,7 @@ const centerDefault = { lat: DEFAULT_LAT, lng: DEFAULT_LNG };
 
 interface DeviceDetailPopupProps {
     device: LatLongData
-    t: any
+    t: (key: string) => string
     onUpdatePosition?: () => void
     canControl: boolean
 }
@@ -135,7 +133,7 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
             } else {
                 setError(true)
             }
-        } catch (e) {
+        } catch {
             setError(true)
         } finally {
             setLoading(false)
@@ -356,7 +354,7 @@ function GoogleMapComponent({ devices }: { devices: LatLongData[] }) {
         if (z) setZoom(z);
     }, [map])
 
-    const onUnmount = useCallback((map: google.maps.Map) => setMap(null), [])
+    const onUnmount = useCallback(() => setMap(null), [])
 
     if (!isLoaded) return <div className="h-full w-full flex items-center justify-center"><Loader2 className="animate-spin" /></div>
 
@@ -449,7 +447,7 @@ function LeafletMapComponent({ offlineUrl, devices }: { offlineUrl?: string, dev
                 const content = popup.getContent();
 
                 if (content instanceof HTMLElement) {
-                    const c = content as any;
+                    const c = content as HTMLElement & { _reactRoot?: import('react-dom/client').Root };
                     let root = c._reactRoot;
 
                     if (!root) {
@@ -475,7 +473,7 @@ function LeafletMapComponent({ offlineUrl, devices }: { offlineUrl?: string, dev
                 const popup = e.popup;
                 const content = popup.getContent();
                 if (content instanceof HTMLElement) {
-                    const c = content as any;
+                    const c = content as HTMLElement & { _reactRoot?: import('react-dom/client').Root };
                     if (c._reactRoot) {
                         // We can unmount on close to convert back to "clean" state
                         setTimeout(() => {
@@ -495,7 +493,7 @@ function LeafletMapComponent({ offlineUrl, devices }: { offlineUrl?: string, dev
     return <div ref={containerRef} className="h-full w-full" style={{ zIndex: 0 }} />
 }
 
-export default function MapContainerComponent({ mode, onlineUrl, offlineUrl, devices }: MapProps) {
+export default function MapContainerComponent({ mode, offlineUrl, devices }: MapProps) {
     if (mode === "online") {
         return (
             <div className="h-full w-full rounded-lg overflow-hidden border relative">
@@ -579,6 +577,7 @@ function LegendItem({ icons, text }: { icons: { color: MarkerColor, badge: Marke
             <div className="flex items-center gap-1 min-w-[50px]">
                 {icons.map((icon, idx) => (
                     <div key={idx} className="flex items-center">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={getLeafletIconUrl(icon.color, icon.badge)} className="w-6 h-6" alt="" />
                         {idx < icons.length - 1 && <span className="text-gray-400 mx-0.5">|</span>}
                     </div>

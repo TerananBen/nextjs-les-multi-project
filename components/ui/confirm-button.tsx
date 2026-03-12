@@ -24,7 +24,7 @@ export function ConfirmButton({
     ...props
 }: ConfirmButtonProps) {
     const [isConfirming, setIsConfirming] = React.useState(false)
-    const [countdown, setCountdown] = React.useState(0)
+    const [, setCountdown] = React.useState(0)
     const timerRef = React.useRef<NodeJS.Timeout | null>(null)
     const intervalRef = React.useRef<NodeJS.Timeout | null>(null)
 

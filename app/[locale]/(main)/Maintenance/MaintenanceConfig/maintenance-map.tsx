@@ -37,7 +37,7 @@ interface MapProps {
     selectedImsis: string[] // to hide markers that are already selected
 }
 
-function getMarkerConfig(device: LatLongData, t: any): { color: MarkerColor, badge: MarkerBadge, statusText: string } {
+function getMarkerConfig(device: LatLongData, t: (key: string) => string): { color: MarkerColor, badge: MarkerBadge, statusText: string } {
     const status = device.status;
     const isAuto = device.type_schedule !== "manual" && device.using_sensor.toLowerCase() !== "false";
     const power = parseInt(device.last_power || "0");
@@ -82,8 +82,8 @@ const centerDefault = { lat: DEFAULT_LAT, lng: DEFAULT_LNG };
 
 interface DeviceDetailPopupProps {
     device: LatLongData
-    tMap: any
-    tConfig: any
+    tMap: (key: string) => string
+    tConfig: (key: string) => string
     onSelectDevice: (device: LatLongData) => void
 }
 
@@ -124,14 +124,20 @@ function GoogleMapComponent({ devices, onSelectDevice, selectedImsis }: { device
         if (z) setZoom(z);
     }, [map])
 
-    const onUnmount = useCallback((map: google.maps.Map) => setMap(null), [])
+    const onUnmount = useCallback(() => setMap(null), [])
 
     // Deselect if the selected device was added to the table
     useEffect(() => {
-        if (selectedDevice && selectedImsis.includes(selectedDevice.imsi)) {
-            setSelectedDevice(null)
-        }
-    }, [selectedImsis, selectedDevice])
+        const timeout = setTimeout(() => {
+            setSelectedDevice((prev) => {
+                if (prev && selectedImsis.includes(prev.imsi)) {
+                    return null;
+                }
+                return prev;
+            });
+        }, 0);
+        return () => clearTimeout(timeout);
+    }, [selectedImsis])
 
     if (!isLoaded) return <div className="h-full w-full flex items-center justify-center"><Loader2 className="animate-spin" /></div>
 
@@ -223,7 +229,7 @@ function LeafletMapComponent({ offlineUrl, devices, onSelectDevice, selectedImsi
                 const content = popup.getContent();
 
                 if (content instanceof HTMLElement) {
-                    const c = content as any;
+                    const c = content as HTMLElement & { _reactRoot?: import('react-dom/client').Root };
                     let root = c._reactRoot;
 
                     if (!root) {
@@ -258,7 +264,7 @@ function LeafletMapComponent({ offlineUrl, devices, onSelectDevice, selectedImsi
                 const popup = e.popup;
                 const content = popup.getContent();
                 if (content instanceof HTMLElement) {
-                    const c = content as any;
+                    const c = content as HTMLElement & { _reactRoot?: import('react-dom/client').Root };
                     if (c._reactRoot) {
                         setTimeout(() => {
                             if (c._reactRoot) {
@@ -282,7 +288,7 @@ function UseTranslationsProvider({ children }: { children: React.ReactNode }) {
     return <>{children}</>
 }
 
-export default function MaintenanceMapComponent({ mode, onlineUrl, offlineUrl, devices, onSelectDevice, selectedImsis }: MapProps) {
+export default function MaintenanceMapComponent({ mode, offlineUrl, devices, onSelectDevice, selectedImsis }: MapProps) {
     if (mode === "online") {
         return (
             <div className="h-full w-full rounded-lg overflow-hidden border relative">

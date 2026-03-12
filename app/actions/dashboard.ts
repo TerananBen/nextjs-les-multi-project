@@ -25,10 +25,10 @@ export interface DashboardData {
     listTotalImeiLose: number[]
     listAvgWatt: number[]
     listAvgVolt: number[]
-    listTotalImeiWattOver: any[]
-    listTotalImeiWattLess: any[]
-    listTotalImeiVoltOver: any[]
-    listTotalImeiVoltLess: any[]
+    listTotalImeiWattOver: unknown[]
+    listTotalImeiWattLess: unknown[]
+    listTotalImeiVoltOver: unknown[]
+    listTotalImeiVoltLess: unknown[]
     listLostContact1Hr: number[]
     listLostContact3Hr: number[]
     listLostContact6Hr: number[]
@@ -46,9 +46,9 @@ export interface DashboardData {
     totalImeiWattLess: string
     totalImeiVoltOver: string
     totalImeiVoltLess: string
-    listTotalLampLose: any[]
-    listTotalRTULose: any[]
-    listTotalInternetLose: any[]
+    listTotalLampLose: unknown[]
+    listTotalRTULose: unknown[]
+    listTotalInternetLose: unknown[]
     totalLampLose: string
     totalVoltageWattLose: string
     totalRTULose: string

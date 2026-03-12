@@ -54,7 +54,7 @@ export const useScheduleColumns = ({ onEdit, onDelete, onFeedback }: UseSchedule
         },
         {
             id: "edit",
-            header: ({ column }) => (
+            header: () => (
                 <div className="font-semibold text-foreground">{t("table.edit")}</div>
             ),
             cell: ({ row }) => {
@@ -73,7 +73,7 @@ export const useScheduleColumns = ({ onEdit, onDelete, onFeedback }: UseSchedule
         },
         {
             id: "feedback",
-            header: ({ column }) => (
+            header: () => (
                 <div className="font-semibold text-foreground">{t("table.feedback")}</div>
             ),
             cell: ({ row }) => {
@@ -92,7 +92,7 @@ export const useScheduleColumns = ({ onEdit, onDelete, onFeedback }: UseSchedule
         },
         {
             id: "delete",
-            header: ({ column }) => (
+            header: () => (
                 <div className="font-semibold text-foreground">{t("table.delete")}</div>
             ),
             cell: ({ row }) => {

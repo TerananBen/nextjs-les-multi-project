@@ -108,7 +108,7 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
             setSearchQuery("")
             setCurrentPage(1)
         }
-    }, [open])
+    }, [open, group.group_name])
 
     const filteredData = React.useMemo(() => {
         if (!searchQuery) return data

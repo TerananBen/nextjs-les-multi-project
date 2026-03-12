@@ -3,14 +3,13 @@
 import { useTranslations } from "next-intl"
 import { useState, useEffect, useCallback } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { DataTable } from "./data-table"
 import { useMaintenanceColumns } from "./columns"
 import { DetailDialog } from "./detail-dialog"
-import { Search, Info, AlertCircle, Clock, CheckCircle, CalendarIcon } from "lucide-react"
+import { Search, AlertCircle, Clock, CheckCircle, CalendarIcon } from "lucide-react"
 import { format } from "date-fns"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -63,7 +62,7 @@ export default function MaintenanceDashboardClient({ initialUsersData }: ClientP
 
     useEffect(() => {
         fetchData()
-    }, [])
+    }, [fetchData])
 
     return (
         <div>

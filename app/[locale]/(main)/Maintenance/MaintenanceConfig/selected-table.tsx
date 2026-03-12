@@ -13,7 +13,7 @@ interface SelectedTableProps {
     onRemoveItem: (imsi: string) => void
 }
 
-function getMarkerConfig(device: any, tMap: any): { color: MarkerColor, badge: MarkerBadge, statusText: string } {
+function getMarkerConfig(device: SelectedDevice, tMap: ReturnType<typeof useTranslations>): { color: MarkerColor, badge: MarkerBadge, statusText: string } {
     const status = device.status;
     const isAuto = device.type_schedule !== "manual" && device.using_sensor?.toLowerCase() !== "false";
     const power = parseInt(device.last_power || "0");
@@ -40,7 +40,7 @@ function getMarkerConfig(device: any, tMap: any): { color: MarkerColor, badge: M
     }
 }
 
-export function SelectedTable({ items, onUpdateReason, onRemoveItem }: SelectedTableProps) {
+export function SelectedTable({ items, onRemoveItem }: SelectedTableProps) {
     const t = useTranslations("MaintenanceConfig.selectedTable")
     const tMap = useTranslations("MapGlobal")
 
@@ -65,7 +65,7 @@ export function SelectedTable({ items, onUpdateReason, onRemoveItem }: SelectedT
                                 </td>
                             </tr>
                         ) : (
-                            items.map((item, idx) => {
+                            items.map((item) => {
                                 const config = getMarkerConfig(item, tMap);
                                 return (
                                     <tr key={item.imsi} className="border-b last:border-0 hover:bg-slate-50 transition-colors">
@@ -75,6 +75,7 @@ export function SelectedTable({ items, onUpdateReason, onRemoveItem }: SelectedT
                                         <td className="py-2 px-2">
                                             <div className="flex items-center gap-2 justify-center">
                                                 <div className="flex flex-none items-center justify-center">
+                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                                     <img src={getLeafletIconUrl(config.color, config.badge)} className="w-[30px] h-[30px] object-contain drop-shadow-sm" alt="" />
                                                 </div>
                                             </div>

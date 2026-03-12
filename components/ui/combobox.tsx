@@ -34,10 +34,10 @@ interface ComboboxProps {
     children: React.ReactNode
     value?: string
     onValueChange?: (value: string) => void
-    items?: readonly any[] // Optional if using custom items
+    items?: readonly unknown[] // Optional if using custom items
 }
 
-export function Combobox({ children, value: controlledValue, onValueChange, items }: ComboboxProps) {
+export function Combobox({ children, value: controlledValue, onValueChange }: ComboboxProps) {
     const [open, setOpen] = React.useState(false)
     const [value, setValue] = React.useState(controlledValue || "")
 
@@ -130,7 +130,7 @@ export function ComboboxItem({ value, children, onSelect }: { value: string, chi
     return (
         <CommandItem
             value={value}
-            onSelect={(currentValue) => {
+            onSelect={() => {
                 // Use original value if possible or currentValue (lowercase)
                 // Passing value prop as the 'value' to Select
                 if (context?.onValueChange) context.onValueChange(value) // Use exact casing value

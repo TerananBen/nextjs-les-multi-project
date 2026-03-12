@@ -309,7 +309,7 @@ export async function sendCommandMqttAction(imsi: string, commandType: "0" | "1"
                     return { success: true }
                 }
                 return { success: true } // Assuming any non-empty return is success based on user input
-            } catch (e) {
+            } catch {
                 return { success: true } // Even purely string return might indicate success if not empty
             }
         } else {

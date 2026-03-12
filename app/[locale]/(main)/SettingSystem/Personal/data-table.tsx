@@ -36,7 +36,6 @@ export function DataTable<TData, TValue>({
     data,
     loading = false,
 }: DataTableProps<TData, TValue>) {
-    const t = useTranslations("StreetLight") // Reuse generic table translations if possible, or mapping to "Personal"
     // Using "StreetLight" for "rowsPerPage", "totalDevice", etc. usually works if they are generic, 
     // but Personal page has "Personal" namespace.
     // Let's check Personal namespace again.
@@ -70,6 +69,7 @@ export function DataTable<TData, TValue>({
 
     const [sorting, setSorting] = React.useState<SortingState>([])
 
+    // eslint-disable-next-line react-hooks/incompatible-library
     const table = useReactTable({
         data,
         columns,

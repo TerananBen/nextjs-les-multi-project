@@ -108,7 +108,7 @@ export function PersonalClient({ initialData, roles }: PersonalClientProps) {
             } else {
                 toast.error(t('messages.errorStatus'))
             }
-        } catch (error) {
+        } catch {
             toast.error(t('messages.errorGeneric'))
         } finally {
             setIsLoading(false)
@@ -137,7 +137,7 @@ export function PersonalClient({ initialData, roles }: PersonalClientProps) {
             } else {
                 toast.error(result?.message || t('messages.errorSave'))
             }
-        } catch (error) {
+        } catch {
             toast.error(t('messages.errorGeneric'))
         } finally {
             setIsLoading(false)
@@ -157,7 +157,7 @@ export function PersonalClient({ initialData, roles }: PersonalClientProps) {
             } else {
                 toast.error(result?.message || t('messages.errorDelete'))
             }
-        } catch (error) {
+        } catch {
             toast.error(t('messages.errorGeneric'))
         } finally {
             setIsLoading(false)

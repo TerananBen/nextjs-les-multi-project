@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useForm, useFieldArray, Controller } from "react-hook-form"
+import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { ScheduleItem, Scene } from "@/types/schedule-settings"
@@ -12,7 +12,6 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogFooter,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import {
@@ -22,7 +21,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Trash2, Plus, X, Clock } from "lucide-react"
+import { Trash2, Plus, Clock } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { saveScheduleSettingsAction } from "@/app/actions/schedule-settings"
@@ -188,16 +187,10 @@ export function EditScheduleDialog({
         },
     })
 
-    const { control, handleSubmit, reset, watch, setValue } = form
+    const { handleSubmit, watch, setValue } = form
     const typeSchedule = watch("typeSchedule")
 
-    // Field Array for Groups (using string array of names here for simplicity as per UI)
-    // In real app, might want to track IDs. API has dataGroupName and dataGroupCode arrays paralleled.
-    // For this UI demo, we'll just manage the names list.
-    const { fields: groupFields, append: appendGroup, remove: removeGroup } = useFieldArray({
-        control,
-        name: "dataGroupName" as any, // casting because simple array field array quirks
-    })
+
 
     // Field Array for Scenes (time based)
     const { fields: sceneFields, append: appendScene, remove: removeScene, replace: replaceScenes } = useFieldArray({
@@ -268,7 +261,7 @@ export function EditScheduleDialog({
             }).filter(Boolean) as string[]
 
             // Determine scenes based on type
-            let finalScenes: any = []
+            let finalScenes: unknown = []
             if (data.typeSchedule === "time") {
                 finalScenes = data.listScenes.map(s => ({
                     time: s.time,
@@ -285,7 +278,7 @@ export function EditScheduleDialog({
             }
 
             // Construct Payload
-            const payload: any = {
+            const payload: Record<string, unknown> = {
                 name_schedule: data.scheduleName,
                 code_name: schedule ? schedule.groupCode : "new", // "new" for Add, groupCode for Edit
                 // API expects JSON STRING of the array, e.g. "[\" Group$Code\"]"
@@ -492,17 +485,17 @@ export function EditScheduleDialog({
                                     {sceneFields.length === 0 ? (
                                         <div className="p-8 text-center text-muted-foreground bg-muted/30 flex flex-col items-center gap-2">
                                             <span>{t("clickAddTask")}</span>
-                                            {(form.formState.errors.listScenes as any)?.message && (
+                                            {(form.formState.errors.listScenes as { message?: string })?.message && (
                                                 <span className="text-sm text-red-500 font-medium">
-                                                    {(form.formState.errors.listScenes as any)?.message}
+                                                    {(form.formState.errors.listScenes as { message?: string })?.message}
                                                 </span>
                                             )}
                                         </div>
                                     ) : (
                                         <div className="max-h-[300px] overflow-y-auto divide-y divide-border relative">
-                                            {(form.formState.errors.listScenes as any)?.message && (
+                                            {(form.formState.errors.listScenes as { message?: string })?.message && (
                                                 <div className="sticky top-0 z-20 bg-destructive/10 text-destructive text-xs font-medium p-2 text-center border-b border-destructive/20">
-                                                    {(form.formState.errors.listScenes as any)?.message}
+                                                    {(form.formState.errors.listScenes as { message?: string })?.message}
                                                 </div>
                                             )}
                                             {sceneFields.map((field, index) => (
@@ -678,7 +671,7 @@ export function EditScheduleDialog({
                     </Button>
                     <Button
                         type="button"
-                        onClick={handleSubmit(onSubmit, (errors) => {
+                        onClick={handleSubmit(onSubmit, () => {
                             toast.error(t("validateError"));
                         })}
                         disabled={isSaving}

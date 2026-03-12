@@ -54,15 +54,6 @@ export default function FilterSidebar({
         return { total, normal, powerFail, commFail, withGps, noGps }
     }, [devices])
 
-    // Icons mapping for visual cues
-    const getTypeIcon = () => {
-        switch (searchType) {
-            case "group": return <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
-            case "imsi": return <Hash className="h-4 w-4 mr-2 text-muted-foreground" />
-            case "street_light_name": return <MapPin className="h-4 w-4 mr-2 text-muted-foreground" />
-            default: return <Search className="h-4 w-4 mr-2 text-muted-foreground" />
-        }
-    }
 
     return (
         <div className="flex flex-col gap-3 w-full relative z-10 px-0 pb-0">
@@ -77,7 +68,7 @@ export default function FilterSidebar({
                         <div className="flex flex-col md:flex-row w-full md:flex-1 gap-2 items-center bg-muted/30 p-1 rounded-xl">
                             {/* Type Selector */}
                             <div className="w-[140px] md:w-[160px] shrink-0">
-                                <Select value={searchType} onValueChange={(val: any) => setSearchType(val)}>
+                                <Select value={searchType} onValueChange={(val: "group" | "imsi" | "street_light_name") => setSearchType(val)}>
                                     <SelectTrigger className="h-10 border-0 bg-transparent shadow-none focus:ring-0 text-sm font-medium">
                                         <div className="flex items-center">
                                             <SelectValue />
@@ -106,7 +97,7 @@ export default function FilterSidebar({
                                             <ComboboxItem value="ALL">
                                                 <span className="font-medium text-primary">{t("filters.all")}</span>
                                             </ComboboxItem>
-                                            {dataOptions.map((opt: any, idx) => {
+                                            {dataOptions.map((opt, idx) => {
                                                 const val = typeof opt === 'string' ? opt : opt.groupName
                                                 const label = typeof opt === 'string' ? opt : opt.groupName
                                                 return (

@@ -20,11 +20,10 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { FileText, RefreshCcw, Search, Sheet, ArrowUpDown, FileSpreadsheet } from "lucide-react"
+import { FileText, RefreshCcw, ArrowUpDown, FileSpreadsheet } from "lucide-react"
 import { StreetLightLog } from "@/types/street-light"
 import { getDataLogStreetLightMongoAction } from "@/app/actions/street-light"
 import { toast } from "sonner"
-import { cn } from "@/lib/utils"
 
 interface HistoryPowerDialogProps {
     imei: string
@@ -44,7 +43,7 @@ export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps
     // Sorting state
     const [sortConfig, setSortConfig] = React.useState<{ key: keyof StreetLightLog; direction: 'asc' | 'desc' } | null>(null)
 
-    const fetchData = async () => {
+    const fetchData = React.useCallback(async () => {
         if (!startDate || !endDate) return
 
         const start = new Date(startDate)
@@ -104,16 +103,14 @@ export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps
         } finally {
             setLoading(false)
         }
-    }
+    }, [startDate, endDate, imei, t])
 
-    // Auto-fetch when dates change
     React.useEffect(() => {
         if (startDate && endDate) {
             fetchData()
         }
-    }, [startDate, endDate])
+    }, [startDate, endDate, fetchData])
 
-    // Initialize dates on open
     React.useEffect(() => {
         if (open && !startDate) {
             // Use local date for initial value
@@ -123,7 +120,7 @@ export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps
             setStartDate(todayStr)
             setEndDate(todayStr)
         }
-    }, [open])
+    }, [open, startDate])
 
     // Sorting logic - Restored
     const handleSort = (key: keyof StreetLightLog) => {
@@ -170,7 +167,7 @@ export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps
     }
 
     const sortedLogs = React.useMemo(() => {
-        let sortableLogs = [...logs]
+        const sortableLogs = [...logs]
         if (sortConfig !== null) {
             sortableLogs.sort((a, b) => {
                 const aValue = a[sortConfig.key]

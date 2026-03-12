@@ -32,7 +32,7 @@ import {
     TabsTrigger,
 } from "@/components/ui/tabs"
 import { User as UserIcon, Lock, Save, KeyRound } from "lucide-react"
-import { updatePersonalProfile } from "@/app/actions/personal"
+import { updatePersonalProfile, UpdatePersonalProfileParams } from "@/app/actions/personal"
 import { User, logout } from "@/app/actions/auth"
 
 const formSchema = z.object({
@@ -79,7 +79,7 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
     async function onSubmit(data: ProfileFormValues) {
         setIsLoading(true)
         try {
-            const payload: any = {
+            const payload: UpdatePersonalProfileParams = {
                 firstname: data.firstName,
                 lastname: data.lastName,
                 password_confirm: data.currentPassword, // Maps to Current Password

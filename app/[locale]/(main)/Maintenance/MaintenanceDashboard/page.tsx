@@ -1,9 +1,7 @@
-import { getTranslations } from "next-intl/server"
 import { getListDataOperatorAndAdmin } from "@/app/actions/maintenance"
 import MaintenanceDashboardClient from "./client"
 
 export default async function Page() {
-    const t = await getTranslations("MaintenanceDashboard")
     const usersData = await getListDataOperatorAndAdmin()
 
     return (

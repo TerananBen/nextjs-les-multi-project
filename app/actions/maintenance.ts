@@ -242,6 +242,45 @@ export async function getDataListMaintenanceTotal(): Promise<MaintenanceConfigRe
     }
 }
 
+export interface MaintenanceDetailListRecord {
+    list_name: string
+    name_operator: string
+    repair_all: string
+    wait_repair: string
+    count_lamp_all: string
+    detail: string
+    confrime: string
+}
+
+export async function getDataListMaintenanceDetail(): Promise<MaintenanceDetailListRecord[] | null> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) return null
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLight/getDataListMaintenanceDetail`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify({}),
+        })
+
+        if (!response.ok) return null
+
+        const data = await response.json()
+        if (data.result) {
+            return data.dataReturn
+        }
+        return null
+    } catch (error) {
+        console.error("Error fetching maintenance detail list:", error)
+        return null
+    }
+}
+
 export interface SaveDataMaintenancePayload {
     list_name: string
     id_operator: string

@@ -606,6 +606,25 @@
             "close": "Close"
         }
     },
+    "MaintenanceDetail": {
+        "title": "Maintenance Details",
+        "totalDevice": "Total Items :",
+        "rowsPerPage": "Rows per page :",
+        "loading": "Loading...",
+        "noData": "No data available.",
+        "table": {
+            "listName": "List Name",
+            "operatorName": "Operator Name",
+            "repaired": "Repaired",
+            "waitingRepair": "Waiting Repair",
+            "total": "Total",
+            "details": "Details",
+            "confirmStatus": "Status",
+            "confirmed": "Confirmed",
+            "pending": "Pending",
+            "index": "#"
+        }
+    },
     "MenuSettings": {
         "menuName": "Menu Name",
         "readable": "Readable",

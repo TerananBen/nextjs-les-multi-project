@@ -606,6 +606,25 @@
             "close": "ปิด"
         }
     },
+    "MaintenanceDetail": {
+        "title": "รายละเอียดการบำรุงรักษา",
+        "totalDevice": "รายการทั้งหมด :",
+        "rowsPerPage": "แถวต่อหน้า :",
+        "loading": "กำลังโหลด...",
+        "noData": "ไม่พบข้อมูล",
+        "table": {
+            "listName": "ชื่อรายการ",
+            "operatorName": "ชื่อหัวหน้าช่าง",
+            "repaired": "ซ่อมแล้ว",
+            "waitingRepair": "รอซ่อม",
+            "total": "ทั้งหมด",
+            "details": "รายละเอียด",
+            "confirmStatus": "ยืนยันการซ่อม",
+            "confirmed": "ยืนยันแล้ว",
+            "pending": "รอยืนยัน",
+            "index": "ลำดับ"
+        }
+    },
     "MenuSettings": {
         "menuName": "ชื่อเมนู",
         "readable": "แสดงเมนู",

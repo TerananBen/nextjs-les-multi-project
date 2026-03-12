@@ -769,12 +769,26 @@
         },
         "form": {
             "itemName": "ชื่อรายการ",
+            "itemNamePlaceholder": "กรอกชื่อรายการซ่อม",
             "operatorName": "ชื่อหัวหน้าช่าง",
             "reporterName": "ชื่อผู้แจ้งซ่อม",
             "selectOperator": "-- เลือก ช่าง --",
             "searchBy": "ค้นหาด้วย :",
             "selectStatus": "-- เลือก สถานะ --",
-            "search": "ค้นหา"
+            "search": "ค้นหา",
+            "addTitle": "เพิ่มรายการซ่อม",
+            "addDescription": "เพิ่มรายการแจ้งซ่อมใหม่"
+        },
+        "messages": {
+            "initError": "โหลดข้อมูลเริ่มต้นไม่สำเร็จ",
+            "searchError": "ค้นหาไม่สำเร็จ",
+            "deviceSelected": "เลือกอุปกรณ์นี้ไว้แล้ว",
+            "enterItemName": "กรุณากรอกชื่อรายการ",
+            "selectOperatorError": "กรุณาเลือกช่าง",
+            "selectDeviceError": "กรุณาเลือกอุปกรณ์จากแผนที่อย่างน้อย 1 รายการ",
+            "saveSuccess": "บันทึกสำเร็จ",
+            "saveError": "บันทึกไม่สำเร็จ",
+            "loadDataError": "โหลดข้อมูลไม่สำเร็จ"
         },
         "map": {
             "reportIssue": "แจ้งซ่อม"

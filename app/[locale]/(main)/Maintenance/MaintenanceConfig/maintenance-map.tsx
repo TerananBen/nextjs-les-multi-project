@@ -91,9 +91,9 @@ function DeviceDetailPopup({ device, tMap, tConfig, onSelectDevice }: DeviceDeta
     return (
         <div className="font-sans min-w-[250px] text-gray-800 text-sm space-y-4 p-1">
             <div className="space-y-1.5">
-                <p><span className="text-gray-500 font-medium">{tMap("popup.group")} :</span> {device.group_name || "-"}</p>
-                <p><span className="text-gray-500 font-medium">{tMap("popup.imsi")} :</span> {device.imsi || "-"}</p>
-                <p><span className="text-gray-500 font-medium">{tMap("popup.name")} :</span> {device.street_light_name || "-"}</p>
+                <p><span className="text-gray-500 font-medium">{tMap("popup.group")}</span> {device.group_name || "-"}</p>
+                <p><span className="text-gray-500 font-medium">{tMap("popup.imsi")}</span> {device.imsi || "-"}</p>
+                <p><span className="text-gray-500 font-medium">{tMap("popup.name")}</span> {device.street_light_name || "-"}</p>
             </div>
             <Button
                 variant="default"

@@ -55,6 +55,7 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
     const tForm = useTranslations("MaintenanceConfig.form")
     const tMap = useTranslations("MapGlobal")
     const tTable = useTranslations("MaintenanceConfig.selectedTable")
+    const tMessages = useTranslations("MaintenanceConfig.messages")
 
     // Form States
     const [itemName, setItemName] = React.useState("")
@@ -105,7 +106,7 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
                 setDevices(results)
             } catch (error) {
                 console.error("Init Error", error)
-                toast.error("Failed to load initial data")
+                toast.error(tMessages("initError"))
             } finally {
                 setIsLoadingInit(false)
             }
@@ -120,7 +121,7 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
             setDevices(results)
         } catch (error) {
             console.error("Search error", error)
-            toast.error("Search failed")
+            toast.error(tMessages("searchError"))
         } finally {
             setIsSearching(false)
         }
@@ -128,7 +129,7 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
 
     const handleSelectDeviceFromMap = async (device: LatLongData) => {
         if (selectedDevices.find(d => d.imsi === device.imsi)) {
-            toast.info("Device already selected")
+            toast.info(tMessages("deviceSelected"))
             return
         }
         setSelectedDevices(prev => [...prev, { ...device, reason: device.status || "" }])
@@ -144,15 +145,15 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
 
     const handleSave = async () => {
         if (!itemName) {
-            toast.error("Please enter Item Name")
+            toast.error(tMessages("enterItemName"))
             return
         }
         if (operatorId === "0") {
-            toast.error("Please select Operator")
+            toast.error(tMessages("selectOperatorError"))
             return
         }
         if (selectedDevices.length === 0) {
-            toast.error("Please select at least one device from map")
+            toast.error(tMessages("selectDeviceError"))
             return
         }
 
@@ -175,13 +176,13 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
 
             const res = await saveAddDataMaintenanceAction(payload)
             if (res.success) {
-                toast.success("Saved successfully")
+                toast.success(tMessages("saveSuccess"))
                 onSuccess()
             } else {
-                toast.error(res.message || "Failed to save")
+                toast.error(res.message || tMessages("saveError"))
             }
         } catch (error) {
-            toast.error("Failed to save")
+            toast.error(tMessages("saveError"))
         } finally {
             setIsSaving(false)
         }
@@ -205,7 +206,7 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
                         value={itemName}
                         onChange={e => setItemName(e.target.value)}
                         className="bg-gray-50 focus:bg-white transition-colors"
-                        placeholder="กรอกชื่อรายการซ่อม"
+                        placeholder={tForm("itemNamePlaceholder")}
                     />
                 </div>
                 <div className="space-y-1.5 md:col-span-1">
@@ -360,6 +361,9 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
 // Main Client Component
 // ---------------------------------------------------------------------------
 export function MaintenanceConfigClient() {
+    const tForm = useTranslations("MaintenanceConfig.form")
+    const tMessages = useTranslations("MaintenanceConfig.messages")
+
     const [data, setData] = React.useState<MaintenanceConfigRecord[]>([])
     const [loading, setLoading] = React.useState(true)
     const [isAddOpen, setIsAddOpen] = React.useState(false)
@@ -371,7 +375,7 @@ export function MaintenanceConfigClient() {
             setData(result || [])
         } catch (error) {
             console.error("Failed to fetch data", error)
-            toast.error("Failed to load data")
+            toast.error(tMessages("loadDataError"))
         } finally {
             setLoading(false)
         }
@@ -420,9 +424,9 @@ export function MaintenanceConfigClient() {
                     <DialogHeader className="mb-2">
                         <DialogTitle className="text-xl font-bold flex items-center gap-2">
                             <span className="w-1.5 h-6 bg-blue-500 rounded-full inline-block"></span>
-                            เพิ่มรายการซ่อม
+                            {tForm("addTitle")}
                         </DialogTitle>
-                        <DialogDescription className="hidden">Add new maintenance task overlay</DialogDescription>
+                        <DialogDescription className="hidden">{tForm("addDescription")}</DialogDescription>
                     </DialogHeader>
 
                     {/* Only render form when dialog is open to ensure Leaflet maps init correctly */}

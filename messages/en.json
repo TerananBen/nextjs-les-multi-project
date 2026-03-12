@@ -767,12 +767,26 @@
         },
         "form": {
             "itemName": "Item Name",
+            "itemNamePlaceholder": "Enter maintenance task name",
             "operatorName": "Operator Name",
             "reporterName": "Reporter Name",
             "selectOperator": "-- Select Operator --",
             "searchBy": "Search By :",
             "selectStatus": "-- Select Status --",
-            "search": "Search"
+            "search": "Search",
+            "addTitle": "Add Maintenance Task",
+            "addDescription": "Add a new maintenance task overlay"
+        },
+        "messages": {
+            "initError": "Failed to load initial data",
+            "searchError": "Search failed",
+            "deviceSelected": "Device already selected",
+            "enterItemName": "Please enter Item Name",
+            "selectOperatorError": "Please select Operator",
+            "selectDeviceError": "Please select at least one device from map",
+            "saveSuccess": "Saved successfully",
+            "saveError": "Failed to save",
+            "loadDataError": "Failed to load data"
         },
         "map": {
             "reportIssue": "Report Issue"

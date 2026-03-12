@@ -6,11 +6,12 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
 import { Loader2 } from "lucide-react"
 import { getLeafletIconUrl, MarkerColor, MarkerBadge } from "@/lib/map-icons"
 
-import { MaintenanceConfigRecord, getDataListMaintenanceTotal, getListDataOperator, saveAddDataMaintenanceAction } from "@/app/actions/maintenance"
+import { MaintenanceConfigRecord, getDataListMaintenanceTotal, getListDataOperator, saveAddDataMaintenanceAction, deleteDetailDataMaintenanceAction, confirmDataMaintenanceAction } from "@/app/actions/maintenance"
 import { getCurrentUser } from "@/app/actions/auth"
 import { getListDataGroupAction, getDataLatLongSearchAction, LatLongData } from "@/app/actions/map-actions"
 
@@ -364,11 +365,19 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
 export function MaintenanceConfigClient() {
     const tForm = useTranslations("MaintenanceConfig.form")
     const tMessages = useTranslations("MaintenanceConfig.messages")
+    const tDelete = useTranslations("MaintenanceConfig.deleteDialog")
+    const tConfirm = useTranslations("MaintenanceConfig.confirmDialog")
 
     const [data, setData] = React.useState<MaintenanceConfigRecord[]>([])
     const [loading, setLoading] = React.useState(true)
     const [isAddOpen, setIsAddOpen] = React.useState(false)
     const [detailId, setDetailId] = React.useState<string | null>(null)
+    
+    const [confirmingStatusItem, setConfirmingStatusItem] = React.useState<MaintenanceConfigRecord | null>(null)
+
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
+    const [deletingId, setDeletingId] = React.useState<string | null>(null)
+    const [isDeleting, setIsDeleting] = React.useState(false)
 
     const fetchData = async () => {
         setLoading(true)
@@ -387,17 +396,26 @@ export function MaintenanceConfigClient() {
         fetchData()
     }, [])
 
+    const [isConfirming, setIsConfirming] = React.useState(false)
+
     const columns = useMaintenanceColumns({
         onDetail: (item) => {
             setDetailId(item.detail)
         },
         onStatusChange: (item) => {
-            console.log("Status clicked", item)
-            // Implementation pending
+            if (isConfirming) return
+            
+            const waitRepair = parseInt(item.wait_repair || "0", 10)
+            if (waitRepair > 0) {
+                toast.error(tMessages("pendingRepairs", { count: waitRepair }))
+                return
+            }
+
+            setConfirmingStatusItem(item)
         },
         onDelete: (item) => {
-            console.log("Delete clicked", item)
-            // Implementation pending
+            setDeletingId(item.detail)
+            setIsDeleteDialogOpen(true)
         }
     })
 
@@ -412,6 +430,52 @@ export function MaintenanceConfigClient() {
     const handleSuccessAdd = () => {
         setIsAddOpen(false)
         fetchData() // Refresh list after adding
+    }
+
+    const handleConfirmStatus = async () => {
+        if (!confirmingStatusItem) return
+
+        const isConfirmed = confirmingStatusItem.confrime === "T" || confirmingStatusItem.confrime === "1" || confirmingStatusItem.confrime?.toLowerCase() === "true"
+        const newType = isConfirmed ? "F" : "T"
+
+        setIsConfirming(true)
+        try {
+            const res = await confirmDataMaintenanceAction({ type: newType, id: confirmingStatusItem.detail })
+            if (res.success) {
+                toast.success(tMessages("confirmSuccess"))
+                fetchData()
+            } else {
+                toast.error(res.message || tMessages("confirmError"))
+            }
+        } catch (error) {
+            console.error("Status update error", error)
+            toast.error(tMessages("confirmError"))
+        } finally {
+            setIsConfirming(false)
+            setConfirmingStatusItem(null)
+        }
+    }
+
+    const handleDelete = async () => {
+        if (!deletingId) return
+        
+        setIsDeleting(true)
+        try {
+            const res = await deleteDetailDataMaintenanceAction(deletingId)
+            if (res.success) {
+                toast.success(tDelete("success"))
+                setIsDeleteDialogOpen(false)
+                fetchData() // Refresh list after deleting
+            } else {
+                toast.error(res.message || tDelete("error"))
+            }
+        } catch (error) {
+            console.error("Delete error", error)
+            toast.error(tDelete("error"))
+        } finally {
+            setIsDeleting(false)
+            setDeletingId(null)
+        }
     }
 
     return (
@@ -437,6 +501,56 @@ export function MaintenanceConfigClient() {
                 </DialogContent>
             </Dialog>
             <DetailDialog detailId={detailId} onClose={() => setDetailId(null)} />
+
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{tDelete("title")}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {tDelete("description")}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel disabled={isDeleting}>{tDelete("cancel")}</AlertDialogCancel>
+                        <AlertDialogAction 
+                            onClick={(e) => {
+                                e.preventDefault()
+                                handleDelete()
+                            }}
+                            disabled={isDeleting}
+                            className="bg-red-600 hover:bg-red-700 text-white focus:ring-red-600"
+                        >
+                            {isDeleting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                            {tDelete("confirm")}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog open={!!confirmingStatusItem} onOpenChange={(open) => !open && setConfirmingStatusItem(null)}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>{tConfirm("title")}</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {tConfirm("description")}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel disabled={isConfirming}>{tConfirm("cancel")}</AlertDialogCancel>
+                        <AlertDialogAction 
+                            onClick={(e) => {
+                                e.preventDefault()
+                                handleConfirmStatus()
+                            }}
+                            disabled={isConfirming}
+                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                        >
+                            {isConfirming ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                            {tConfirm("confirm")}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
     )
 }

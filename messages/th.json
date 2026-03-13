@@ -589,7 +589,17 @@
                 "gps": "พิกัด (GPS)",
                 "reportCause": "สาเหตุที่แจ้ง",
                 "maintenance": "การซ่อมบำรุง",
-                "status": "สถานะ"
+                "status": "สถานะ",
+                "poleName": "ชื่อเสา",
+                "oldDevice": "รหัสอุปกรณ์เดิม",
+                "newDevice": "รหัสอุปกรณ์ใหม่",
+                "coordinates": "พิกัด (Lat, Lng)",
+                "issueReason": "สาเหตุ",
+                "repairAction": "การดำเนินการ",
+                "noData": "ไม่พบข้อมูล",
+                "enterNewDevice": "กรอกรหัสใหม่",
+                "selectAction": "เลือกการดำเนินการ",
+                "statusButton": "ดำเนินการ"
             },
             "status": {
                 "repaired": "ซ่อมแล้ว",
@@ -603,6 +613,14 @@
                 "unknown": "ไม่ทราบ"
             },
             "repairImage": "รูปภาพรายงานการซ่อม",
+            "navigate": "นำทาง",
+            "addImage": "เพิ่มรูปภาพ",
+            "noImages": "ยังไม่มีรูปภาพ",
+            "confirmDelete": "คุณแน่ใจหรือไม่ว่าต้องการลบรูปภาพนี้?",
+            "uploadSuccess": "อัปโหลดรูปภาพสำเร็จ",
+            "uploadError": "อัปโหลดรูปภาพไม่สำเร็จ",
+            "deleteSuccess": "ลบรูปภาพสำเร็จ",
+            "deleteError": "ลบรูปภาพไม่สำเร็จ",
             "close": "ปิด"
         }
     },

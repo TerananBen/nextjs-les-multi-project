@@ -379,3 +379,89 @@ export async function confirmDataMaintenanceAction(payload: ConfirmDataMaintenan
         return { success: false, message: "Network error occurred" }
     }
 }
+
+export interface UploadImageReq {
+    id: string
+    img_base64_string: string
+}
+
+export interface UploadImageRes {
+    result: boolean
+    apiName: string
+    dateTime: string
+    dataReturn: {
+        id_list: string
+        id_img: string
+        path_img: string | null
+    }
+}
+
+export async function uploadImageAction(payload: UploadImageReq): Promise<{ success: boolean; data?: UploadImageRes["dataReturn"]; message?: string }> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) return { success: false, message: "Authentication required" }
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLight/uploadImage`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(payload),
+        })
+
+        if (!response.ok) return { success: false, message: `Server error: ${response.status}` }
+
+        const data: UploadImageRes = await response.json()
+        if (data.result) {
+            return { success: true, data: data.dataReturn }
+        }
+        return { success: false, message: "Failed to upload image" }
+    } catch (error) {
+        console.error("Error uploading image:", error)
+        return { success: false, message: "Network error occurred" }
+    }
+}
+
+export interface DeleteImageReq {
+    id_list: string
+    id_img: string
+}
+
+export interface DeleteImageRes {
+    result: boolean
+    apiName: string
+    dateTime: string
+    dataReturn: boolean
+}
+
+export async function deleteImageAction(payload: DeleteImageReq): Promise<{ success: boolean; message?: string }> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) return { success: false, message: "Authentication required" }
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLight/deleteImage`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(payload),
+        })
+
+        if (!response.ok) return { success: false, message: `Server error: ${response.status}` }
+
+        const data: DeleteImageRes = await response.json()
+        if (data.result && data.dataReturn === true) {
+            return { success: true }
+        }
+        return { success: false, message: "Failed to delete image" }
+    } catch (error) {
+        console.error("Error deleting image:", error)
+        return { success: false, message: "Network error occurred" }
+    }
+}

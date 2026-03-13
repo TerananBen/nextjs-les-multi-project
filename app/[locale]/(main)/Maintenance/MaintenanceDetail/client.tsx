@@ -4,13 +4,15 @@ import * as React from "react"
 import { MaintenanceDetailListRecord } from "@/app/actions/maintenance"
 import { useMaintenanceDetailColumns } from "./columns"
 import { DataTable } from "./data-table"
+import { DetailDialog } from "./detail-dialog"
 
 interface MaintenanceDetailClientProps {
     initialData: MaintenanceDetailListRecord[]
 }
 
 export function MaintenanceDetailClient({ initialData }: MaintenanceDetailClientProps) {
-    const columns = useMaintenanceDetailColumns()
+    const [selectedDetailId, setSelectedDetailId] = React.useState<string | null>(null)
+    const columns = useMaintenanceDetailColumns(setSelectedDetailId)
 
     const [data] = React.useState<MaintenanceDetailListRecord[]>(initialData)
 
@@ -25,6 +27,12 @@ export function MaintenanceDetailClient({ initialData }: MaintenanceDetailClient
             <div className="flex-1">
                 <DataTable columns={columns} data={data} />
             </div>
+
+            {/* Dialog Component */}
+            <DetailDialog
+                detailId={selectedDetailId}
+                onClose={() => setSelectedDetailId(null)}
+            />
         </div>
     )
 }

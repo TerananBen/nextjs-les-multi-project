@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
   /* config options here */
   output: "standalone",
   experimental: {
+    serverActions: {
+      bodySizeLimit: '10mb',
+    },
   },
   allowedDevOrigins: ["10.0.0.10", "localhost"],
   images: {

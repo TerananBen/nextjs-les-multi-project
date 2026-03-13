@@ -6,9 +6,8 @@ import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { ArrowUpDown, Info } from "lucide-react"
 import { cn } from "@/lib/utils"
-import Link from "next/link"
 
-export const useMaintenanceDetailColumns = () => {
+export const useMaintenanceDetailColumns = (onOpenDialog: (id: string) => void) => {
     const t = useTranslations("MaintenanceDetail.table")
 
     const columns: ColumnDef<MaintenanceDetailListRecord>[] = [
@@ -104,11 +103,14 @@ export const useMaintenanceDetailColumns = () => {
             cell: ({ row }) => {
                 return (
                     <div className="flex justify-center">
-                        <Link href={`/${row.original.detail}`}>
-                            <Button variant="default" size="icon" className="h-8 w-8 bg-blue-500 hover:bg-blue-600 rounded-lg">
-                                <Info className="h-4 w-4 text-white" />
-                            </Button>
-                        </Link>
+                        <Button 
+                            variant="default" 
+                            size="icon" 
+                            className="h-8 w-8 bg-blue-500 hover:bg-blue-600 rounded-lg"
+                            onClick={() => onOpenDialog(row.original.detail)}
+                        >
+                            <Info className="h-4 w-4 text-white" />
+                        </Button>
                     </div>
                 )
             },

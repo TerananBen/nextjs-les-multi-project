@@ -51,7 +51,7 @@ export function ResponseDialog({
         try {
             const result = await getScheduleResponseAction(codeName)
             if (result.result && Array.isArray(result.dataReturn)) {
-                setData(result.dataReturn)
+                setData(result.dataReturn as ScheduleResponseItem[])
             } else {
                 setData([])
             }

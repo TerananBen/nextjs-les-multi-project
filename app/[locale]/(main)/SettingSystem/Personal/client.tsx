@@ -183,10 +183,10 @@ export function PersonalClient({ initialData, roles }: PersonalClientProps) {
                         placeholder={t('searchPlaceholder')}
                         value={searchQuery}
                         onChange={(event) => setSearchQuery(event.target.value)}
-                        className="pl-9 h-12 rounded-xl bg-white border-gray-200 shadow-sm"
+                        className="pl-9 h-9 rounded-lg bg-white border-gray-200 shadow-sm"
                     />
                 </div>
-                <Button onClick={handleAdd}>
+                <Button size="sm" onClick={handleAdd}>
                     <Plus className="mr-2 h-4 w-4" /> {t('addUser')}
                 </Button>
             </div>

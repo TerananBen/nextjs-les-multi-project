@@ -69,7 +69,7 @@ export default function FilterSidebar({
                             {/* Type Selector */}
                             <div className="w-[140px] md:w-[160px] shrink-0">
                                 <Select value={searchType} onValueChange={(val: "group" | "imsi" | "street_light_name") => setSearchType(val)}>
-                                    <SelectTrigger className="h-10 border-0 bg-transparent shadow-none focus:ring-0 text-sm font-medium">
+                                    <SelectTrigger className="h-9 rounded-xl bg-white border-gray-200 shadow-sm text-sm font-medium">
                                         <div className="flex items-center">
                                             <SelectValue />
                                         </div>
@@ -89,7 +89,7 @@ export default function FilterSidebar({
                                 <Combobox value={searchValue} onValueChange={setSearchValue}>
                                     <ComboboxInput
                                         placeholder={t("filters.all")}
-                                        className="h-10 border-0 bg-transparent shadow-none focus:ring-0 text-sm w-full font-normal px-2"
+                                        className="h-9 rounded-xl bg-white border-gray-200 shadow-sm"
                                     />
                                     <ComboboxContent className="z-[9999]" searchPlaceholder={t("filters.search")}>
                                         <ComboboxEmpty>{t("filters.noResult")}</ComboboxEmpty>
@@ -131,8 +131,8 @@ export default function FilterSidebar({
                         </div>
 
                         {/* Search Button */}
-                        <Button onClick={onSearch} className="h-10 w-full md:w-14 rounded-xl p-0 ml-0 md:ml-4 shadow-md transition-all hover:shadow-lg hover:scale-[1.02] shrink-0">
-                            <Search className="h-5 w-5" />
+                        <Button size="sm" onClick={onSearch} className="h-9 w-full md:w-12 rounded-xl p-0 ml-0 md:ml-4 shadow-md transition-all hover:shadow-lg hover:scale-[1.02] shrink-0">
+                            <Search className="h-4 w-5" />
                         </Button>
                     </div>
                 </div>

@@ -110,7 +110,7 @@ export function StreetLightClient() {
                 {/* Group Selector (Combobox) */}
                 <div className="flex-1 w-full">
                     <Combobox value={selectedGroup} onValueChange={setSelectedGroup}>
-                        <ComboboxInput placeholder={t("selectGroupPlaceholder")} />
+                        <ComboboxInput className="h-9 rounded-xl bg-white border-gray-200 shadow-sm" placeholder={t("selectGroupPlaceholder")} />
                         <ComboboxContent searchPlaceholder={t("searchGroupPlaceholder")}>
                             <ComboboxEmpty>{t("noGroupFound")}</ComboboxEmpty>
                             <ComboboxList>
@@ -129,7 +129,7 @@ export function StreetLightClient() {
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                         placeholder={t("searchPlaceholder")}
-                        className="pl-9 h-12 rounded-xl bg-white border-gray-200 shadow-sm"
+                        className="pl-9 h-9 rounded-xl bg-white border-gray-200 shadow-sm"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />

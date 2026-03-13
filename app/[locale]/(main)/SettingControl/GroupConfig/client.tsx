@@ -130,6 +130,7 @@ export function GroupConfigClient() {
                             }}
                         >
                             <Button
+                                size="sm"
                                 className={cn(
                                     "h-9 rounded-lg px-4 shadow-sm transition-all",
                                     canAdd

@@ -1,11 +1,20 @@
 import { getCurrentUser } from "@/app/actions/auth"
 import { ProfileForm } from "@/components/profile-form"
 import { redirect } from "@/i18n/routing"
+import { getTranslations } from "next-intl/server"
 
 interface ProfilePageProps {
     params: Promise<{
         locale: string
     }>
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params
+    const t = await getTranslations({ locale, namespace: "Sidebar" })
+    return {
+        title: t("menu.personal"),
+    }
 }
 
 export default async function ProfilePage({ params }: ProfilePageProps) {

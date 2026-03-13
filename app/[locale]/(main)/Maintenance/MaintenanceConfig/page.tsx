@@ -1,4 +1,13 @@
+import { getTranslations } from "next-intl/server"
 import { MaintenanceConfigClient } from "./client"
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params
+    const t = await getTranslations({ locale, namespace: "Sidebar" })
+    return {
+        title: t("menu.maintenanceConfig"),
+    }
+}
 
 export default function Page() {
     return (

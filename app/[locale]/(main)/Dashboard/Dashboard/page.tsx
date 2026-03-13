@@ -3,6 +3,15 @@ import { DataTable } from "@/components/data-table"
 import { SectionCards } from "@/components/section-cards"
 
 import data from "./data.json"
+import { getTranslations } from "next-intl/server"
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "Sidebar" })
+  return {
+    title: t("menu.overview"),
+  }
+}
 
 export default async function Page() {
   return (

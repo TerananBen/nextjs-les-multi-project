@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   experimental: {
     serverActions: {
+      allowedOrigins: process.env.ALLOWED_ORIGINS ? [process.env.ALLOWED_ORIGINS] : ["10.0.0.10", "localhost"],
       bodySizeLimit: '10mb',
     },
   },

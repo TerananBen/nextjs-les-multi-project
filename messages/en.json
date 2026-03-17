@@ -309,6 +309,10 @@
             "failure": "Power/RTU Failure"
         }
     },
+    "PageUnavailable": {
+        "title": "Page Unavailable",
+        "description": "This page is not yet available. Please contact the system administrator or try again later."
+    },
     "Dashboard": {
         "filter": {
             "searchLabel": "Search :",

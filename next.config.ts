@@ -4,24 +4,41 @@ import createNextIntlPlugin from 'next-intl/plugin';
 const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+        ],
+      },
+    ];
+  },
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
   /* config options here */
-  output: "standalone",
   experimental: {
     serverActions: {
-      allowedOrigins: process.env.ALLOWED_ORIGINS ? [process.env.ALLOWED_ORIGINS] : ["10.0.0.10", "localhost"],
+      allowedOrigins: process.env.ALLOWED_ORIGINS?.split(",") || ["10.0.0.10", "localhost"],
       bodySizeLimit: '10mb',
     },
   },
-  allowedDevOrigins: ["10.0.0.10", "localhost"],
+  allowedDevOrigins: process.env.ALLOWED_ORIGINS?.split(",") || ["10.0.0.10", "localhost"],
   images: {
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: '192.167.5.46',
-        port: '8012',
+        protocol: process.env.IMAGE_PROTOCOL as "http" | "https",
+        hostname: process.env.IMAGE_HOSTNAME as string,
+        port: process.env.IMAGE_PORT as string,
       },
     ],
   },
+  output: "standalone",
 };
 
 export default withNextIntl(nextConfig);

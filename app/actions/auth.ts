@@ -15,6 +15,7 @@ export async function login(prevState: LoginState, formData: FormData): Promise<
     const password = formData.get("password") as string
     const projectName = process.env.PROJECT_NAME
     const apiUrl = process.env.API_URL
+    const usingHttps = process.env.USING_HTTPS
 
     if (!apiUrl) {
         console.error("API_URL is not defined")
@@ -51,12 +52,14 @@ export async function login(prevState: LoginState, formData: FormData): Promise<
             const cookieStore = await cookies()
             cookieStore.set("jwt", data.dataReturn, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
+                secure: usingHttps === "true",
+                sameSite: "lax",
                 path: "/",
             })
             cookieStore.set("menuRole", data.dataMenuRole, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === "production",
+                secure: usingHttps === "true",
+                sameSite: "lax",
                 path: "/",
             })
             return { success: true }

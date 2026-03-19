@@ -7,11 +7,12 @@ import { ChartsSection } from "@/components/dashboard/charts-section"
 import { GroupItem, DashboardData, getDataDashBoard } from "@/app/actions/dashboard"
 
 interface GroupDashboardClientProps {
-    groups: GroupItem[]
+    groups: GroupItem[],
+    startDate?: string,
     defaultGroupCode?: string
 }
 
-export function GroupDashboardClient({ groups, defaultGroupCode }: GroupDashboardClientProps) {
+export function GroupDashboardClient({ groups, startDate, defaultGroupCode }: GroupDashboardClientProps) {
     const [data, setData] = useState<DashboardData | null>(null)
     const [loading, setLoading] = useState(false)
 
@@ -181,7 +182,7 @@ export function GroupDashboardClient({ groups, defaultGroupCode }: GroupDashboar
 
     return (
         <div className="space-y-6">
-            <FilterBar groups={groups} onSearch={handleSearch} />
+            <FilterBar groups={groups} startDate={startDate} onSearch={handleSearch} />
 
             <SummaryCards data={data} loading={loading} />
             <ChartsSection data={data} loading={loading} />

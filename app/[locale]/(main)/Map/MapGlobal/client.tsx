@@ -12,13 +12,23 @@ import {
 import { Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
 
+interface MapGlobalClientProps {
+    defaultLat?: string,
+    defaultLng?: string,
+    defaultZoom?: string,
+    iconScale?: string,
+    mapMode?: "online" | "offline",
+    mapOnlineUrl?: string,
+    mapOfflineUrl?: string
+}
+
 // Dynamic import for MapContainer to avoid SSR issues with Leaflet
 const MapContainerComponent = dynamic(() => import("./map-container"), {
     ssr: false,
     loading: () => <div className="h-full w-full flex items-center justify-center bg-muted/20"><Loader2 className="h-8 w-8 animate-spin" /></div>
 })
 
-export default function MapGlobalClient() {
+export default function MapGlobalClient({ defaultLat, defaultLng, defaultZoom, iconScale, mapMode, mapOnlineUrl, mapOfflineUrl }: MapGlobalClientProps) {
     const t = useTranslations("MapGlobal")
     const [searchType, setSearchType] = useState<"group" | "imsi" | "street_light_name">("group")
     const [searchValue, setSearchValue] = useState<string>("ALL")
@@ -32,11 +42,6 @@ export default function MapGlobalClient() {
     // Map Data
     const [devices, setDevices] = useState<LatLongData[]>([])
     const [isLoading, setIsLoading] = useState(false)
-
-    // Config
-    const mapMode = (process.env.NEXT_PUBLIC_MAP_MODE as "online" | "offline") || "online"
-    const onlineUrl = process.env.NEXT_PUBLIC_MAP_ONLINE_URL
-    const offlineUrl = process.env.NEXT_PUBLIC_MAP_OFFLINE_URL
 
     // Initial Data Load
     useEffect(() => {
@@ -102,9 +107,13 @@ export default function MapGlobalClient() {
             <div className="flex-1 relative order-2 min-h-0 px-0 pb-0">
                 <MapContainerComponent
                     mode={mapMode}
-                    onlineUrl={onlineUrl}
-                    offlineUrl={offlineUrl}
+                    onlineUrl={mapOnlineUrl}
+                    offlineUrl={mapOfflineUrl}
                     devices={devices}
+                    defaultLat={defaultLat}
+                    defaultLng={defaultLng}
+                    defaultZoom={defaultZoom}
+                    iconScale={iconScale}
                 />
 
                 {/* Floating Loading Indicator */}

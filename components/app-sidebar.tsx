@@ -84,14 +84,15 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
     avatar?: string
     role?: string
   }
+  sidebarLogo?: string;
 }
 
-export function AppSidebar({ menuItems = [], user, ...props }: AppSidebarProps) {
+export function AppSidebar({ menuItems = [], user, sidebarLogo, ...props }: AppSidebarProps) {
   const pathname = usePathname()
   const t = useTranslations("Sidebar")
 
   // Environment variables for personalization
-  const sidebarLogo = process.env.NEXT_PUBLIC_SIDEBAR_LOGO || "/logo-placeholder.png"
+  // const sidebarLogo = process.env.SIDEBAR_LOGO || "/logo-placeholder.png"
 
   // Create a map of readable menu items for easy lookup
   const readableItems = React.useMemo(() => {

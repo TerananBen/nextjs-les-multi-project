@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default function LoginPage() {
-    const sidebarLogo = process.env.NEXT_PUBLIC_SIDEBAR_LOGO || "/logo-placeholder.png"
+    const sidebarLogo = process.env.SIDEBAR_LOGO || "/logo-placeholder.png"
     return (
         <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10 relative">
             <div className="absolute top-4 right-4 flex gap-2">

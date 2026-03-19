@@ -289,7 +289,7 @@ export function EditScheduleDialog({
                 type_set: "group", // Default "group"
                 // API expects JSON STRING of the array
                 list_days: JSON.stringify(["sun", "mon", "tue", "wed", "thu", "fri", "sat"]),
-                version_light_sensor: process.env.NEXT_PUBLIC_VERSION_LIGHT_SENSOR || "2"
+                version_light_sensor: process.env.VERSION_LIGHT_SENSOR || "2"
             }
 
             const result = await saveScheduleSettingsAction(payload)

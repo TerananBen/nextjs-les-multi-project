@@ -13,10 +13,10 @@ import { Button } from "@/components/ui/button"
 import { isValidGPS } from "../../Map/MapGlobal/map-utils"
 
 // Environment Defaults
-const DEFAULT_LAT = parseFloat(process.env.NEXT_PUBLIC_LAT_PROJECT || "13.736717")
-const DEFAULT_LNG = parseFloat(process.env.NEXT_PUBLIC_LNG_PROJECT || "100.523186")
-const DEFAULT_ZOOM = parseInt(process.env.NEXT_PUBLIC_ZOOM_PROJECT || "14")
-const ICON_SCALE = parseFloat(process.env.NEXT_PUBLIC_SIZE_ICON || "1")
+const DEFAULT_LAT = parseFloat(process.env.LAT_PROJECT || "13.736717")
+const DEFAULT_LNG = parseFloat(process.env.LNG_PROJECT || "100.523186")
+const DEFAULT_ZOOM = parseInt(process.env.ZOOM_PROJECT || "14")
+const ICON_SCALE = parseFloat(process.env.SIZE_ICON || "1")
 
 const DefaultIcon = L.icon({
     iconUrl: "/images/marker-icon.png",
@@ -109,7 +109,7 @@ function DeviceDetailPopup({ device, tMap, tConfig, onSelectDevice }: DeviceDeta
 function GoogleMapComponent({ devices, onSelectDevice, selectedImsis }: { devices: LatLongData[], onSelectDevice: (device: LatLongData) => void, selectedImsis: string[] }) {
     const tMap = useTranslations("MapGlobal");
     const tConfig = useTranslations("MaintenanceConfig");
-    const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || "", language: "th" })
+    const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: process.env.GOOGLE_MAPS_KEY || "", language: "th" })
     const [map, setMap] = useState<google.maps.Map | null>(null)
     const [zoom, setZoom] = useState(DEFAULT_ZOOM)
     const [selectedDevice, setSelectedDevice] = useState<LatLongData | null>(null)

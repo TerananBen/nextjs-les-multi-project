@@ -14,10 +14,10 @@ import { GoogleMap, useJsApiLoader, Marker as GoogleMarker, InfoWindow } from "@
 import { Loader2 } from "lucide-react"
 
 // Environment Defaults
-const DEFAULT_LAT = parseFloat(process.env.NEXT_PUBLIC_LAT_PROJECT || "13.736717")
-const DEFAULT_LNG = parseFloat(process.env.NEXT_PUBLIC_LNG_PROJECT || "100.523186")
-const DEFAULT_ZOOM = parseInt(process.env.NEXT_PUBLIC_ZOOM_PROJECT || "14")
-const ICON_SCALE = parseFloat(process.env.NEXT_PUBLIC_SIZE_ICON || "1")
+const DEFAULT_LAT = parseFloat(process.env.LAT_PROJECT || "13.736717")
+const DEFAULT_LNG = parseFloat(process.env.LNG_PROJECT || "100.523186")
+const DEFAULT_ZOOM = parseInt(process.env.ZOOM_PROJECT || "14")
+const ICON_SCALE = parseFloat(process.env.SIZE_ICON || "1")
 
 function getIconSizeForZoom(zoom: number) {
     const size = 20 + (zoom - 10) * 5
@@ -206,7 +206,7 @@ function GoogleMapComponent({ devices }: { devices: MaintenanceDetailRecord[] })
     const t = useTranslations("MaintenanceDashboard")
     const { isLoaded } = useJsApiLoader({
         id: "google-map-script",
-        googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || "",
+        googleMapsApiKey: process.env.GOOGLE_MAPS_KEY || "",
         language: "th"
     })
     const [map, setMap] = useState<google.maps.Map | null>(null)
@@ -270,8 +270,8 @@ interface DetailMapProps {
 }
 
 export function DetailMap({ data }: DetailMapProps) {
-    const mapMode = (process.env.NEXT_PUBLIC_MAP_MODE as "online" | "offline") || "online"
-    const offlineUrl = process.env.NEXT_PUBLIC_MAP_OFFLINE_URL
+    const mapMode = (process.env.MAP_MODE as "online" | "offline") || "online"
+    const offlineUrl = process.env.MAP_OFFLINE_URL
 
     if (mapMode === "online") {
         return (

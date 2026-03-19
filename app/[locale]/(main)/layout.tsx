@@ -31,7 +31,7 @@ export default async function MainLayout({
                 } as React.CSSProperties
             }
         >
-            <AppSidebar variant="inset" menuItems={menuItems} user={sidebarUser} />
+            <AppSidebar variant="inset" menuItems={menuItems} user={sidebarUser} sidebarLogo={process.env.SIDEBAR_LOGO} />
             <PermissionProvider initialPermissions={menuItems}>
                 <SidebarInset>
                     <SiteHeader />

@@ -9,11 +9,19 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     }
 }
 
+const mapMode = process.env.MAP_MODE || "offline"
+const mapOnlineUrl = process.env.MAP_ONLINE_URL || ""
+const mapOfflineUrl = process.env.MAP_OFFLINE_URL || ""
+const defaultLat = process.env.MAP_DEFAULT_LAT || "13.736717"
+const defaultLng = process.env.MAP_DEFAULT_LNG || "100.523186"
+const defaultZoom = process.env.MAP_DEFAULT_ZOOM || "14"
+const iconScale = process.env.MAP_ICON_SCALE || "1"
+
 export default function MapGlobalPage() {
 
     return (
         <div className="flex flex-1 flex-col gap-4 p-4 md:gap-6 md:p-6">
-            <MapGlobalClient />
+            <MapGlobalClient mapMode={mapMode as "offline" | "online"} mapOnlineUrl={mapOnlineUrl} mapOfflineUrl={mapOfflineUrl} defaultLat={defaultLat} defaultLng={defaultLng} defaultZoom={defaultZoom} iconScale={iconScale} />
         </div>
     )
 }

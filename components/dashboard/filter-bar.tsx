@@ -25,11 +25,12 @@ import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
 interface FilterBarProps {
-    groups: GroupItem[]
+    groups: GroupItem[],
+    startDate?: string,
     onSearch: (groupCode: string, type: string, date: string) => void
 }
 
-export function FilterBar({ groups, onSearch }: FilterBarProps) {
+export function FilterBar({ groups, startDate, onSearch }: FilterBarProps) {
     const t = useTranslations("GroupDashboard.filter")
     const locale = useLocale()
     const [selectedGroup, setSelectedGroup] = useState<string>("")
@@ -40,7 +41,7 @@ export function FilterBar({ groups, onSearch }: FilterBarProps) {
     const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
 
     // Parse Project Start Date
-    const projectStartDateStr = process.env.NEXT_PUBLIC_START_DATE_PROJECT || "2020-01-01"
+    const projectStartDateStr = startDate || "2020-01-01"
     const projectStartDate = new Date(projectStartDateStr)
     const startYear = projectStartDate.getFullYear()
     const startMonthVal = projectStartDate.getMonth() // 0-11

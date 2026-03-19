@@ -84,9 +84,9 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
     const [isSaving, setIsSaving] = React.useState(false)
 
     // Config
-    const mapMode = (process.env.NEXT_PUBLIC_MAP_MODE as "online" | "offline") || "online"
-    const onlineUrl = process.env.NEXT_PUBLIC_MAP_ONLINE_URL
-    const offlineUrl = process.env.NEXT_PUBLIC_MAP_OFFLINE_URL
+    const mapMode = (process.env.MAP_MODE as "online" | "offline") || "online"
+    const onlineUrl = process.env.MAP_ONLINE_URL
+    const offlineUrl = process.env.MAP_OFFLINE_URL
 
     React.useEffect(() => {
         const initData = async () => {
@@ -373,7 +373,7 @@ export function MaintenanceConfigClient() {
     const [loading, setLoading] = React.useState(true)
     const [isAddOpen, setIsAddOpen] = React.useState(false)
     const [detailId, setDetailId] = React.useState<string | null>(null)
-    
+
     const [confirmingStatusItem, setConfirmingStatusItem] = React.useState<MaintenanceConfigRecord | null>(null)
 
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
@@ -405,7 +405,7 @@ export function MaintenanceConfigClient() {
         },
         onStatusChange: (item) => {
             if (isConfirming) return
-            
+
             const waitRepair = parseInt(item.wait_repair || "0", 10)
             if (waitRepair > 0) {
                 toast.error(tMessages("pendingRepairs", { count: waitRepair }))
@@ -459,7 +459,7 @@ export function MaintenanceConfigClient() {
 
     const handleDelete = async () => {
         if (!deletingId) return
-        
+
         setIsDeleting(true)
         try {
             const res = await deleteDetailDataMaintenanceAction(deletingId)
@@ -513,7 +513,7 @@ export function MaintenanceConfigClient() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel disabled={isDeleting}>{tDelete("cancel")}</AlertDialogCancel>
-                        <AlertDialogAction 
+                        <AlertDialogAction
                             onClick={(e) => {
                                 e.preventDefault()
                                 handleDelete()
@@ -538,7 +538,7 @@ export function MaintenanceConfigClient() {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel disabled={isConfirming}>{tConfirm("cancel")}</AlertDialogCancel>
-                        <AlertDialogAction 
+                        <AlertDialogAction
                             onClick={(e) => {
                                 e.preventDefault()
                                 handleConfirmStatus()

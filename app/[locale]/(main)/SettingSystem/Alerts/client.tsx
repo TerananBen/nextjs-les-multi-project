@@ -38,7 +38,7 @@ export function AlertsClient() {
         const fetchData = async () => {
             try {
                 // Get hidden types from env
-                const hiddenConfig = process.env.NEXT_PUBLIC_HIDDEN_CONFIG_ALERTS || ""
+                const hiddenConfig = process.env.HIDDEN_CONFIG_ALERTS || ""
                 const hiddenList = hiddenConfig.split(",").map(t => t.trim())
                 setHiddenTypes(hiddenList)
 

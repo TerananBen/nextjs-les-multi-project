@@ -42,6 +42,6 @@ export const fontMap = {
 };
 
 export function getFont() {
-    const fontName = (process.env.NEXT_PUBLIC_FONT_FAMILY as FontFamily) || 'Kanit';
+    const fontName = (process.env.FONT_FAMILY as FontFamily) || 'Kanit';
     return fontMap[fontName] || kanit;
 }

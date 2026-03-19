@@ -165,7 +165,7 @@ export async function getDataLatLongSearchAction(
     // Use environment variable for default GPS type if not provided or if we want to enforce it from env?
     // User request: "อันนี้จะต้องดึงตั้งค่ามาจาก .env" for type_gps default.
     // However, the action allows overriding. Let's stick to the argument or env.
-    const finalTypeGps = typeGps || process.env.NEXT_PUBLIC_GPS_TYPE || "rtu"
+    const finalTypeGps = typeGps || process.env.GPS_TYPE || "rtu"
 
     if (!API_URL || !token) {
         return []

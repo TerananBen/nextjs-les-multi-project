@@ -14,10 +14,10 @@ import { GoogleMap, useJsApiLoader, Marker as GoogleMarker, InfoWindow } from "@
 import { Loader2 } from "lucide-react"
 
 // Environment Defaults
-const DEFAULT_LAT = parseFloat(process.env.LAT_PROJECT || "13.736717")
-const DEFAULT_LNG = parseFloat(process.env.LNG_PROJECT || "100.523186")
-const DEFAULT_ZOOM = parseInt(process.env.ZOOM_PROJECT || "14")
-const ICON_SCALE = parseFloat(process.env.SIZE_ICON || "1")
+//const DEFAULT_LAT = parseFloat(process.env.LAT_PROJECT || "13.736717")
+//const DEFAULT_LNG = parseFloat(process.env.LNG_PROJECT || "100.523186")
+//const DEFAULT_ZOOM = parseInt(process.env.ZOOM_PROJECT || "14")
+//const ICON_SCALE = parseFloat(process.env.SIZE_ICON || "1")
 
 function getIconSizeForZoom(zoom: number) {
     const size = 20 + (zoom - 10) * 5
@@ -87,9 +87,17 @@ function UseTranslationsProvider({ children }: { children: React.ReactNode }) {
 // Leaflet (offline) component
 // ─────────────────────────────────────────────
 function LeafletMapComponent({
+    defaultLat,
+    defaultLng,
+    defaultZoom,
+    iconScale,
     offlineUrl,
     devices,
 }: {
+    defaultLat: number
+    defaultLng: number
+    defaultZoom: number
+    iconScale: number
     offlineUrl?: string
     devices: MaintenanceDetailRecord[]
 }) {
@@ -97,7 +105,7 @@ function LeafletMapComponent({
     const containerRef = useRef<HTMLDivElement>(null)
     const mapInstanceRef = useRef<L.Map | null>(null)
     const markersRef = useRef<L.Marker[]>([])
-    const [currentZoom, setCurrentZoom] = useState(DEFAULT_ZOOM)
+    const [currentZoom, setCurrentZoom] = useState(defaultZoom)
 
     // Init map once
     useEffect(() => {
@@ -113,7 +121,7 @@ function LeafletMapComponent({
         })
         L.Marker.prototype.options.icon = DefaultIcon
 
-        const map = L.map(containerRef.current).setView([DEFAULT_LAT, DEFAULT_LNG], DEFAULT_ZOOM)
+        const map = L.map(containerRef.current).setView([defaultLat, defaultLng], defaultZoom)
         L.tileLayer(offlineUrl || "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
             attribution: "&copy; OpenStreetMap contributors",
             maxZoom: 20
@@ -128,7 +136,7 @@ function LeafletMapComponent({
                 mapInstanceRef.current = null
             }
         }
-    }, [offlineUrl])
+    }, [offlineUrl, defaultLat, defaultLng, defaultZoom])
 
     // Fit bounds when data changes
     const fitBounds = useCallback(() => {
@@ -150,7 +158,7 @@ function LeafletMapComponent({
         markersRef.current.forEach(m => m.remove())
         markersRef.current = []
 
-        const iconSize = getIconSizeForZoom(currentZoom) * ICON_SCALE
+        const iconSize = getIconSizeForZoom(currentZoom) * iconScale
 
         devices.forEach(item => {
             if (!isValidGPS(item.lat, item.lng)) return
@@ -191,7 +199,7 @@ function LeafletMapComponent({
 
             markersRef.current.push(marker)
         })
-    }, [devices, currentZoom, t])
+    }, [devices, currentZoom, t, defaultLat, defaultLng, defaultZoom, iconScale])
 
     return <div ref={containerRef} className="h-full w-full" style={{ zIndex: 0 }} />
 }
@@ -200,17 +208,16 @@ function LeafletMapComponent({
 // Google Maps (online) component
 // ─────────────────────────────────────────────
 const containerStyle = { width: "100%", height: "100%" }
-const centerDefault = { lat: DEFAULT_LAT, lng: DEFAULT_LNG }
 
-function GoogleMapComponent({ devices }: { devices: MaintenanceDetailRecord[] }) {
+function GoogleMapComponent({ googleMapsApiKey, devices, defaultLat, defaultLng, defaultZoom, iconScale }: { googleMapsApiKey?: string, devices: MaintenanceDetailRecord[], defaultLat: number, defaultLng: number, defaultZoom: number, iconScale: number }) {
     const t = useTranslations("MaintenanceDashboard")
     const { isLoaded } = useJsApiLoader({
         id: "google-map-script",
-        googleMapsApiKey: process.env.GOOGLE_MAPS_KEY || "",
+        googleMapsApiKey: googleMapsApiKey || "",
         language: "th"
     })
     const [map, setMap] = useState<google.maps.Map | null>(null)
-    const [zoom, setZoom] = useState(DEFAULT_ZOOM)
+    const [zoom, setZoom] = useState(defaultZoom)
     const [selectedDevice, setSelectedDevice] = useState<MaintenanceDetailRecord | null>(null)
 
     const onLoad = useCallback((m: google.maps.Map) => setMap(m), [])
@@ -223,13 +230,13 @@ function GoogleMapComponent({ devices }: { devices: MaintenanceDetailRecord[] })
 
     if (!isLoaded) return <div className="h-full w-full flex items-center justify-center"><Loader2 className="animate-spin" /></div>
 
-    const iconSize = getIconSizeForZoom(zoom) * ICON_SCALE
+    const iconSize = getIconSizeForZoom(zoom) * iconScale
 
     return (
         <GoogleMap
             mapContainerStyle={containerStyle}
-            center={centerDefault}
-            zoom={DEFAULT_ZOOM}
+            center={{ lat: defaultLat, lng: defaultLng }}
+            zoom={zoom}
             onLoad={onLoad}
             onUnmount={onUnmount}
             onZoomChanged={onZoomChanged}
@@ -266,23 +273,28 @@ function GoogleMapComponent({ devices }: { devices: MaintenanceDetailRecord[] })
 // Public export
 // ─────────────────────────────────────────────
 interface DetailMapProps {
+    mapMode?: "online" | "offline" | undefined
+    mapOfflineUrl?: string
+    defaultLat?: string
+    defaultLng?: string
+    defaultZoom?: string
+    iconScale?: string
+    googleMapsApiKey?: string
     data: MaintenanceDetailRecord[]
 }
 
-export function DetailMap({ data }: DetailMapProps) {
-    const mapMode = (process.env.MAP_MODE as "online" | "offline") || "online"
-    const offlineUrl = process.env.MAP_OFFLINE_URL
+export function DetailMap({ mapMode, mapOfflineUrl, defaultLat, defaultLng, defaultZoom, iconScale, googleMapsApiKey, data }: DetailMapProps) {
 
     if (mapMode === "online") {
         return (
             <div className="h-full w-full rounded-lg overflow-hidden border relative">
-                <GoogleMapComponent devices={data} />
+                <GoogleMapComponent googleMapsApiKey={googleMapsApiKey} devices={data} defaultLat={parseFloat(defaultLat || "0")} defaultLng={parseFloat(defaultLng || "0")} defaultZoom={parseFloat(defaultZoom || "13")} iconScale={parseFloat(iconScale || "1")} />
             </div>
         )
     }
     return (
         <div className="h-full w-full rounded-lg overflow-hidden border relative z-0">
-            <LeafletMapComponent offlineUrl={offlineUrl} devices={data} />
+            <LeafletMapComponent defaultLat={parseFloat(defaultLat || "0")} defaultLng={parseFloat(defaultLng || "0")} defaultZoom={parseFloat(defaultZoom || "13")} iconScale={parseFloat(iconScale || "1")} offlineUrl={mapOfflineUrl} devices={data} />
         </div>
     )
 }

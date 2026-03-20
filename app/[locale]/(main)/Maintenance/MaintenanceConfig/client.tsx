@@ -54,7 +54,7 @@ function LegendItem({ icons, text }: { icons: { color: MarkerColor, badge: Marke
 // ---------------------------------------------------------------------------
 // Add Form Component (was the main client component)
 // ---------------------------------------------------------------------------
-function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onSuccess: () => void }) {
+function AddMaintenanceForm({ mapMode, mapOfflineUrl, defaultLat, defaultLng, defaultZoom, iconScale, googleMapsApiKey, onCancel, onSuccess }: { mapMode?: "online" | "offline", mapOnlineUrl?: string, mapOfflineUrl?: string, defaultLat?: number, defaultLng?: number, defaultZoom?: number, iconScale?: number, googleMapsApiKey?: string, onCancel: () => void, onSuccess: () => void }) {
     const tForm = useTranslations("MaintenanceConfig.form")
     const tMap = useTranslations("MapGlobal")
     const tTable = useTranslations("MaintenanceConfig.selectedTable")
@@ -82,11 +82,6 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
     const [isLoadingInit, setIsLoadingInit] = React.useState(true)
     const [isSearching, setIsSearching] = React.useState(false)
     const [isSaving, setIsSaving] = React.useState(false)
-
-    // Config
-    const mapMode = (process.env.MAP_MODE as "online" | "offline") || "online"
-    const onlineUrl = process.env.MAP_ONLINE_URL
-    const offlineUrl = process.env.MAP_OFFLINE_URL
 
     React.useEffect(() => {
         const initData = async () => {
@@ -296,9 +291,13 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
                             <div className="flex-1 absolute inset-0 pt-[45px] sm:pt-[45px] md:pt-[41px]">
                                 {/* The pt-[xxpx] is to offset the legend height so the map takes the full remaining space */}
                                 <MaintenanceMapComponent
-                                    mode={mapMode}
-                                    onlineUrl={onlineUrl}
-                                    offlineUrl={offlineUrl}
+                                    mapMode={mapMode}
+                                    mapOfflineUrl={mapOfflineUrl}
+                                    defaultLat={defaultLat?.toString()}
+                                    defaultLng={defaultLng?.toString()}
+                                    defaultZoom={defaultZoom?.toString()}
+                                    iconScale={iconScale?.toString()}
+                                    googleMapsApiKey={googleMapsApiKey}
                                     devices={devices}
                                     onSelectDevice={handleSelectDeviceFromMap}
                                     selectedImsis={selectedDevices.map(d => d.imsi)}
@@ -360,10 +359,20 @@ function AddMaintenanceForm({ onCancel, onSuccess }: { onCancel: () => void, onS
     )
 }
 
+interface MaintenanceConfigClientProps {
+    mapMode?: "online" | "offline" | undefined
+    mapOfflineUrl?: string
+    defaultLat?: string
+    defaultLng?: string
+    defaultZoom?: string
+    iconScale: string
+    googleMapsApiKey?: string
+}
+
 // ---------------------------------------------------------------------------
 // Main Client Component
 // ---------------------------------------------------------------------------
-export function MaintenanceConfigClient() {
+export function MaintenanceConfigClient({ mapMode, mapOfflineUrl, defaultLat, defaultLng, defaultZoom, iconScale, googleMapsApiKey }: MaintenanceConfigClientProps) {
     const tForm = useTranslations("MaintenanceConfig.form")
     const tMessages = useTranslations("MaintenanceConfig.messages")
     const tDelete = useTranslations("MaintenanceConfig.deleteDialog")
@@ -497,7 +506,17 @@ export function MaintenanceConfigClient() {
 
                     {/* Only render form when dialog is open to ensure Leaflet maps init correctly */}
                     {isAddOpen && (
-                        <AddMaintenanceForm onCancel={handleCloseAdd} onSuccess={handleSuccessAdd} />
+                        <AddMaintenanceForm
+                            mapMode={mapMode}
+                            mapOfflineUrl={mapOfflineUrl}
+                            defaultLat={parseFloat(defaultLat || "0")}
+                            defaultLng={parseFloat(defaultLng || "0")}
+                            defaultZoom={parseFloat(defaultZoom || "13")}
+                            iconScale={parseFloat(iconScale || "1")}
+                            googleMapsApiKey={googleMapsApiKey}
+                            onCancel={handleCloseAdd}
+                            onSuccess={handleSuccessAdd}
+                        />
                     )}
                 </DialogContent>
             </Dialog>

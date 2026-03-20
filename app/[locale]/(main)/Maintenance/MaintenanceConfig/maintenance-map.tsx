@@ -13,10 +13,10 @@ import { Button } from "@/components/ui/button"
 import { isValidGPS } from "../../Map/MapGlobal/map-utils"
 
 // Environment Defaults
-const DEFAULT_LAT = parseFloat(process.env.LAT_PROJECT || "13.736717")
-const DEFAULT_LNG = parseFloat(process.env.LNG_PROJECT || "100.523186")
-const DEFAULT_ZOOM = parseInt(process.env.ZOOM_PROJECT || "14")
-const ICON_SCALE = parseFloat(process.env.SIZE_ICON || "1")
+//const DEFAULT_LAT = parseFloat(process.env.LAT_PROJECT || "13.736717")
+//const DEFAULT_LNG = parseFloat(process.env.LNG_PROJECT || "100.523186")
+//const DEFAULT_ZOOM = parseInt(process.env.ZOOM_PROJECT || "14")
+//const ICON_SCALE = parseFloat(process.env.SIZE_ICON || "1")
 
 const DefaultIcon = L.icon({
     iconUrl: "/images/marker-icon.png",
@@ -29,9 +29,13 @@ const DefaultIcon = L.icon({
 L.Marker.prototype.options.icon = DefaultIcon
 
 interface MapProps {
-    mode: "online" | "offline"
-    onlineUrl?: string
-    offlineUrl?: string
+    mapMode?: "online" | "offline" | undefined
+    mapOfflineUrl?: string
+    defaultLat?: string
+    defaultLng?: string
+    defaultZoom?: string
+    iconScale?: string
+    googleMapsApiKey?: string
     devices: LatLongData[]
     onSelectDevice: (device: LatLongData) => void
     selectedImsis: string[] // to hide markers that are already selected
@@ -78,7 +82,7 @@ const customIconLeaflet = (color: MarkerColor, badge: MarkerBadge, size: number)
 })
 
 const containerStyle = { width: '100%', height: '100%' };
-const centerDefault = { lat: DEFAULT_LAT, lng: DEFAULT_LNG };
+//const centerDefault = { lat: DEFAULT_LAT, lng: DEFAULT_LNG };
 
 interface DeviceDetailPopupProps {
     device: LatLongData
@@ -106,12 +110,12 @@ function DeviceDetailPopup({ device, tMap, tConfig, onSelectDevice }: DeviceDeta
     )
 }
 
-function GoogleMapComponent({ devices, onSelectDevice, selectedImsis }: { devices: LatLongData[], onSelectDevice: (device: LatLongData) => void, selectedImsis: string[] }) {
+function GoogleMapComponent({ defaultLat, defaultLng, defaultZoom, iconScale, googleMapsApiKey, devices, onSelectDevice, selectedImsis }: { defaultLat?: number, defaultLng?: number, defaultZoom?: number, iconScale?: number, googleMapsApiKey?: string, devices: LatLongData[], onSelectDevice: (device: LatLongData) => void, selectedImsis: string[] }) {
     const tMap = useTranslations("MapGlobal");
     const tConfig = useTranslations("MaintenanceConfig");
-    const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: process.env.GOOGLE_MAPS_KEY || "", language: "th" })
+    const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: googleMapsApiKey || "", language: "th" })
     const [map, setMap] = useState<google.maps.Map | null>(null)
-    const [zoom, setZoom] = useState(DEFAULT_ZOOM)
+    const [zoom, setZoom] = useState(defaultZoom)
     const [selectedDevice, setSelectedDevice] = useState<LatLongData | null>(null)
 
     const onLoad = useCallback((map: google.maps.Map) => {
@@ -141,13 +145,13 @@ function GoogleMapComponent({ devices, onSelectDevice, selectedImsis }: { device
 
     if (!isLoaded) return <div className="h-full w-full flex items-center justify-center"><Loader2 className="animate-spin" /></div>
 
-    const iconSize = getIconSizeForZoom(zoom) * ICON_SCALE;
+    const iconSize = getIconSizeForZoom(zoom || 13) * (iconScale || 1);
 
     return (
         <GoogleMap
             mapContainerStyle={containerStyle}
-            center={centerDefault}
-            zoom={DEFAULT_ZOOM}
+            center={{ lat: defaultLat ?? 0, lng: defaultLng ?? 0 }}
+            zoom={zoom ?? 13}
             onLoad={onLoad}
             onUnmount={onUnmount}
             onZoomChanged={onZoomChanged}
@@ -181,17 +185,17 @@ function GoogleMapComponent({ devices, onSelectDevice, selectedImsis }: { device
     )
 }
 
-function LeafletMapComponent({ offlineUrl, devices, onSelectDevice, selectedImsis }: { offlineUrl?: string, devices: LatLongData[], onSelectDevice: (device: LatLongData) => void, selectedImsis: string[] }) {
+function LeafletMapComponent({ defaultLat, defaultLng, defaultZoom, iconScale, offlineUrl, devices, onSelectDevice, selectedImsis }: { defaultLat: number, defaultLng: number, defaultZoom: number, iconScale: number, offlineUrl?: string, devices: LatLongData[], onSelectDevice: (device: LatLongData) => void, selectedImsis: string[] }) {
     const tMap = useTranslations("MapGlobal");
     const tConfig = useTranslations("MaintenanceConfig");
     const containerRef = useRef<HTMLDivElement>(null)
     const mapInstanceRef = useRef<L.Map | null>(null)
     const markersRef = useRef<L.Marker[]>([])
-    const [currentZoom, setCurrentZoom] = useState(DEFAULT_ZOOM)
+    const [currentZoom, setCurrentZoom] = useState(defaultZoom)
 
     useEffect(() => {
         if (!containerRef.current || mapInstanceRef.current) return
-        const map = L.map(containerRef.current).setView([DEFAULT_LAT, DEFAULT_LNG], DEFAULT_ZOOM)
+        const map = L.map(containerRef.current).setView([defaultLat, defaultLng], defaultZoom)
         L.tileLayer(offlineUrl || "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { attribution: '&copy; OpenStreetMap', maxZoom: 20 }).addTo(map)
 
         map.on('zoomend', () => {
@@ -200,7 +204,7 @@ function LeafletMapComponent({ offlineUrl, devices, onSelectDevice, selectedImsi
 
         mapInstanceRef.current = map
         return () => { if (mapInstanceRef.current) { mapInstanceRef.current.remove(); mapInstanceRef.current = null } }
-    }, [offlineUrl])
+    }, [offlineUrl, defaultLat, defaultLng, defaultZoom])
 
     useEffect(() => {
         const map = mapInstanceRef.current
@@ -209,7 +213,7 @@ function LeafletMapComponent({ offlineUrl, devices, onSelectDevice, selectedImsi
         markersRef.current.forEach(marker => marker.remove())
         markersRef.current = []
 
-        const iconSize = getIconSizeForZoom(currentZoom) * ICON_SCALE;
+        const iconSize = getIconSizeForZoom(currentZoom) * iconScale;
 
         const visibleDevices = devices.filter(d => !selectedImsis.includes(d.imsi))
 
@@ -278,7 +282,7 @@ function LeafletMapComponent({ offlineUrl, devices, onSelectDevice, selectedImsi
 
             markersRef.current.push(marker)
         })
-    }, [devices, currentZoom, tMap, tConfig, onSelectDevice, selectedImsis])
+    }, [devices, currentZoom, tMap, tConfig, onSelectDevice, selectedImsis, iconScale])
 
     return <div ref={containerRef} className="h-full w-full" style={{ zIndex: 0 }} />
 }
@@ -288,17 +292,32 @@ function UseTranslationsProvider({ children }: { children: React.ReactNode }) {
     return <>{children}</>
 }
 
-export default function MaintenanceMapComponent({ mode, offlineUrl, devices, onSelectDevice, selectedImsis }: MapProps) {
-    if (mode === "online") {
+export default function MaintenanceMapComponent({ mapMode, mapOfflineUrl, devices, defaultLat, defaultLng, defaultZoom, iconScale, onSelectDevice, selectedImsis }: MapProps) {
+    if (mapMode === "online") {
         return (
             <div className="h-full w-full rounded-lg overflow-hidden border relative">
-                <GoogleMapComponent devices={devices} onSelectDevice={onSelectDevice} selectedImsis={selectedImsis} />
+                <GoogleMapComponent
+                    defaultLat={parseFloat(defaultLat || "0")}
+                    defaultLng={parseFloat(defaultLng || "0")}
+                    defaultZoom={parseFloat(defaultZoom || "13")}
+                    iconScale={parseFloat(iconScale || "1")}
+                    devices={devices}
+                    onSelectDevice={onSelectDevice}
+                    selectedImsis={selectedImsis} />
             </div>
         )
     }
     return (
         <div className="h-full w-full rounded-lg overflow-hidden border relative z-0">
-            <LeafletMapComponent offlineUrl={offlineUrl} devices={devices} onSelectDevice={onSelectDevice} selectedImsis={selectedImsis} />
+            <LeafletMapComponent
+                defaultLat={parseFloat(defaultLat || "0")}
+                defaultLng={parseFloat(defaultLng || "0")}
+                defaultZoom={parseFloat(defaultZoom || "13")}
+                iconScale={parseFloat(iconScale || "1")}
+                offlineUrl={mapOfflineUrl}
+                devices={devices}
+                onSelectDevice={onSelectDevice}
+                selectedImsis={selectedImsis} />
         </div>
     )
 }

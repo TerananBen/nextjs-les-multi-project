@@ -18,8 +18,8 @@ interface MapGlobalClientProps {
     defaultZoom?: string,
     iconScale?: string,
     mapMode?: "online" | "offline",
-    mapOnlineUrl?: string,
     mapOfflineUrl?: string
+    googleMapsApiKey?: string
 }
 
 // Dynamic import for MapContainer to avoid SSR issues with Leaflet
@@ -28,7 +28,7 @@ const MapContainerComponent = dynamic(() => import("./map-container"), {
     loading: () => <div className="h-full w-full flex items-center justify-center bg-muted/20"><Loader2 className="h-8 w-8 animate-spin" /></div>
 })
 
-export default function MapGlobalClient({ defaultLat, defaultLng, defaultZoom, iconScale, mapMode, mapOnlineUrl, mapOfflineUrl }: MapGlobalClientProps) {
+export default function MapGlobalClient({ googleMapsApiKey, defaultLat, defaultLng, defaultZoom, iconScale, mapMode, mapOfflineUrl }: MapGlobalClientProps) {
     const t = useTranslations("MapGlobal")
     const [searchType, setSearchType] = useState<"group" | "imsi" | "street_light_name">("group")
     const [searchValue, setSearchValue] = useState<string>("ALL")
@@ -107,13 +107,13 @@ export default function MapGlobalClient({ defaultLat, defaultLng, defaultZoom, i
             <div className="flex-1 relative order-2 min-h-0 px-0 pb-0">
                 <MapContainerComponent
                     mode={mapMode}
-                    onlineUrl={mapOnlineUrl}
                     offlineUrl={mapOfflineUrl}
                     devices={devices}
                     defaultLat={defaultLat}
                     defaultLng={defaultLng}
                     defaultZoom={defaultZoom}
                     iconScale={iconScale}
+                    googleMapsApiKey={googleMapsApiKey}
                 />
 
                 {/* Floating Loading Indicator */}

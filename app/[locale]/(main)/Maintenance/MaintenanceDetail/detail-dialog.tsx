@@ -15,10 +15,17 @@ const DetailMap = dynamic(() => import("./detail-map").then(m => ({ default: m.D
 
 interface DetailDialogProps {
     detailId: string | null
+    mapMode?: "online" | "offline" | undefined
+    mapOfflineUrl?: string
+    defaultLat?: string
+    defaultLng?: string
+    defaultZoom?: string
+    iconScale: string
+    googleMapsApiKey?: string
     onClose: () => void
 }
 
-export function DetailDialog({ detailId, onClose }: DetailDialogProps) {
+export function DetailDialog({ detailId, mapMode, mapOfflineUrl, defaultLat, defaultLng, defaultZoom, iconScale, googleMapsApiKey, onClose }: DetailDialogProps) {
     const t = useTranslations("MaintenanceDashboard")
     const tMap = useTranslations("MapGlobal")
     const [data, setData] = useState<MaintenanceDetailRecord[]>([])
@@ -122,7 +129,7 @@ export function DetailDialog({ detailId, onClose }: DetailDialogProps) {
 
                     {/* Map Section */}
                     <div className="h-[300px] mb-6 rounded-md overflow-hidden border relative z-0">
-                        <DetailMap data={data} />
+                        <DetailMap data={data} mapMode={mapMode} mapOfflineUrl={mapOfflineUrl} defaultLat={defaultLat} defaultLng={defaultLng} defaultZoom={defaultZoom} iconScale={iconScale} googleMapsApiKey={googleMapsApiKey} />
                     </div>
 
                     {/* Table Section */}

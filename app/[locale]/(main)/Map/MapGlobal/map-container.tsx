@@ -27,13 +27,13 @@ L.Marker.prototype.options.icon = DefaultIcon
 
 interface MapProps {
     mode?: "online" | "offline"
-    onlineUrl?: string
     offlineUrl?: string
     defaultLat?: string
     defaultLng?: string
     defaultZoom?: string
     iconScale?: string
     devices: LatLongData[]
+    googleMapsApiKey?: string
 }
 
 // Helpers
@@ -332,11 +332,11 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
 }
 
 // Google Map Component
-function GoogleMapComponent({ devices, defaultLat, defaultLng, defaultZoom, iconScale }: { devices: LatLongData[], defaultLat?: string, defaultLng?: string, defaultZoom?: string, iconScale?: string }) {
+function GoogleMapComponent({ googleMapsApiKey, devices, defaultLat, defaultLng, defaultZoom, iconScale }: { googleMapsApiKey?: string, devices: LatLongData[], defaultLat?: string, defaultLng?: string, defaultZoom?: string, iconScale?: string }) {
     const t = useTranslations("MapGlobal");
     const { getPermission } = usePermission();
     const { control: canControl } = getPermission("V_MapGlobal");
-    const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: process.env.GOOGLE_MAPS_KEY || "", language: "th" })
+    const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: googleMapsApiKey || "", language: "th" })
     const [map, setMap] = useState<google.maps.Map | null>(null)
     const [zoom, setZoom] = useState(parseFloat(defaultZoom || "13"))
     const [selectedDevice, setSelectedDevice] = useState<LatLongData | null>(null)

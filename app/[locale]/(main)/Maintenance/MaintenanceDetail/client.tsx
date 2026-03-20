@@ -8,9 +8,16 @@ import { DetailDialog } from "./detail-dialog"
 
 interface MaintenanceDetailClientProps {
     initialData: MaintenanceDetailListRecord[]
+    mapMode?: "online" | "offline" | undefined
+    mapOfflineUrl?: string
+    defaultLat?: string
+    defaultLng?: string
+    defaultZoom?: string
+    iconScale: string
+    googleMapsApiKey?: string
 }
 
-export function MaintenanceDetailClient({ initialData }: MaintenanceDetailClientProps) {
+export function MaintenanceDetailClient({ initialData, mapMode, mapOfflineUrl, defaultLat, defaultLng, defaultZoom, iconScale, googleMapsApiKey }: MaintenanceDetailClientProps) {
     const [selectedDetailId, setSelectedDetailId] = React.useState<string | null>(null)
     const columns = useMaintenanceDetailColumns(setSelectedDetailId)
 
@@ -30,6 +37,13 @@ export function MaintenanceDetailClient({ initialData }: MaintenanceDetailClient
 
             {/* Dialog Component */}
             <DetailDialog
+                mapMode={mapMode}
+                mapOfflineUrl={mapOfflineUrl}
+                defaultLat={defaultLat || "0"}
+                defaultLng={defaultLng || "0"}
+                defaultZoom={defaultZoom || "13"}
+                iconScale={iconScale || "1"}
+                googleMapsApiKey={googleMapsApiKey}
                 detailId={selectedDetailId}
                 onClose={() => setSelectedDetailId(null)}
             />

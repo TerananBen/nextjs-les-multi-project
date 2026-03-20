@@ -104,7 +104,7 @@ const CommandCell = ({
                             if (!canControl) {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                toast.error("Permission Denied");
+                                toast.error(t("permissionDenied"));
                             }
                         }}
                     >
@@ -419,7 +419,7 @@ export const useStreetLightColumns = () => {
             },
             cell: ({ row }) => {
                 return (
-                    <PowerCell 
+                    <PowerCell
                         lastPower={row.original.lastPower}
                         gatewayId={row.original.gatewayId}
                         imei={row.original.imeI_Name}
@@ -442,7 +442,7 @@ export const useStreetLightColumns = () => {
             header: t("logPower"),
             cell: ({ row }) => {
                 return (
-                    <HistoryCell 
+                    <HistoryCell
                         imei={row.original.imeI_Name}
                         deviceName={row.original.streetLightName}
                     />

@@ -125,7 +125,7 @@ export function GroupConfigClient() {
                                 if (!canAdd) {
                                     e.preventDefault()
                                     e.stopPropagation()
-                                    toast.error("Permission Denied")
+                                    toast.error(t("permissionDenied"))
                                 }
                             }}
                         >

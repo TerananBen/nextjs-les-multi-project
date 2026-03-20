@@ -297,6 +297,7 @@
             "sending": "Sending...",
             "readPower": "Read Power",
             "readSuccess": "Read Power Successfully",
+            "noGatewayId": "No Gateway ID found",
             "readError": "Read Power Failed",
             "reading": "Reading..."
         },
@@ -353,6 +354,7 @@
         "selectGroupPlaceholder": "-- Select Group --",
         "searchButton": "Search",
         "noData": "No Data",
+        "failedToLoadData": "Failed to load data",
         "table": {
             "streetLightName": "Streetlight Name",
             "gov": "Gov",
@@ -373,7 +375,8 @@
             "send": "Send",
             "stop": "Stop",
             "commandSuccess": "Command sent successfully",
-            "commandFailed": "Failed to send command"
+            "commandFailed": "Failed to send command",
+            "permissionDenied": "Permission Denied"
         },
         "commands": {
             "on": "On",
@@ -426,13 +429,15 @@
         "rowsPerPage": "Rows per page",
         "loading": "Loading...",
         "noData": "No results.",
+        "permissionDenied": "Permission Denied",
         "table": {
             "groupName": "Group Name",
             "control": "Control",
             "addDevice": "Manage Devices",
             "addDeviceCsv": "Add Device (CSV)",
             "editDeviceCsv": "Edit Device (CSV)",
-            "delete": "Delete"
+            "delete": "Delete",
+            "permissionDenied": "Permission Denied"
         },
         "dialog": {
             "title": "Add New Group",
@@ -442,7 +447,8 @@
             "saving": "Saving...",
             "required": "Group name is required",
             "success": "Group added successfully",
-            "error": "Failed to add group"
+            "error": "Failed to add group",
+            "permissionDenied": "Permission Denied"
         },
         "deleteDialog": {
             "title": "Delete Group",
@@ -451,7 +457,8 @@
             "cancel": "Cancel",
             "deleting": "Deleting...",
             "success": "Group deleted successfully",
-            "error": "Failed to delete group"
+            "error": "Failed to delete group",
+            "permissionDenied": "Permission Denied"
         },
         "csvDialog": {
             "title": "Add Devices via CSV",
@@ -780,7 +787,8 @@
             "resendingAll": "Resending All...",
             "resendAllComplete": "Resend All Complete. Success: {success}, Failed: {failed}",
             "noData": "No data"
-        }
+        },
+        "failedToLoadData": "Failed to load data"
     },
     "MaintenanceConfig": {
         "title": "Maintenance Config",

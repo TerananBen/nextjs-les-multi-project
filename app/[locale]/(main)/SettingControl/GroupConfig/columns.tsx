@@ -126,7 +126,7 @@ function DeleteCell({ row, onSuccess }: DeleteCellProps) {
                         if (!canDelete) {
                             e.preventDefault()
                             e.stopPropagation()
-                            toast.error("Permission Denied")
+                            toast.error(t("permissionDenied"))
                         }
                     }}
                 >
@@ -191,7 +191,7 @@ function ControlGroupCell({ row }: { row: GroupConfigData }) {
                 )}
                 onClick={() => {
                     if (canControl) setOpen(true)
-                    else toast.error("Permission Denied")
+                    else toast.error(t("permissionDenied"))
                 }}
                 disabled={!canControl}
             >
@@ -227,7 +227,7 @@ function AddDeviceCell({ row }: { row: GroupConfigData }) {
                 )}
                 onClick={() => {
                     if (canManage) setOpen(true)
-                    else toast.error("Permission Denied")
+                    else toast.error(t("permissionDenied"))
                 }}
                 disabled={!canManage}
             >
@@ -258,7 +258,7 @@ function AddDeviceCsvCell({ row }: { row: GroupConfigData }) {
                 )}
                 onClick={() => {
                     if (canManage) setOpen(true)
-                    else toast.error("Permission Denied")
+                    else toast.error(t("permissionDenied"))
                 }}
                 disabled={!canManage}
             >
@@ -285,7 +285,7 @@ function EditDeviceCsvCell({ row }: { row: GroupConfigData }) {
                 size="icon"
                 onClick={() => {
                     if (canManage) setOpen(true)
-                    else toast.error("Permission Denied")
+                    else toast.error(t("permissionDenied"))
                 }}
                 className={cn(
                     "h-8 w-8",

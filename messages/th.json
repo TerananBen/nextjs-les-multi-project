@@ -297,6 +297,7 @@
             "sending": "กําลังส่ง...",
             "readPower": "อ่านค่าพลังงาน",
             "readSuccess": "อ่านค่าพลังงานสำเร็จ",
+            "noGatewayId": "ไม่พบรหัสอุปกรณ์",
             "readError": "อ่านค่าพลังงานล้มเหลว",
             "reading": "กำลังอ่านค่า..."
         },
@@ -353,6 +354,7 @@
         "selectGroupPlaceholder": "-- เลือกกลุ่ม --",
         "searchButton": "ค้นหา",
         "noData": "ไม่พบข้อมูล",
+        "failedToLoadData": "โหลดข้อมูลไม่สำเร็จ",
         "table": {
             "streetLightName": "ชื่อโคมไฟ",
             "gov": "ครุภัณฑ์",
@@ -373,7 +375,8 @@
             "send": "ส่ง",
             "stop": "หยุด",
             "commandSuccess": "ส่งคำสั่งสำเร็จ",
-            "commandFailed": "ส่งคำสั่งไม่สำเร็จ"
+            "commandFailed": "ส่งคำสั่งไม่สำเร็จ",
+            "permissionDenied": "ไม่ได้รับอนุญาต"
         },
         "commands": {
             "on": "เปิด",
@@ -426,13 +429,15 @@
         "rowsPerPage": "แถวต่อหน้า",
         "loading": "กำลังโหลด...",
         "noData": "ไม่พบข้อมูล",
+        "permissionDenied": "ไม่ได้รับอนุญาต",
         "table": {
             "groupName": "ชื่อกลุ่ม",
             "control": "ควบคุม",
             "addDevice": "จัดการอุปกรณ์",
             "addDeviceCsv": "เพิ่มอุปกรณ์ (CSV)",
             "editDeviceCsv": "แก้ไขอุปกรณ์ (CSV)",
-            "delete": "ลบกลุ่ม"
+            "delete": "ลบกลุ่ม",
+            "permissionDenied": "ไม่ได้รับอนุญาต"
         },
         "dialog": {
             "title": "เพิ่มกลุ่มใหม่",
@@ -442,7 +447,8 @@
             "saving": "กำลังบันทึก...",
             "required": "กรุณาระบุชื่อกลุ่ม",
             "success": "เพิ่มกลุ่มสำเร็จ",
-            "error": "เพิ่มกลุ่มไม่สำเร็จ"
+            "error": "เพิ่มกลุ่มไม่สำเร็จ",
+            "permissionDenied": "ไม่ได้รับอนุญาต"
         },
         "deleteDialog": {
             "title": "ลบกลุ่ม",
@@ -451,7 +457,8 @@
             "cancel": "ยกเลิก",
             "deleting": "กำลังลบ...",
             "success": "ลบกลุ่มสำเร็จ",
-            "error": "ลบกลุ่มไม่สำเร็จ"
+            "error": "ลบกลุ่มไม่สำเร็จ",
+            "permissionDenied": "ไม่ได้รับอนุญาต"
         },
         "csvDialog": {
             "title": "เพิ่มอุปกรณ์ด้วยไฟล์ CSV",
@@ -782,7 +789,8 @@
             "resendingAll": "กำลังส่งซ้ำ...",
             "resendAllComplete": "ส่งซ้ำเสร็จสิ้น สำเร็จ: {success}, ล้มเหลว: {failed}",
             "noData": "ไม่พบข้อมูล"
-        }
+        },
+        "failedToLoadData": "โหลดข้อมูลไม่สำเร็จ"
     },
     "MaintenanceConfig": {
         "title": "กำหนดค่าการบำรุงรักษา",

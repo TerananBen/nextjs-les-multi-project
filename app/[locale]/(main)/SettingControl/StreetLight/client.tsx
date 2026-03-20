@@ -18,12 +18,16 @@ import {
     ComboboxList,
 } from "@/components/ui/combobox"
 
-export function StreetLightClient() {
+interface StreetLightClientProps {
+    defaultGroupCode?: string
+}
+
+export function StreetLightClient({ defaultGroupCode }: StreetLightClientProps) {
     const t = useTranslations("StreetLight")
 
     // State
     const [groups, setGroups] = React.useState<DeviceGroup[]>([])
-    const [selectedGroup, setSelectedGroup] = React.useState<string>("ALL") // Default ALL
+    const [selectedGroup, setSelectedGroup] = React.useState<string>(defaultGroupCode || "oPIvy3ef9VITLORALOCAL")
     const [devices, setDevices] = React.useState<StreetLightDevice[]>([])
     const [loading, setLoading] = React.useState(false)
 
@@ -43,7 +47,7 @@ export function StreetLightClient() {
                     // Ensure "ALL" exists or prepend it
                     const hasAll = data.some(g => g.groupName === "ALL")
                     if (!hasAll) {
-                        setGroups([{ groupCode: "ALL", groupName: "ALL" }, ...data])
+                        setGroups([{ groupCode: defaultGroupCode || "oPIvy3ef9VITLORALOCAL", groupName: "ALL" }, ...data])
                     } else {
                         setGroups(data)
                     }
@@ -56,12 +60,12 @@ export function StreetLightClient() {
                 }
             } catch (error) {
                 console.error("Failed to fetch groups", error)
-                toast.error("Failed to load groups")
+                toast.error(t("failedToLoadData"))
             }
         }
 
         fetchGroups()
-    }, [])
+    }, [defaultGroupCode])
 
     // 2. Fetch Devices when Group Changes (Auto-Search)
     React.useEffect(() => {
@@ -78,7 +82,7 @@ export function StreetLightClient() {
                 }
             } catch (error) {
                 console.error("Failed to fetch devices", error)
-                toast.error("Failed to load devices")
+                toast.error(t("failedToLoadData"))
                 setDevices([])
             } finally {
                 setLoading(false)

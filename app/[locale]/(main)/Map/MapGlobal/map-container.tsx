@@ -165,7 +165,7 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
             return
         }
         if (!device.gateway_id) {
-            toast.error("No Gateway ID found")
+            toast.error(t("control.noGatewayId") || "No Gateway ID found")
             return
         }
         console.log("Triggering Read Power Action...")

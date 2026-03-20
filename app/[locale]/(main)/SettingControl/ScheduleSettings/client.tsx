@@ -105,7 +105,7 @@ export function ScheduleSettingsClient({ versionLightSensor }: ScheduleSettingsC
                 setGroups(groupsResult)
             } catch (error) {
                 console.error("Failed to fetch data", error)
-                toast.error("Failed to load data")
+                toast.error(t("failedToLoadData"))
             } finally {
                 setLoading(false)
             }

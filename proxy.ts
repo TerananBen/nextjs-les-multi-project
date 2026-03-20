@@ -2,9 +2,13 @@ import createMiddleware from 'next-intl/middleware';
 import { routing } from './i18n/routing';
 import { NextRequest, NextResponse } from 'next/server';
 
-const intlMiddleware = createMiddleware(routing);
-
 export default async function proxy(request: NextRequest) {
+    const defaultLocale = (process.env.DEFAULT_LOCALE as "en" | "th") || 'th';
+    const intlMiddleware = createMiddleware({
+        ...routing,
+        defaultLocale
+    });
+
     const { pathname } = request.nextUrl;
 
     // Define public pages that don't require authentication
@@ -25,7 +29,7 @@ export default async function proxy(request: NextRequest) {
         // by redirecting to /login (which next-intl might handle if configured) or constructing a localized path.
         // A safer bet is to redirect to /th/login or /en/login.
         // Let's try to infer locale or default to 'th'.
-        const locale = request.nextUrl.pathname.split('/')[1] || 'th';
+        const locale = request.nextUrl.pathname.split('/')[1] || defaultLocale;
         const loginUrl = new URL(`/${locale}/login`, request.url);
         return NextResponse.redirect(loginUrl);
     }
@@ -42,15 +46,15 @@ export default async function proxy(request: NextRequest) {
 
             if (response.status === 401 || !response.ok) {
                 // Token is invalid or expired
-                const locale = request.nextUrl.pathname.split('/')[1] || 'th';
+                const locale = request.nextUrl.pathname.split('/')[1] || defaultLocale;
                 const loginUrl = new URL(`/${locale}/login`, request.url);
-                const response = NextResponse.redirect(loginUrl);
+                const redirectResponse = NextResponse.redirect(loginUrl);
 
                 // Optional: Clear the invalid cookie
-                response.cookies.delete('jwt');
-                response.cookies.delete('menuRole');
+                redirectResponse.cookies.delete('jwt');
+                redirectResponse.cookies.delete('menuRole');
 
-                return response;
+                return redirectResponse;
             }
         } catch (error) {
             console.error("Middleware auth check failed:", error);
@@ -58,7 +62,7 @@ export default async function proxy(request: NextRequest) {
             // For security, failing safe (redirecting to login) is often better, 
             // but if the API is down, it locks everyone out.
             // Let's assume if we can't reach the auth server, we shouldn't let them in.
-            const locale = request.nextUrl.pathname.split('/')[1] || 'th';
+            const locale = request.nextUrl.pathname.split('/')[1] || defaultLocale;
             const loginUrl = new URL(`/${locale}/login`, request.url);
             return NextResponse.redirect(loginUrl);
         }

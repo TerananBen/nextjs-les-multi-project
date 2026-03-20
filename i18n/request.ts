@@ -6,7 +6,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
 
     // Ensure that a valid locale is used
     if (!locale || !['en', 'th'].includes(locale)) {
-        locale = 'en';
+        locale = process.env.DEFAULT_LOCALE || "th";
     }
 
     return {

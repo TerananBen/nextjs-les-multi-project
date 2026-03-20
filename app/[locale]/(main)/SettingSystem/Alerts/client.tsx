@@ -23,7 +23,11 @@ import { AlertSetting } from "@/types/setting-system"
 import { Loader2, Save, MessageSquare, Mail, AlertTriangle, Clock, Battery, Zap, Activity } from "lucide-react"
 import { toast } from "sonner"
 
-export function AlertsClient() {
+interface Props {
+    hiddenConfigAlerts: string
+}
+
+export function AlertsClient({ hiddenConfigAlerts }: Props) {
     const t = useTranslations("Alerts")
     const [data, setData] = useState<AlertSetting[]>([])
     const [loading, setLoading] = useState(true)
@@ -37,18 +41,13 @@ export function AlertsClient() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Get hidden types from env
-                const hiddenConfig = process.env.HIDDEN_CONFIG_ALERTS || ""
+                const hiddenConfig = hiddenConfigAlerts || ""
                 const hiddenList = hiddenConfig.split(",").map(t => t.trim())
                 setHiddenTypes(hiddenList)
 
                 const result = await getDataAlertStreetLightAction()
-                // Filter out hidden types immediately or handle at render time? 
-                // Render time is safer for preserving data if user saves, but here we just want to hide UI.
-                // Let's filter at render helpers instead to keep original data intact.
                 setData(result)
 
-                // Initialize Line Token parts
                 const lineToken = result.find(d => d.name === "lineToken")
                 if (lineToken) {
                     const [token, groupId] = lineToken.value.split("channel_access_token_group_id")
@@ -64,7 +63,7 @@ export function AlertsClient() {
             }
         }
         fetchData()
-    }, [])
+    }, [hiddenConfigAlerts])
 
     const handleLineTokenChange = (part: "token" | "groupId", value: string) => {
         setLineTokenParts(prev => {

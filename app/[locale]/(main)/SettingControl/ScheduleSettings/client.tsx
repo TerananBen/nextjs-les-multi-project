@@ -24,7 +24,11 @@ import {
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
-export function ScheduleSettingsClient() {
+interface ScheduleSettingsClientProps {
+    versionLightSensor: string
+}
+
+export function ScheduleSettingsClient({ versionLightSensor }: ScheduleSettingsClientProps) {
     const t = useTranslations("ScheduleSettings")
     const [data, setData] = React.useState<ScheduleItem[]>([])
     const [groups, setGroups] = React.useState<DeviceGroup[]>([])
@@ -118,6 +122,7 @@ export function ScheduleSettingsClient() {
             </div>
 
             <EditScheduleDialog
+                versionLightSensor={versionLightSensor}
                 open={openDialog}
                 onOpenChange={setOpenDialog}
                 schedule={selectedSchedule}

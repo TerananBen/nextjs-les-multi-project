@@ -48,6 +48,7 @@ interface ScheduleFormValues {
 
 interface EditScheduleDialogProps {
     open: boolean
+    versionLightSensor: string
     onOpenChange: (open: boolean) => void
     schedule: ScheduleItem | null
     groups: DeviceGroup[] // Available groups to select
@@ -55,6 +56,7 @@ interface EditScheduleDialogProps {
 
 export function EditScheduleDialog({
     open,
+    versionLightSensor,
     onOpenChange,
     schedule,
     groups,
@@ -244,7 +246,7 @@ export function EditScheduleDialog({
         }
     }, [open, schedule, form])
 
-    const onSubmit = async (data: ScheduleFormValues) => {
+    const onSubmit = async (data: ScheduleFormValues, versionLightSensor: string) => {
         setIsSaving(true)
         try {
             // Construct list_group_name_code: " GroupName$GroupCode"
@@ -289,7 +291,7 @@ export function EditScheduleDialog({
                 type_set: "group", // Default "group"
                 // API expects JSON STRING of the array
                 list_days: JSON.stringify(["sun", "mon", "tue", "wed", "thu", "fri", "sat"]),
-                version_light_sensor: process.env.VERSION_LIGHT_SENSOR || "2"
+                version_light_sensor: versionLightSensor
             }
 
             const result = await saveScheduleSettingsAction(payload)
@@ -333,7 +335,7 @@ export function EditScheduleDialog({
                 </DialogHeader>
 
                 <div className="p-6 space-y-8 min-h-[60vh] bg-background">
-                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+                    <form onSubmit={handleSubmit((data) => onSubmit(data, versionLightSensor))} className="space-y-8">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Schedule Name */}
                             <div className="space-y-2">
@@ -671,7 +673,7 @@ export function EditScheduleDialog({
                     </Button>
                     <Button
                         type="button"
-                        onClick={handleSubmit(onSubmit, () => {
+                        onClick={handleSubmit((data) => onSubmit(data, versionLightSensor), () => {
                             toast.error(t("validateError"));
                         })}
                         disabled={isSaving}

@@ -22,6 +22,7 @@ const nextConfig: NextConfig = {
     },
   },
   /* config options here */
+  output: "standalone",
   experimental: {
     serverActions: {
       allowedOrigins: process.env.ALLOWED_ORIGINS?.split(",") || ["10.0.0.10", "localhost"],
@@ -38,7 +39,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  output: "standalone",
 };
 
 export default withNextIntl(nextConfig);

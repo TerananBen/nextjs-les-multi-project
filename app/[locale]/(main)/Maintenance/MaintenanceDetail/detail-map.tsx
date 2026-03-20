@@ -13,12 +13,6 @@ import { isValidGPS } from "../../Map/MapGlobal/map-utils"
 import { GoogleMap, useJsApiLoader, Marker as GoogleMarker, InfoWindow } from "@react-google-maps/api"
 import { Loader2 } from "lucide-react"
 
-// Environment Defaults
-//const DEFAULT_LAT = parseFloat(process.env.LAT_PROJECT || "13.736717")
-//const DEFAULT_LNG = parseFloat(process.env.LNG_PROJECT || "100.523186")
-//const DEFAULT_ZOOM = parseInt(process.env.ZOOM_PROJECT || "14")
-//const ICON_SCALE = parseFloat(process.env.SIZE_ICON || "1")
-
 function getIconSizeForZoom(zoom: number) {
     const size = 20 + (zoom - 10) * 5
     return Math.max(10, Math.min(size, 80))

@@ -12,12 +12,6 @@ import { createRoot } from "react-dom/client"
 import { Button } from "@/components/ui/button"
 import { isValidGPS } from "../../Map/MapGlobal/map-utils"
 
-// Environment Defaults
-//const DEFAULT_LAT = parseFloat(process.env.LAT_PROJECT || "13.736717")
-//const DEFAULT_LNG = parseFloat(process.env.LNG_PROJECT || "100.523186")
-//const DEFAULT_ZOOM = parseInt(process.env.ZOOM_PROJECT || "14")
-//const ICON_SCALE = parseFloat(process.env.SIZE_ICON || "1")
-
 const DefaultIcon = L.icon({
     iconUrl: "/images/marker-icon.png",
     shadowUrl: "/images/marker-shadow.png",

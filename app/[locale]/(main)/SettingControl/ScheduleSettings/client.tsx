@@ -112,7 +112,7 @@ export function ScheduleSettingsClient({ versionLightSensor }: ScheduleSettingsC
         }
 
         fetchData()
-    }, [])
+    }, [t])
 
     return (
         <div className="flex flex-col gap-6 w-full">

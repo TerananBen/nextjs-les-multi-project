@@ -228,8 +228,8 @@ export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps
             {/* Increase standard max width for detailed table */}
             <DialogContent className="max-w-[95vw] w-full max-h-[90vh] overflow-hidden flex flex-col p-0">
                 <DialogHeader className="px-6 py-4 border-b">
-                    <DialogTitle>{t("historyPowerTitle", { defaultValue: "ประวัติกำลังไฟฟ้า" })}</DialogTitle>
-                    <div className="text-sm text-muted-foreground">{t("device", { defaultValue: "อุปกรณ์" })}: {imei} {deviceName ? `(${deviceName})` : ''}</div>
+                    <DialogTitle>{t("historyPowerTitle", { defaultValue: "History Power" })}</DialogTitle>
+                    <div className="text-sm text-muted-foreground">{t("device", { defaultValue: "Device" })}: {imei} {deviceName ? `(${deviceName})` : ''}</div>
                 </DialogHeader>
 
                 <div className="flex flex-col flex-1 overflow-hidden bg-gray-50/50">

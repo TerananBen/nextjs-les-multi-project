@@ -51,7 +51,7 @@ export function DetailDataTable({ data }: DetailDataTableProps) {
                             <TableCell>{row.street_light_name}</TableCell>
                             <TableCell>{row.imsi_befor}</TableCell>
                             <TableCell>
-                                <Input 
+                                <Input
                                     defaultValue={row.imsi_after || ""}
                                     placeholder={t("detail.table.enterNewDevice")}
                                     className="h-8 w-full min-w-[120px]"
@@ -69,16 +69,16 @@ export function DetailDataTable({ data }: DetailDataTableProps) {
                                         <SelectValue placeholder={t("detail.table.selectAction")} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="change_rtu">เปลี่ยน RTU</SelectItem>
-                                        <SelectItem value="change_lamp">เปลี่ยนโคมไฟ</SelectItem>
-                                        <SelectItem value="repair_wiring">ซ่อมสายไฟ</SelectItem>
-                                        <SelectItem value="other">อื่นๆ</SelectItem>
+                                        <SelectItem value="change_rtu">{t("detail.table.changeRtu")}</SelectItem>
+                                        <SelectItem value="change_lamp">{t("detail.table.changeLamp")}</SelectItem>
+                                        <SelectItem value="repair_wiring">{t("detail.table.repairWiring")}</SelectItem>
+                                        <SelectItem value="other">{t("detail.table.other")}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </TableCell>
                             <TableCell className="text-center">
                                 <Button variant="destructive" size="sm" className="h-8 text-xs bg-red-500 hover:bg-red-600">
-                                    {t("detail.table.statusButton", { defaultMessage: "ดำเนินการ" })}
+                                    {t("detail.table.statusButton")}
                                 </Button>
                             </TableCell>
                         </TableRow>

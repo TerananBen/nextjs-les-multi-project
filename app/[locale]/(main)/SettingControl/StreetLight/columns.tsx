@@ -312,7 +312,7 @@ export const useStreetLightColumns = () => {
                         variant="ghost"
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                     >
-                        IMEI
+                        {t("deviceNo")}
                         <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
                 )

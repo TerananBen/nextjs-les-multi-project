@@ -65,7 +65,7 @@ export function StreetLightClient({ defaultGroupCode }: StreetLightClientProps) 
         }
 
         fetchGroups()
-    }, [defaultGroupCode])
+    }, [t, defaultGroupCode])
 
     // 2. Fetch Devices when Group Changes (Auto-Search)
     React.useEffect(() => {
@@ -90,7 +90,7 @@ export function StreetLightClient({ defaultGroupCode }: StreetLightClientProps) 
         }
 
         fetchDevices()
-    }, [selectedGroup])
+    }, [selectedGroup, t])
 
 
     // 3. Local Filtering

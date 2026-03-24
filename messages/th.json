@@ -279,7 +279,9 @@
             "lastCommand": "คำสั่งล่าสุด :",
             "lastStatus": "สถานะล่าสุด :",
             "govName": "ครุภัณฑ์ :",
-            "mode": "โหมด :"
+            "mode": "โหมด :",
+            "failedToLoadDetailedData": "ไม่สามารถโหลดข้อมูลรายละเอียดได้",
+            "retry": "ลองอีกครั้ง"
         },
         "serviceStatus": {
             "on": "เปิด",
@@ -307,7 +309,8 @@
             "manual": "เปิด/ปิด (แมนนวล)",
             "disconnect": "ขาดการติดต่อ (สื่อสารขัดข้อง)",
             "abnormal": "ค่าพลังงาน/กระแสไฟผิดปกติ",
-            "failure": "ระบบไฟฟ้า/RTU ขัดข้อง"
+            "failure": "ระบบไฟฟ้า/RTU ขัดข้อง",
+            "unknown": "ไม่ทราบสถานะ"
         }
     },
     "PageUnavailable": {
@@ -358,6 +361,7 @@
         "table": {
             "streetLightName": "ชื่อโคมไฟ",
             "gov": "ครุภัณฑ์",
+            "deviceNo": "หมายเลขอุปกรณ์",
             "groupName": "ชื่อกลุ่ม",
             "lastUpdate": "อัปเดตล่าสุด",
             "lifeTime": "อายุการใช้งาน",
@@ -538,6 +542,9 @@
             "selectedCount": "เลือก {count} รายการ",
             "totalCount": "ทั้งหมด: {count}",
             "noData": "ไม่พบรายการอุปกรณ์",
+            "success": "สำเร็จ",
+            "failed": "ล้มเหลว",
+            "pending": "รอผล",
             "table": {
                 "name": "ชื่อโคมไฟ",
                 "imsi": "IMSI",
@@ -610,7 +617,11 @@
                 "noData": "ไม่พบข้อมูล",
                 "enterNewDevice": "กรอกรหัสใหม่",
                 "selectAction": "เลือกการดำเนินการ",
-                "statusButton": "ดำเนินการ"
+                "statusButton": "ดำเนินการ",
+                "changeRtu": "เปลี่ยน RTU",
+                "changeLamp": "เปลี่ยนโคมไฟ",
+                "repairWiring": "ซ่อมสายไฟ",
+                "other": "อื่นๆ"
             },
             "status": {
                 "repaired": "ซ่อมแล้ว",
@@ -626,6 +637,7 @@
             "repairImage": "รูปภาพรายงานการซ่อม",
             "navigate": "นำทาง",
             "addImage": "เพิ่มรูปภาพ",
+            "imagePreview": "รูปภาพตัวอย่าง",
             "noImages": "ยังไม่มีรูปภาพ",
             "confirmDelete": "คุณแน่ใจหรือไม่ว่าต้องการลบรูปภาพนี้?",
             "uploadSuccess": "อัปโหลดรูปภาพสำเร็จ",
@@ -770,6 +782,7 @@
         "responseDialog": {
             "title": "สถานะการตอบกลับ",
             "loading": "กำลังโหลดข้อมูล...",
+            "description": "สถานะการตอบกลับ",
             "table": {
                 "imsi": "หมายเลขอุปกรณ์",
                 "group": "กลุ่ม",

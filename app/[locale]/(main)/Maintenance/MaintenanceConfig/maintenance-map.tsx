@@ -58,7 +58,7 @@ function getMarkerConfig(device: LatLongData, t: (key: string) => string): { col
         case "6":
             return { color: 'blue', badge: 'A', statusText: t("legend.disconnect") };
         default:
-            return { color: 'gray', badge: null, statusText: "Unknown" };
+            return { color: 'gray', badge: null, statusText: t("legend.unknown") };
     }
 }
 

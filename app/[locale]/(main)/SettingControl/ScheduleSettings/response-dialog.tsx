@@ -164,7 +164,7 @@ export function ResponseDialog({
                         <div className="flex flex-col gap-1">
                             <DialogTitle className="leading-snug text-xl">{t("title")} - {scheduleName}</DialogTitle>
                             <DialogDescription className="sr-only">
-                                Feedback response status
+                                {t("description")}
                             </DialogDescription>
                         </div>
                         <div className="grid grid-cols-2 gap-4 pt-4 border-t w-full">

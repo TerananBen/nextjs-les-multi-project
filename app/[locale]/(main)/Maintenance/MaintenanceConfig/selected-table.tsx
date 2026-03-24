@@ -36,7 +36,7 @@ function getMarkerConfig(device: SelectedDevice, tMap: ReturnType<typeof useTran
         case "6":
             return { color: 'blue', badge: 'A', statusText: tMap("legend.disconnect") };
         default:
-            return { color: 'gray', badge: null, statusText: "Unknown" };
+            return { color: 'gray', badge: null, statusText: tMap("legend.unknown") };
     }
 }
 

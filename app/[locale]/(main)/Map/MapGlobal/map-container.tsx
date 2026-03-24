@@ -60,7 +60,7 @@ function getMarkerConfig(device: LatLongData, t: (key: string) => string): { col
         case "6":
             return { color: 'blue', badge: 'A', statusText: t("legend.disconnect") };
         default:
-            return { color: 'gray', badge: null, statusText: "Unknown" };
+            return { color: 'gray', badge: null, statusText: t("legend.unknown") };
     }
 }
 
@@ -195,8 +195,8 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
             <div className="space-y-2 min-w-[300px]">
                 <h3 className="font-bold text-lg">{device.name_pole || device.street_light_name || "N/A"}</h3>
                 <p className="text-sm text-gray-500">{t("popup.imsi")} {device.imsi}</p>
-                <p className="text-red-500 text-sm">Failed to load detailed data.</p>
-                <Button variant="outline" size="sm" onClick={fetchDetail}><RefreshCcw className="w-4 h-4 mr-2" />Retry</Button>
+                <p className="text-red-500 text-sm">{t("popup.failedToLoadDetailedData")}</p>
+                <Button variant="outline" size="sm" onClick={fetchDetail}><RefreshCcw className="w-4 h-4 mr-2" />{t("popup.retry")} </Button>
             </div>
         )
     }

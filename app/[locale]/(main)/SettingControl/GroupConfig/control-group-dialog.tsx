@@ -105,11 +105,13 @@ function parseCustomDate(dateStr: string): Date | null {
 const DeviceRow = React.memo(({
     item,
     isSelected,
-    onSelect
+    onSelect,
+    t
 }: {
     item: DeviceStatus,
     isSelected: boolean,
-    onSelect: (imsi: string, checked: boolean) => void
+    onSelect: (imsi: string, checked: boolean) => void,
+    t: (key: string) => string
 }) => {
     return (
         <TableRow key={item.imsi} className="whitespace-nowrap">
@@ -135,10 +137,10 @@ const DeviceRow = React.memo(({
                 </div>
             </TableCell>
             <TableCell className="text-center">
-                {item.commandStatus === "success" && <Badge className="bg-green-500 hover:bg-green-600">Success</Badge>}
-                {item.commandStatus === "failed" && <Badge variant="destructive">Failed</Badge>}
+                {item.commandStatus === "success" && <Badge className="bg-green-500 hover:bg-green-600">{t("success")}</Badge>}
+                {item.commandStatus === "failed" && <Badge variant="destructive">{t("failed")}</Badge>}
                 {item.commandStatus === "pending" && (
-                    <Badge variant="outline" className="animate-pulse">Pending</Badge>
+                    <Badge variant="outline" className="animate-pulse">{t("pending")}</Badge>
                 )}
             </TableCell>
         </TableRow>
@@ -492,6 +494,7 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                                         item={item}
                                         isSelected={selectedImsis.has(item.imsi)}
                                         onSelect={handleSelectRow}
+                                        t={t}
                                     />
                                 ))
                             ) : (

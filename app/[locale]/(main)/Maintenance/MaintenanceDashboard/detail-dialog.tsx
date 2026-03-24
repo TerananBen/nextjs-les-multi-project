@@ -152,7 +152,7 @@ export function DetailDialog({ detailId, onClose }: DetailDialogProps) {
                         ) : (
                             <div className="flex flex-col items-center justify-center p-8 bg-slate-50 rounded-lg border border-dashed text-gray-400">
                                 <ImageIcon className="h-10 w-10 mb-2 opacity-50" />
-                                <span className="text-sm">No images available</span>
+                                <span className="text-sm">{t("detail.noImages")}</span>
                             </div>
                         )}
                     </div>
@@ -173,7 +173,7 @@ export function DetailDialog({ detailId, onClose }: DetailDialogProps) {
             {/* Image Preview Modal */}
             <Dialog open={!!previewImage} onOpenChange={(open) => !open && setPreviewImage(null)}>
                 <DialogContent className="max-w-[95vw] max-h-[95vh] w-auto h-auto p-0 overflow-hidden bg-transparent border-none shadow-none flex justify-center items-center">
-                    <DialogTitle className="sr-only">Image Preview</DialogTitle>
+                    <DialogTitle className="sr-only">{t("detail.imagePreview")}</DialogTitle>
                     <div className="relative flex justify-center items-center w-full h-full">
                         {previewImage && (
                             <div className="relative w-full h-full min-h-[50vh]">

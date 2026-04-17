@@ -521,7 +521,8 @@
             "noDeviceFound": "No device found.",
             "add": "Add",
             "addSuccess": "Device added successfully",
-            "addError": "Failed to add device"
+            "addError": "Failed to add device",
+            "pagination": "Page {page} of {totalPage} ({totalItems} items)"
         },
         "controlDialog": {
             "title": "Control Group",

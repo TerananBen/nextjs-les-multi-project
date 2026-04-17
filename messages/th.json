@@ -521,7 +521,8 @@
             "noDeviceFound": "ไม่พบอุปกรณ์",
             "add": "เพิ่ม",
             "addSuccess": "เพิ่มอุปกรณ์สำเร็จ",
-            "addError": "เพิ่มอุปกรณ์ไม่สำเร็จ"
+            "addError": "เพิ่มอุปกรณ์ไม่สำเร็จ",
+            "pagination": "หน้า {page} จาก {totalPage} ({totalItems} รายการ)"
         },
         "controlDialog": {
             "title": "ควบคุมกลุ่ม",

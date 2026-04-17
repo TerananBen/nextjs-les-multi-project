@@ -388,7 +388,11 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
                 {!loading && filteredData.length > 0 && (
                     <div className="flex items-center justify-between py-2">
                         <div className="text-sm text-muted-foreground">
-                            Page {currentPage} of {totalPages} ({filteredData.length} items)
+                            {t("pagination", {
+                                page: currentPage,
+                                totalPage: totalPages,
+                                totalItems: filteredData.length
+                            })}
                         </div>
                         <div className="flex items-center space-x-2">
                             <Button

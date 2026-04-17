@@ -27,7 +27,7 @@ export function StreetLightClient({ defaultGroupCode }: StreetLightClientProps) 
 
     // State
     const [groups, setGroups] = React.useState<DeviceGroup[]>([])
-    const [selectedGroup, setSelectedGroup] = React.useState<string>(defaultGroupCode || "oPIvy3ef9VITLORALOCAL")
+    const [selectedGroup, setSelectedGroup] = React.useState<string>("ALL")
     const [devices, setDevices] = React.useState<StreetLightDevice[]>([])
     const [loading, setLoading] = React.useState(false)
 

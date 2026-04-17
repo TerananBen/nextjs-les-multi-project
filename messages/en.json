@@ -630,7 +630,7 @@
             },
             "maintenanceCase": {
                 "1": "Change RTU",
-                "2": "Change Lamp",
+                "2": "Repair Wiring",
                 "3": "Repair Lamp",
                 "unknown": "Unknown"
             },

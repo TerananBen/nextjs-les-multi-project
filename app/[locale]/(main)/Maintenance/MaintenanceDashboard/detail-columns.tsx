@@ -4,24 +4,38 @@ import { useTranslations } from "next-intl"
 import { ColumnDef } from "@tanstack/react-table"
 import { MaintenanceDetailRecord } from "@/app/actions/maintenance"
 import { Lightbulb } from "lucide-react"
+import { getLeafletIconUrl } from "@/lib/map-icons"
 
 export const useMaintenanceDetailColumns = (): ColumnDef<MaintenanceDetailRecord>[] => {
     const t = useTranslations("MaintenanceDashboard")
 
     const getReportCauseIcon = (lampCase: string) => {
-        // Mapped based on assumptions derived from Global Map and instructions. 
-        // 4 = Red (Power/RTU fail)
-        // Others map to default or assumed colors.
+        let color: "blue" | "green" | "red" | "gray" = "gray"
+        let badge: string | null = null
+
         switch (lampCase) {
             case "4":
-                return <Lightbulb className="w-5 h-5 text-red-500 fill-current" />
-            case "3":
-                return <Lightbulb className="w-5 h-5 text-yellow-500 fill-current" />
+                color = "red"
+                badge = null
+                break
+            case "5":
+                color = "green"
+                badge = "⚡"
+                break
             case "2":
-                return <Lightbulb className="w-5 h-5 text-blue-500 fill-current" />
+                color = "blue"
+                badge = "A"
+                break
             default:
-                return <Lightbulb className="w-5 h-5 text-gray-500 fill-current" />
+                color = "gray"
+                badge = null
+                break
         }
+
+        return (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={getLeafletIconUrl(color, badge as any)} className="w-6 h-6 object-contain" alt="Report Cause" />
+        )
     }
 
     const getMaintenanceActionText = (maintenanceCase: string) => {

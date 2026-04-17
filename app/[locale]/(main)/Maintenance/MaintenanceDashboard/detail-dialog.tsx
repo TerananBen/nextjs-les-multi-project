@@ -9,6 +9,7 @@ import { Lightbulb, Loader2, X, Image as ImageIcon } from "lucide-react"
 import { MaintenanceDetailRecord, MaintenanceImageRecord, getDetailDataMaintenance, getLoadImage } from "@/app/actions/maintenance"
 import { DetailDataTable } from "./detail-data-table"
 import { useMaintenanceDetailColumns } from "./detail-columns"
+import { getLeafletIconUrl, MarkerBadge, MarkerColor } from "@/lib/map-icons"
 
 interface DetailDialogProps {
     detailId: string | null
@@ -17,12 +18,30 @@ interface DetailDialogProps {
 
 export function DetailDialog({ detailId, onClose }: DetailDialogProps) {
     const t = useTranslations("MaintenanceDashboard")
+    const tMap = useTranslations("MapGlobal")
     const columns = useMaintenanceDetailColumns()
     const [data, setData] = useState<MaintenanceDetailRecord[]>([])
     const [images, setImages] = useState<MaintenanceImageRecord[]>([])
     const [loading, setLoading] = useState(false)
     const [loadingImages, setLoadingImages] = useState(false)
     const [previewImage, setPreviewImage] = useState<string | null>(null)
+
+    function LegendItem({ icons, text }: { icons: { color: MarkerColor, badge: MarkerBadge }[], text: string }) {
+        return (
+            <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 min-w-[30px]">
+                    {icons.map((icon, idx) => (
+                        <div key={idx} className="flex items-center">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={getLeafletIconUrl(icon.color, icon.badge)} className="w-6 h-6 object-contain" alt="" />
+                            {idx < icons.length - 1 && <span className="text-gray-400 mx-0.5 text-xs">|</span>}
+                        </div>
+                    ))}
+                </div>
+                <span>{text}</span>
+            </div>
+        )
+    }
 
     useEffect(() => {
         if (!detailId) {
@@ -88,18 +107,9 @@ export function DetailDialog({ detailId, onClose }: DetailDialogProps) {
                 <div className="p-6">
                     {/* Legend */}
                     <div className="bg-slate-100 flex items-center gap-6 p-3 rounded-md mb-6 w-full text-sm text-gray-500 font-medium">
-                        <div className="flex items-center gap-2">
-                            <Lightbulb className="w-5 h-5 text-red-500 fill-current" />
-                            {t("detail.legend.powerFailure")}
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Lightbulb className="w-5 h-5 text-yellow-500 fill-current" />
-                            {t("detail.legend.abnormalVoltage")}
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Lightbulb className="w-5 h-5 text-blue-500 fill-current" />
-                            {t("detail.legend.networkFailure")}
-                        </div>
+                        <LegendItem icons={[{ color: "blue", badge: "A" }]} text={tMap("legend.disconnect")} />
+                        <LegendItem icons={[{ color: "green", badge: "⚡" }]} text={tMap("legend.abnormal")} />
+                        <LegendItem icons={[{ color: "red", badge: null }]} text={tMap("legend.failure")} />
                     </div>
 
                     {/* Table */}

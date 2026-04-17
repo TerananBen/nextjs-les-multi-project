@@ -121,11 +121,12 @@ const DeviceRow = React.memo(({
                     onCheckedChange={(checked) => onSelect(item.imsi, !!checked)}
                 />
             </TableCell>
-            <TableCell className="font-medium">{item.street_light_name}</TableCell>
-            <TableCell>{item.imsi}</TableCell>
-            <TableCell>{item.gov_name}</TableCell>
-            <TableCell>{item.lat}</TableCell>
-            <TableCell>{item.lng}</TableCell>
+            <TableCell className="font-medium max-w-[150px] sm:max-w-[250px] truncate" title={item.street_light_name}>{item.street_light_name}</TableCell>
+            <TableCell className="max-w-[100px] sm:max-w-[100px] truncate" title={item.imsi}>{item.imsi}</TableCell>
+            <TableCell className="max-w-[120px] sm:max-w-[200px] truncate" title={item.gov_name}>{item.gov_name}</TableCell>
+            <TableCell className="max-w-[100px] sm:max-w-[100px] truncate" title={String(item.lat)}>{item.lat}</TableCell>
+            <TableCell className="max-w-[80px] sm:max-w-[100px] truncate" title={String(item.lng)}>{item.lng}</TableCell>
+
             <TableCell>{formatTimestamp(item.time_stamp)}</TableCell>
             <TableCell className="text-center">
                 <div className="flex justify-center" title={item.isOnline ? "Online" : "Offline"}>
@@ -366,7 +367,7 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="w-full max-w-[95vw] sm:max-w-[90vw] h-[90vh] flex flex-col p-4 sm:p-6">
+            <DialogContent className="w-[95vw] md:max-w-[85vw] lg:max-w-[80vw] xl:max-w-[75vw] h-[95vh] flex flex-col p-4 sm:p-6 gap-3 sm:gap-4 overflow-hidden">
                 <DialogHeader>
                     <DialogTitle>{t("title")} - {group.group_name}</DialogTitle>
                     <DialogDescription>
@@ -375,8 +376,8 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                 </DialogHeader>
 
                 {/* Control Panel */}
-                <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center gap-4 p-4 border rounded-md bg-muted/20 overflow-x-auto">
-                    <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-start">
+                <div className="flex flex-col lg:flex-row flex-wrap items-stretch lg:items-center gap-4 p-4 border rounded-md bg-muted/20">
+                    <div className="flex items-center gap-2 w-full lg:w-auto justify-between lg:justify-start">
                         <span className="text-sm font-medium whitespace-nowrap">{t("brightness")}: {dimPercent}%</span>
                         <div className="flex items-center gap-2 flex-1 sm:flex-none justify-end">
                             <Slider
@@ -400,8 +401,6 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                         </div>
                     </div>
 
-                    <div className="w-full sm:w-px h-px sm:h-8 bg-border hidden sm:block" />
-
                     <Button
                         onClick={() => handleSendCommand("1")}
                         disabled={isSending || selectedImsis.size === 0}
@@ -420,11 +419,11 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                     </Button>
 
                     {commandToken && (
-                        <>
+                        <div className="flex flex-row items-center gap-2 w-full lg:w-auto">
                             <Button
                                 onClick={handleResend}
                                 variant="outline"
-                                className="gap-2"
+                                className="gap-2 flex-1 lg:flex-none"
                                 title={t("resend")}
                             >
                                 <RotateCcw className="w-4 h-4" />
@@ -434,17 +433,17 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                                 onClick={handleCheckStatus}
                                 disabled={isChecking}
                                 variant="outline"
-                                className="gap-2"
+                                className="gap-2 flex-1 lg:flex-none"
                             >
                                 <RefreshCw className={cn("w-4 h-4", isChecking && "animate-spin")} />
                                 {t("checkStatus")}
                             </Button>
-                        </>
+                        </div>
                     )}
 
-                    <div className="flex-1 sm:flex-none" />
+                    <div className="hidden lg:block flex-1" />
 
-                    <div className="relative w-full sm:w-[200px] mt-2 sm:mt-0">
+                    <div className="relative w-full lg:w-[250px] mt-2 lg:mt-0">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder={t("searchPlaceholder")}
@@ -457,55 +456,57 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                 </div>
 
                 {/* Device Table */}
-                <div className="flex-1 overflow-auto border rounded-md min-h-0">
-                    <Table>
-                        <TableHeader className="bg-muted/50 sticky top-0 z-10">
-                            <TableRow>
-                                <TableHead className="w-[50px]">
-                                    <Checkbox
-                                        checked={isIndeterminate ? "indeterminate" : allSelected}
-                                        onCheckedChange={handleSelectAll}
-                                    />
-                                </TableHead>
-                                <TableHead>{t("table.name")}</TableHead>
-                                <TableHead>{t("table.imsi")}</TableHead>
-                                <TableHead>{t("table.asset")}</TableHead>
-                                <TableHead>{t("table.lat")}</TableHead>
-                                <TableHead>{t("table.lng")}</TableHead>
-                                <TableHead>{t("table.lastWorkTime")}</TableHead>
-                                <TableHead className="text-center">{t("table.status")}</TableHead>
-                                <TableHead className="text-center">{t("table.cmdStatus")}</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {loading ? (
+                <div className="flex-1 overflow-hidden border rounded-md min-h-0 flex flex-col">
+                    <div className="flex-1 overflow-auto">
+                        <Table className="relative w-full">
+                            <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm">
                                 <TableRow>
-                                    <TableCell colSpan={9} className="h-24 text-center">
-                                        <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                            <span>Loading...</span>
-                                        </div>
-                                    </TableCell>
+                                    <TableHead className="w-[50px]">
+                                        <Checkbox
+                                            checked={isIndeterminate ? "indeterminate" : allSelected}
+                                            onCheckedChange={handleSelectAll}
+                                        />
+                                    </TableHead>
+                                    <TableHead>{t("table.name")}</TableHead>
+                                    <TableHead>{t("table.imsi")}</TableHead>
+                                    <TableHead>{t("table.asset")}</TableHead>
+                                    <TableHead className="w-[80px] sm:w-[100px]">{t("table.lat")}</TableHead>
+                                    <TableHead className="w-[80px] sm:w-[100px]">{t("table.lng")}</TableHead>
+                                    <TableHead>{t("table.lastWorkTime")}</TableHead>
+                                    <TableHead className="text-center">{t("table.status")}</TableHead>
+                                    <TableHead className="text-center">{t("table.cmdStatus")}</TableHead>
                                 </TableRow>
-                            ) : filteredData.length ? (
-                                filteredData.map((item) => (
-                                    <DeviceRow
-                                        key={item.imsi}
-                                        item={item}
-                                        isSelected={selectedImsis.has(item.imsi)}
-                                        onSelect={handleSelectRow}
-                                        t={t}
-                                    />
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={9} className="h-24 text-center">
-                                        {t("noData")}
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {loading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={9} className="h-24 text-center">
+                                            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                <span>Loading...</span>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : filteredData.length ? (
+                                    filteredData.map((item) => (
+                                        <DeviceRow
+                                            key={item.imsi}
+                                            item={item}
+                                            isSelected={selectedImsis.has(item.imsi)}
+                                            onSelect={handleSelectRow}
+                                            t={t}
+                                        />
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={9} className="h-24 text-center">
+                                            {t("noData")}
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </div>
 
                 <div className="p-2 text-xs text-muted-foreground flex justify-between">

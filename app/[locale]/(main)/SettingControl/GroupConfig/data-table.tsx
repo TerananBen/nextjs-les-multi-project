@@ -86,9 +86,10 @@ export function DataTable<TData, TValue>({
                 </div>
             </div>
 
-            <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
-                <Table>
-                    <TableHeader className="bg-muted/50">
+            <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
+                <div className="overflow-x-auto">
+                    <Table className="w-full whitespace-nowrap lg:whitespace-normal">
+                        <TableHeader className="bg-muted/50">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
@@ -141,7 +142,8 @@ export function DataTable<TData, TValue>({
                             </TableRow>
                         )}
                     </TableBody>
-                </Table>
+                    </Table>
+                </div>
             </div>
 
             {/* Pagination */}

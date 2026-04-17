@@ -232,7 +232,7 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="min-w-[40vw] max-w-[90vw] max-h-[80vh] flex flex-col">
+            <DialogContent className="w-[95vw] md:max-w-[85vw] lg:max-w-[75vw] h-[95vh] md:h-[85vh] flex flex-col p-4 sm:p-6 overflow-hidden">
                 <DialogHeader>
                     <DialogTitle>{t("title")}</DialogTitle>
                     <DialogDescription>
@@ -240,8 +240,8 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="flex items-center gap-4 w-full">
-                    <div className="relative flex-1">
+                <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 w-full">
+                    <div className="relative flex-1 w-full">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder={t("searchPlaceholder")}
@@ -289,16 +289,17 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
                             </Command>
                         </PopoverContent>
                     </Popover>
-                    <Button onClick={handleAddDevice} disabled={!selectedImsi || isAddingDevice}>
+                    <Button onClick={handleAddDevice} disabled={!selectedImsi || isAddingDevice} className="w-full md:w-auto">
                         {isAddingDevice && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         <Plus className="mr-2 h-4 w-4" />
                         {t("add", { defaultValue: "Add" })}
                     </Button>
                 </div>
 
-                <div className="flex-1 overflow-auto border rounded-md min-h-[300px]">
-                    <Table>
-                        <TableHeader className="bg-muted/50 sticky top-0 z-10">
+                <div className="flex-1 overflow-hidden border rounded-md min-h-0 flex flex-col">
+                    <div className="flex-1 overflow-auto">
+                        <Table className="relative w-full whitespace-nowrap md:whitespace-normal">
+                            <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm">
                             <TableRow>
                                 <TableHead className="w-[200px]">{t("table.name")}</TableHead>
                                 <TableHead>{t("table.imsi")}</TableHead>
@@ -323,6 +324,7 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
                                     <TableRow key={`${item.imsi}-${index}`}>
                                         <TableCell>
                                             <Input
+                                                className="min-w-[120px]"
                                                 value={item.street_light_name}
                                                 onChange={(e) => handleInputChange(index, "street_light_name", e.target.value)}
                                             />
@@ -330,18 +332,21 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
                                         <TableCell>{item.imsi}</TableCell>
                                         <TableCell>
                                             <Input
+                                                className="min-w-[120px]"
                                                 value={item.gov_name}
                                                 onChange={(e) => handleInputChange(index, "gov_name", e.target.value)}
                                             />
                                         </TableCell>
                                         <TableCell>
                                             <Input
+                                                className="min-w-[100px]"
                                                 value={item.lat || ""}
                                                 onChange={(e) => handleInputChange(index, "lat", e.target.value)}
                                             />
                                         </TableCell>
                                         <TableCell>
                                             <Input
+                                                className="min-w-[100px]"
                                                 value={item.lng || ""}
                                                 onChange={(e) => handleInputChange(index, "lng", e.target.value)}
                                             />
@@ -375,7 +380,8 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
                                 </TableRow>
                             )}
                         </TableBody>
-                    </Table>
+                        </Table>
+                    </div>
                 </div>
 
                 {/* Pagination Controls */}

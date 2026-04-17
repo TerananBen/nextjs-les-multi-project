@@ -135,7 +135,7 @@ export function EditDeviceCsvDialog({ open, onOpenChange, group }: EditDeviceCsv
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="w-[95vw] sm:max-w-[500px] p-4 sm:p-6 rounded-lg">
                 <DialogHeader>
                     <DialogTitle>{t("title")}</DialogTitle>
                     <DialogDescription>

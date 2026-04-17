@@ -99,7 +99,7 @@ export function GroupConfigClient() {
     return (
         <div className="flex flex-col gap-6 w-full">
             {/* Top Bar: Search and Add Button */}
-            <div className="flex flex-col md:flex-row gap-4 justify-between items-center w-full">
+            <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center w-full">
                 {/* Search Input */}
                 <div className="relative w-full md:w-[400px]">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -118,7 +118,7 @@ export function GroupConfigClient() {
                     <DialogTrigger asChild>
                         <div
                             className={cn(
-                                "inline-flex",
+                                "inline-flex w-full md:w-auto",
                                 !canAdd && "cursor-not-allowed"
                             )}
                             onClick={(e) => {
@@ -132,7 +132,7 @@ export function GroupConfigClient() {
                             <Button
                                 size="sm"
                                 className={cn(
-                                    "h-9 rounded-lg px-4 shadow-sm transition-all",
+                                    "h-9 w-full md:w-auto rounded-lg px-4 shadow-sm transition-all",
                                     canAdd
                                         ? "bg-primary hover:bg-primary/90 text-white hover:scale-[1.02] active:scale-[0.98]"
                                         : "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300"

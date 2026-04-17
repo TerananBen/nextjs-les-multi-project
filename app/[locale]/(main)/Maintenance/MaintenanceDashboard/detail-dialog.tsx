@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Lightbulb, Loader2, X, Image as ImageIcon } from "lucide-react"
+import { Loader2, X, Image as ImageIcon } from "lucide-react"
 import { MaintenanceDetailRecord, MaintenanceImageRecord, getDetailDataMaintenance, getLoadImage } from "@/app/actions/maintenance"
 import { DetailDataTable } from "./detail-data-table"
 import { useMaintenanceDetailColumns } from "./detail-columns"
@@ -178,34 +178,32 @@ export function DetailDialog({ detailId, onClose }: DetailDialogProps) {
                         </Button>
                     </div>
                 </div>
-            </DialogContent>
 
-            {/* Image Preview Modal */}
-            <Dialog open={!!previewImage} onOpenChange={(open) => !open && setPreviewImage(null)}>
-                <DialogContent className="max-w-[95vw] max-h-[95vh] w-auto h-auto p-0 overflow-hidden bg-transparent border-none shadow-none flex justify-center items-center">
-                    <DialogTitle className="sr-only">{t("detail.imagePreview")}</DialogTitle>
-                    <div className="relative flex justify-center items-center w-full h-full">
-                        {previewImage && (
-                            <div className="relative w-full h-full min-h-[50vh]">
-                                <Image
-                                    src={previewImage}
-                                    alt="Preview Fullscreen"
-                                    fill
-                                    className="object-contain rounded-md"
-                                />
-                            </div>
-                        )}
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="absolute top-2 right-2 h-10 w-10 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
-                            onClick={() => setPreviewImage(null)}
-                        >
-                            <X className="h-6 w-6" />
-                        </Button>
+                {/* Fullscreen Preview */}
+                {previewImage && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80" onClick={() => setPreviewImage(null)}>
+                        <div className="relative w-full max-w-4xl max-h-[90vh] aspect-video">
+                            <Image
+                                src={previewImage}
+                                alt="Preview Fullscreen"
+                                fill
+                                className="object-contain"
+                            />
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="absolute top-2 right-2 h-10 w-10 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    setPreviewImage(null)
+                                }}
+                            >
+                                <X className="h-6 w-6" />
+                            </Button>
+                        </div>
                     </div>
-                </DialogContent>
-            </Dialog>
+                )}
+            </DialogContent>
         </Dialog>
     )
 }

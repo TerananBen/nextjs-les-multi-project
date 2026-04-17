@@ -3,8 +3,7 @@
 import { useTranslations } from "next-intl"
 import { ColumnDef } from "@tanstack/react-table"
 import { MaintenanceDetailRecord } from "@/app/actions/maintenance"
-import { Lightbulb } from "lucide-react"
-import { getLeafletIconUrl } from "@/lib/map-icons"
+import { getLeafletIconUrl, MarkerBadge } from "@/lib/map-icons"
 
 export const useMaintenanceDetailColumns = (): ColumnDef<MaintenanceDetailRecord>[] => {
     const t = useTranslations("MaintenanceDashboard")
@@ -34,7 +33,7 @@ export const useMaintenanceDetailColumns = (): ColumnDef<MaintenanceDetailRecord
 
         return (
             /* eslint-disable-next-line @next/next/no-img-element */
-            <img src={getLeafletIconUrl(color, badge as any)} className="w-6 h-6 object-contain" alt="Report Cause" />
+            <img src={getLeafletIconUrl(color, badge as MarkerBadge)} className="w-6 h-6 object-contain" alt="Report Cause" />
         )
     }
 

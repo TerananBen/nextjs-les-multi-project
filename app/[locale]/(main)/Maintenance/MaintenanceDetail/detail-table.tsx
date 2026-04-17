@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { MaintenanceDetailRecord } from "@/app/actions/maintenance"
+import { getLeafletIconUrl, MarkerBadge } from "@/lib/map-icons"
 
 interface DetailDataTableProps {
     data: MaintenanceDetailRecord[]
@@ -20,6 +21,35 @@ interface DetailDataTableProps {
 
 export function DetailDataTable({ data }: DetailDataTableProps) {
     const t = useTranslations("MaintenanceDashboard")
+
+    const getReportCauseIcon = (lampCase: string) => {
+        let color: "blue" | "green" | "red" | "gray" = "gray"
+        let badge: string | null = null
+
+        switch (String(lampCase)) {
+            case "4":
+                color = "red"
+                badge = null
+                break
+            case "5":
+                color = "green"
+                badge = "⚡"
+                break
+            case "2":
+                color = "blue"
+                badge = "A"
+                break
+            default:
+                color = "gray"
+                badge = null
+                break
+        }
+
+        return (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img src={getLeafletIconUrl(color, badge as MarkerBadge)} className="w-6 h-6 object-contain" alt="Report Cause" />
+        )
+    }
 
     if (!data.length) {
         return (
@@ -62,7 +92,11 @@ export function DetailDataTable({ data }: DetailDataTableProps) {
                                     {row.lat}, {row.lng}
                                 </div>
                             </TableCell>
-                            <TableCell>{row.lamp_case}</TableCell>
+                            <TableCell>
+                                <div className="flex items-center">
+                                    {getReportCauseIcon(String(row.lamp_case))}
+                                </div>
+                            </TableCell>
                             <TableCell>
                                 <Select defaultValue={row.maintenance_case || ""}>
                                     <SelectTrigger className="h-8 w-[140px]">

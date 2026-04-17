@@ -230,7 +230,7 @@
             "lamp": "โคม",
             "lampFailure": "โคมเสีย",
             "onlineStatus": "สถานะออนไลน์",
-            "failureCount": "จำนวนที่เสีย",
+            "failureCount": "จำนวนที่เสีย ",
             "voltage": "แรงดันไฟฟ้า",
             "volt": "โวลต์",
             "averageVoltage": "แรงดันไฟฟ้าเฉลี่ย",
@@ -243,6 +243,23 @@
             "lampFailure": "โคมเสีย (จำนวน)",
             "noData": "ไม่พบข้อมูล",
             "time": "เวลา"
+        },
+        "pdf": {
+            "title": "รายงานการใช้พลังงาน: {groupName}",
+            "titleAll": "รายงานการใช้พลังงาน: ทั้งหมด",
+            "dateRange": "ช่วงเวลา: {dateRange}",
+            "printDate": "วันที่พิมพ์: {date}",
+            "energyTotal": "พลังงานที่ใช้ทั้งหมด (kWh)",
+            "avgVoltage": "แรงดันไฟฟ้าเฉลี่ย (V)",
+            "onlineLamps": "จำนวนโคมไฟออนไลน์ (โคม)",
+            "failureLamps": "จำนวนโคมไฟขัดข้อง (โคม)",
+            "energyChart": "กราฟแสดงการใช้พลังงาน",
+            "failureChart": "กราฟแสดงโคมไฟขัดข้อง",
+            "footerSystem": "ระบบจัดการ IoT Dashboard",
+            "page": "หน้าที่ {pageNumber} / {totalPages}",
+            "preparing": "กำลังเตรียมไฟล์ PDF...",
+            "success": "บันทึกไฟล์ PDF สำเร็จ",
+            "error": "เกิดข้อผิดพลาดในการสร้าง PDF"
         }
     },
     "MapGlobal": {

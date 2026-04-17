@@ -5,6 +5,11 @@ import { FilterBar } from "@/components/dashboard/filter-bar"
 import { SummaryCards } from "@/components/dashboard/summary-cards"
 import { ChartsSection } from "@/components/dashboard/charts-section"
 import { GroupItem, DashboardData, getDataDashBoard } from "@/app/actions/dashboard"
+import { toPng } from "html-to-image"
+import { toast } from "sonner"
+import { IoTReportPDF } from "./pdf-report"
+import { pdf } from "@react-pdf/renderer"
+import { useTranslations, useLocale } from "next-intl"
 
 interface GroupDashboardClientProps {
     groups: GroupItem[],
@@ -24,10 +29,19 @@ export function GroupDashboardClient({ groups, startDate, defaultGroupCode }: Gr
     // but FilterBar manages its own state. We might need to lift state up or use refs.
     // For now, let's just trigger the fetch.
 
+    const t = useTranslations("GroupDashboard")
+    const locale = useLocale()
+    const [isGeneratingPdf, setIsGeneratingPdf] = useState(false)
+    const [currentGroupCode, setCurrentGroupCode] = useState<string>(defaultGroupCode || "")
+    // To display the date range on PDF
+    const [currentDateRange, setCurrentDateRange] = useState<string>(currentMonth)
+
 
     const handleSearch = useCallback(async (groupCode: string, type: string, date: string) => {
         setLoading(true)
         setData(null)
+        setCurrentDateRange(date)
+        setCurrentGroupCode(groupCode)
         try {
             if (type === "Day" && date.includes(",")) {
                 // Handle Multi-Day Range
@@ -180,9 +194,88 @@ export function GroupDashboardClient({ groups, startDate, defaultGroupCode }: Gr
         }
     }, [defaultGroupCode, currentMonth, handleSearch])
 
+    const handlePrint = async () => {
+        if (!data) {
+            toast.error(t("charts.noData"))
+            return
+        }
+
+        try {
+            setIsGeneratingPdf(true)
+            toast.info(t("pdf.preparing"))
+
+            let energyChartImage
+            let failureChartImage
+
+            // Capture charts
+            const energyNode = document.getElementById("energy-chart-container")
+            if (energyNode) {
+                energyChartImage = await toPng(energyNode, { pixelRatio: 2 })
+            }
+
+            const failureNode = document.getElementById("failure-chart-container")
+            if (failureNode) {
+                failureChartImage = await toPng(failureNode, { pixelRatio: 2 })
+            }
+
+            const activeGroupProps = groups.find(g => g.group_code === currentGroupCode)
+            const title = currentGroupCode ? t("pdf.title", { groupName: activeGroupProps?.group_name || "-" }) : t("pdf.titleAll")
+
+            const blob = await pdf(
+                <IoTReportPDF 
+                    data={data}
+                    reportTitle={title}
+                    dateRange={t("pdf.dateRange", { dateRange: currentDateRange })}
+                    energyChartImage={energyChartImage}
+                    failureChartImage={failureChartImage}
+                    t={{
+                        summaryOnlineTotal: t("summary.onlineTotal"),
+                        summaryLamp: t("summary.lamp"),
+                        summaryLampFailure: t("summary.lampFailure"),
+                        summaryOnlineStatus: t("summary.onlineStatus"),
+                        summaryFailureCount: t("summary.failureCount"),
+                        summaryVoltage: t("summary.voltage"),
+                        summaryVolt: t("summary.volt"),
+                        summaryAverageVoltage: t("summary.averageVoltage"),
+                        summaryEnergyConsumption: t("summary.energyConsumption"),
+                        summaryKwh: t("summary.kwh"),
+                        summaryPerMonth: t("summary.perMonth"),
+                        footerSystem: t("pdf.footerSystem"),
+                        printDate: t("pdf.printDate", { date: new Date().toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric'}) }),
+                        pageStr: t("pdf.page", { pageNumber: "{pageNumber}", totalPages: "{totalPages}" })
+                    }}
+                />
+            ).toBlob()
+
+            const url = URL.createObjectURL(blob)
+            
+            // Trigger download
+            const link = document.createElement('a')
+            link.href = url
+            link.download = `iot_dashboard_report_${new Date().getTime()}.pdf`
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+            URL.revokeObjectURL(url)
+            
+            toast.success(t("pdf.success"))
+        } catch (error) {
+            console.error("PDF generation failed:", error)
+            toast.error(t("pdf.error"))
+        } finally {
+            setIsGeneratingPdf(false)
+        }
+    }
+
     return (
         <div className="space-y-6">
-            <FilterBar groups={groups} startDate={startDate} onSearch={handleSearch} />
+            <FilterBar 
+                groups={groups} 
+                startDate={startDate} 
+                onSearch={handleSearch} 
+                onPrint={handlePrint}
+                isGeneratingPdf={isGeneratingPdf}
+            />
 
             <SummaryCards data={data} loading={loading} />
             <ChartsSection data={data} loading={loading} />

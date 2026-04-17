@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select"
 import { DateRange } from "react-day-picker"
 import { GroupItem } from "@/app/actions/dashboard"
-import { Printer, Search, Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react"
+import { Printer, Search, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 import { useTranslations, useLocale } from "next-intl"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -27,10 +27,12 @@ import { toast } from "sonner"
 interface FilterBarProps {
     groups: GroupItem[],
     startDate?: string,
-    onSearch: (groupCode: string, type: string, date: string) => void
+    onSearch: (groupCode: string, type: string, date: string) => void,
+    onPrint?: () => void,
+    isGeneratingPdf?: boolean
 }
 
-export function FilterBar({ groups, startDate, onSearch }: FilterBarProps) {
+export function FilterBar({ groups, startDate, onSearch, onPrint, isGeneratingPdf }: FilterBarProps) {
     const t = useTranslations("GroupDashboard.filter")
     const locale = useLocale()
     const [selectedGroup, setSelectedGroup] = useState<string>("")
@@ -433,9 +435,10 @@ export function FilterBar({ groups, startDate, onSearch }: FilterBarProps) {
                 </Button>
                 <Button
                     variant="secondary"
-                    onClick={() => window.print()}
+                    onClick={() => onPrint ? onPrint() : window.print()}
+                    disabled={isGeneratingPdf}
                 >
-                    <Printer className="w-4 h-4 mr-2" />
+                    {isGeneratingPdf ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
                     {t("printButton")}
                 </Button>
             </div>

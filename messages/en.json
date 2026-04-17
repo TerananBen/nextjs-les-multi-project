@@ -243,6 +243,23 @@
             "lampFailure": "Lamp Failure (Unit)",
             "noData": "No data available",
             "time": "Time"
+        },
+        "pdf": {
+            "title": "Energy Consumption Report: {groupName}",
+            "titleAll": "Energy Consumption Report: All",
+            "dateRange": "Period: {dateRange}",
+            "printDate": "Print Date: {date}",
+            "energyTotal": "Total Energy Consumption (kWh)",
+            "avgVoltage": "Average Voltage (V)",
+            "onlineLamps": "Online Lamps (Unit)",
+            "failureLamps": "Lamp Failures (Unit)",
+            "energyChart": "Energy Consumption Chart",
+            "failureChart": "Lamp Failure Chart",
+            "footerSystem": "IoT Dashboard Management System",
+            "page": "Page {pageNumber} of {totalPages}",
+            "preparing": "Preparing PDF file...",
+            "success": "PDF saved successfully",
+            "error": "Failed to generate PDF"
         }
     },
     "MapGlobal": {

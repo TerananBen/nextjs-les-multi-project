@@ -35,7 +35,7 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
             )
         }
         return (
-            <div className="h-[300px] w-full">
+            <div className="h-[360px] w-full pdf-chart-export">
                 <ResponsiveContainer width="100%" height="100%">
                     {children}
                 </ResponsiveContainer>
@@ -79,11 +79,11 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
 
     return (
         <div className="grid gap-4 grid-cols-1">
-            <Card>
+            <Card className="chart-card">
                 <CardHeader>
                     <CardTitle>{t("energyConsumption")}</CardTitle>
                 </CardHeader>
-                <CardContent className="pl-2">
+                <CardContent className="pl-2" id="energy-chart-container">
                     {renderChartContent(
                         <AreaChart data={energyData}>
                             <defs>
@@ -134,11 +134,11 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
                 </CardContent>
             </Card>
 
-            <Card>
+            <Card className="chart-card">
                 <CardHeader>
                     <CardTitle>{t("lampFailure")}</CardTitle>
                 </CardHeader>
-                <CardContent className="pl-2">
+                <CardContent className="pl-2" id="failure-chart-container">
                     {renderChartContent(
                         <BarChart data={failureData}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} />

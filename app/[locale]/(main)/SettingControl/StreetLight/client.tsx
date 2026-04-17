@@ -8,7 +8,9 @@ import { useStreetLightColumns } from "./columns"
 import { DataTable } from "./data-table"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
-import { Search } from "lucide-react"
+import { Search, FileDown } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import * as XLSX from "xlsx"
 import {
     Combobox,
     ComboboxContent,
@@ -106,6 +108,29 @@ export function StreetLightClient({ defaultGroupCode }: StreetLightClientProps) 
         )
     }, [devices, searchQuery])
 
+    const handleExportExcel = () => {
+        if (!devices || devices.length === 0) {
+            toast.error(t("noData"))
+            return
+        }
+
+        const dataToExport = devices.map((d, index) => ({
+            [t("table.index")]: index + 1,
+            [t("table.streetLightName")]: d.streetLightName || "",
+            [t("table.gov")]: d.streetLightSerial || "",
+            [t("table.deviceNo")]: d.imeI_Name || "",
+            [t("table.groupName")]: d.streetLightGroups?.join(", ") || "",
+            [t("table.lastUpdate")]: d.streetLightLastUpdate || "-",
+            [t("table.lifeTime")]: d.lifeTime || "-",
+            [`${t("table.lastPower")} (W)`]: d.lastPower || "0"
+        }))
+
+        const ws = XLSX.utils.json_to_sheet(dataToExport)
+        const wb = XLSX.utils.book_new()
+        XLSX.utils.book_append_sheet(wb, ws, "Devices")
+        XLSX.writeFile(wb, `StreetLight_Group_${selectedGroup}_${new Date().toISOString().split('T')[0]}.xlsx`)
+    }
+
     return (
         <div className="flex flex-col gap-6 w-full">
             {/* Filter Bar */}
@@ -129,14 +154,25 @@ export function StreetLightClient({ defaultGroupCode }: StreetLightClientProps) 
                 </div>
 
                 {/* Local Search Input */}
-                <div className="relative w-full md:w-[400px]">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                        placeholder={t("searchPlaceholder")}
-                        className="pl-9 h-9 rounded-xl bg-white border-gray-200 shadow-sm"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
+                <div className="flex w-full md:w-auto items-center gap-2">
+                    <div className="relative w-full md:w-[350px]">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                            placeholder={t("searchPlaceholder")}
+                            className="pl-9 h-9 rounded-xl bg-white border-gray-200 shadow-sm"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                    </div>
+                    <Button
+                        variant="outline"
+                        className="h-9 whitespace-nowrap bg-green-50 text-green-600 hover:bg-green-100 border-green-200 shadow-sm rounded-xl"
+                        onClick={handleExportExcel}
+                        disabled={loading || devices.length === 0}
+                    >
+                        <FileDown className="h-4 w-4 mr-2" />
+                        {t("exportAllExcel")}
+                    </Button>
                 </div>
             </div>
 

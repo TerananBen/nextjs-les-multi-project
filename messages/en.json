@@ -380,7 +380,8 @@
             "stop": "Stop",
             "commandSuccess": "Command sent successfully",
             "commandFailed": "Failed to send command",
-            "permissionDenied": "Permission Denied"
+            "permissionDenied": "Permission Denied",
+            "index": "No."
         },
         "commands": {
             "on": "On",
@@ -388,6 +389,7 @@
             "dim": "Dim"
         },
         "historyPowerTitle": "Power History",
+        "exportAllExcel": "Export All to Excel",
         "powerHistory": {
             "validation": {
                 "startDateAfterEndDate": "Start date cannot be after end date",

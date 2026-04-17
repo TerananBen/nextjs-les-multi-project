@@ -380,7 +380,8 @@
             "stop": "หยุด",
             "commandSuccess": "ส่งคำสั่งสำเร็จ",
             "commandFailed": "ส่งคำสั่งไม่สำเร็จ",
-            "permissionDenied": "ไม่ได้รับอนุญาต"
+            "permissionDenied": "ไม่ได้รับอนุญาต",
+            "index": "ลำดับ"
         },
         "commands": {
             "on": "เปิด",
@@ -388,6 +389,7 @@
             "dim": "หรี่ไฟ"
         },
         "historyPowerTitle": "ประวัติกำลังไฟฟ้า",
+        "exportAllExcel": "ส่งออกเป็นไฟล์ Excel",
         "powerHistory": {
             "validation": {
                 "startDateAfterEndDate": "วันที่เริ่มต้นต้องไม่เกินวันที่สิ้นสุด",

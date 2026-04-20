@@ -25,6 +25,13 @@ export function DetailImage({ detailId, images, loadingImages, onImagesChanged }
         const file = e.target.files?.[0]
         if (!file || !detailId) return
 
+        const allowedTypes = ['image/jpeg', 'image/png']
+        if (!allowedTypes.includes(file.type)) {
+            toast.error(t("detail.invalidImage", { defaultMessage: "Unsupported image format. Please upload .jpg or .png only." }))
+            e.target.value = ''
+            return
+        }
+
         setUploading(true)
         try {
             const reader = new FileReader()
@@ -89,7 +96,7 @@ export function DetailImage({ detailId, images, loadingImages, onImagesChanged }
                         <input 
                             id="image-upload" 
                             type="file" 
-                            accept="image/*" 
+                            accept=".jpg,.jpeg,.png,image/jpeg,image/png" 
                             className="hidden" 
                             onChange={handleFileChange}
                             disabled={uploading}

@@ -465,3 +465,74 @@ export async function deleteImageAction(payload: DeleteImageReq): Promise<{ succ
         return { success: false, message: "Network error occurred" }
     }
 }
+
+export interface ConfirmDataMaintenanceDetailPayload {
+    type: "T" | "F"
+    id: string
+    street_light_name: string
+    rtu_new: string
+}
+
+export async function confirmDataMaintenanceDetailAction(payload: ConfirmDataMaintenanceDetailPayload): Promise<{ success: boolean; message?: string }> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) return { success: false, message: "Authentication required" }
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLight/confrimeDataMaintenanceDetail`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(payload),
+        })
+
+        if (!response.ok) return { success: false, message: `Server error: ${response.status}` }
+
+        const data = await response.json()
+        if (data.result && data.dataReturn === true) {
+            return { success: true }
+        }
+        return { success: false, message: "Failed to update detail status" }
+    } catch (error) {
+        console.error("Error updating detail status:", error)
+        return { success: false, message: "Network error occurred" }
+    }
+}
+
+export interface MaintenanceCaseSavePayload {
+    id: string
+    maintenance_case_id: string
+    street_light_name: string
+}
+
+export async function maintenanceCaseSaveAction(payload: MaintenanceCaseSavePayload): Promise<{ success: boolean; message?: string }> {
+    const cookieStore = await cookies()
+    const token = cookieStore.get("jwt")?.value
+
+    if (!API_URL || !token) return { success: false, message: "Authentication required" }
+
+    try {
+        const response = await fetch(`${API_URL}/StreetLight/maintenanceCaseSave`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(payload),
+        })
+
+        if (!response.ok) return { success: false, message: `Server error: ${response.status}` }
+
+        const data = await response.json()
+        if (data.result && data.dataReturn === true) {
+            return { success: true }
+        }
+        return { success: false, message: "Failed to update maintenance case" }
+    } catch (error) {
+        console.error("Error updating maintenance case:", error)
+        return { success: false, message: "Network error occurred" }
+    }
+}

@@ -139,7 +139,7 @@ export function DetailDialog({ detailId, mapMode, mapOfflineUrl, defaultLat, def
                                 <Loader2 className="animate-spin h-8 w-8 text-slate-400" />
                             </div>
                         )}
-                        <DetailDataTable data={data} />
+                        <DetailDataTable data={data} detailId={detailId} />
                     </div>
 
                     {/* Image Upload Gallery Section */}

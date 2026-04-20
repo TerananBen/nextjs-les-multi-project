@@ -662,8 +662,11 @@
             "confirmDelete": "Are you sure you want to delete this image?",
             "uploadSuccess": "Image uploaded successfully",
             "uploadError": "Failed to upload image",
+            "invalidImage": "Unsupported image format. Please upload .jpg or .png only.",
             "deleteSuccess": "Image deleted successfully",
             "deleteError": "Failed to delete image",
+            "actionSuccess": "Action updated successfully",
+            "actionError": "Failed to update action",
             "close": "Close"
         }
     },

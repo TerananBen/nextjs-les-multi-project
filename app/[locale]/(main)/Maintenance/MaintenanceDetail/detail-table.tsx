@@ -1,6 +1,7 @@
 "use client"
 
 import { useTranslations } from "next-intl"
+import { useState } from "react"
 import {
     Table,
     TableBody,
@@ -12,14 +13,108 @@ import {
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
-import { MaintenanceDetailRecord } from "@/app/actions/maintenance"
+import { MaintenanceDetailRecord, confirmDataMaintenanceDetailAction, maintenanceCaseSaveAction } from "@/app/actions/maintenance"
 import { getLeafletIconUrl, MarkerBadge } from "@/lib/map-icons"
+import { toast } from "sonner"
+import { Loader2 } from "lucide-react"
 
 interface DetailDataTableProps {
     data: MaintenanceDetailRecord[]
+    detailId?: string | null
 }
 
-export function DetailDataTable({ data }: DetailDataTableProps) {
+function DetailTableRow({ row, index, getReportCauseIcon, detailId }: { row: MaintenanceDetailRecord, index: number, getReportCauseIcon: (cause: string) => React.ReactNode, detailId: string | null | undefined }) {
+    const t = useTranslations("MaintenanceDashboard")
+    const [rtuNew, setRtuNew] = useState(row.imsi_after || "")
+    const [status, setStatus] = useState<"T" | "F">(row.lamp_status === "T" ? "T" : "F")
+    const [updating, setUpdating] = useState(false)
+
+    const handleStatusToggle = async () => {
+        if (!detailId) return
+        setUpdating(true)
+        const nextStatus = status === "T" ? "F" : "T"
+        const res = await confirmDataMaintenanceDetailAction({
+            type: nextStatus,
+            id: detailId,
+            street_light_name: row.street_light_name,
+            rtu_new: rtuNew
+        })
+        setUpdating(false)
+        if (res.success) {
+            setStatus(nextStatus)
+            toast.success(nextStatus === "T" ? t("detail.status.repaired") : t("detail.status.pending"))
+        } else {
+            toast.error(res.message || "Failed to update status.")
+        }
+    }
+
+    const handleMaintenanceCaseChange = async (val: string) => {
+        if (!detailId) return
+        setUpdating(true)
+        const res = await maintenanceCaseSaveAction({
+            id: detailId,
+            maintenance_case_id: val,
+            street_light_name: row.street_light_name
+        })
+        setUpdating(false)
+        if (res.success) {
+            toast.success(t("detail.actionSuccess"))
+        } else {
+            toast.error(res.message || t("detail.actionError"))
+        }
+    }
+
+    return (
+        <TableRow>
+            <TableCell className="text-center">{index + 1}</TableCell>
+            <TableCell>{row.street_light_name}</TableCell>
+            <TableCell>{row.imsi_befor}</TableCell>
+            <TableCell>
+                <Input
+                    value={rtuNew}
+                    onChange={(e) => setRtuNew(e.target.value)}
+                    placeholder={t("detail.table.enterNewDevice")}
+                    className="h-8 w-full min-w-[120px]"
+                />
+            </TableCell>
+            <TableCell>
+                <div className="text-xs text-gray-500">
+                    {row.lat}, {row.lng}
+                </div>
+            </TableCell>
+            <TableCell>
+                <div className="flex items-center">
+                    {getReportCauseIcon(String(row.lamp_case))}
+                </div>
+            </TableCell>
+            <TableCell>
+                <Select defaultValue={row.maintenance_case || ""} onValueChange={handleMaintenanceCaseChange}>
+                    <SelectTrigger className="h-8 w-[140px]" disabled={updating || !detailId}>
+                        <SelectValue placeholder={t("detail.table.selectAction")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="1">{t("detail.table.changeRtu")}</SelectItem>
+                        <SelectItem value="2">{t("detail.table.changeLamp")}</SelectItem>
+                        <SelectItem value="3">{t("detail.table.repairWiring")}</SelectItem>
+                        <SelectItem value="4">{t("detail.table.other")}</SelectItem>
+                    </SelectContent>
+                </Select>
+            </TableCell>
+            <TableCell className="text-center">
+                <Button 
+                    onClick={handleStatusToggle}
+                    disabled={updating || !detailId}
+                    size="sm" 
+                    className={`h-8 text-xs ${status === "T" ? "bg-green-500 hover:bg-green-600 text-white" : "bg-red-500 hover:bg-red-600 text-white"}`}
+                >
+                    {updating ? <Loader2 className="h-4 w-4 animate-spin" /> : (status === "T" ? t("detail.status.repaired") : t("detail.status.pending"))}
+                </Button>
+            </TableCell>
+        </TableRow>
+    )
+}
+
+export function DetailDataTable({ data, detailId }: DetailDataTableProps) {
     const t = useTranslations("MaintenanceDashboard")
 
     const getReportCauseIcon = (lampCase: string) => {
@@ -76,46 +171,13 @@ export function DetailDataTable({ data }: DetailDataTableProps) {
                 </TableHeader>
                 <TableBody>
                     {data.map((row, index) => (
-                        <TableRow key={row.imsi_befor || index}>
-                            <TableCell className="text-center">{index + 1}</TableCell>
-                            <TableCell>{row.street_light_name}</TableCell>
-                            <TableCell>{row.imsi_befor}</TableCell>
-                            <TableCell>
-                                <Input
-                                    defaultValue={row.imsi_after || ""}
-                                    placeholder={t("detail.table.enterNewDevice")}
-                                    className="h-8 w-full min-w-[120px]"
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <div className="text-xs text-gray-500">
-                                    {row.lat}, {row.lng}
-                                </div>
-                            </TableCell>
-                            <TableCell>
-                                <div className="flex items-center">
-                                    {getReportCauseIcon(String(row.lamp_case))}
-                                </div>
-                            </TableCell>
-                            <TableCell>
-                                <Select defaultValue={row.maintenance_case || ""}>
-                                    <SelectTrigger className="h-8 w-[140px]">
-                                        <SelectValue placeholder={t("detail.table.selectAction")} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="change_rtu">{t("detail.table.changeRtu")}</SelectItem>
-                                        <SelectItem value="change_lamp">{t("detail.table.changeLamp")}</SelectItem>
-                                        <SelectItem value="repair_wiring">{t("detail.table.repairWiring")}</SelectItem>
-                                        <SelectItem value="other">{t("detail.table.other")}</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </TableCell>
-                            <TableCell className="text-center">
-                                <Button variant="destructive" size="sm" className="h-8 text-xs bg-red-500 hover:bg-red-600">
-                                    {t("detail.table.statusButton")}
-                                </Button>
-                            </TableCell>
-                        </TableRow>
+                        <DetailTableRow
+                            key={row.imsi_befor || `${row.street_light_name}-${index}`}
+                            row={row}
+                            index={index}
+                            getReportCauseIcon={getReportCauseIcon}
+                            detailId={detailId}
+                        />
                     ))}
                 </TableBody>
             </Table>

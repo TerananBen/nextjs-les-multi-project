@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/select"
 import { DateRange } from "react-day-picker"
 import { GroupItem } from "@/app/actions/dashboard"
-import { Printer, Search, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
+import { Printer, Search, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Loader2, X } from "lucide-react"
 import { useTranslations, useLocale } from "next-intl"
 import { Calendar } from "@/components/ui/calendar"
 import {
@@ -19,7 +19,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
-import { differenceInDays, format, startOfWeek, endOfWeek } from "date-fns"
+import { differenceInDays, format, startOfWeek, endOfWeek, subDays, subWeeks } from "date-fns"
 import { th, enUS } from "date-fns/locale"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
@@ -38,10 +38,13 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
     const locale = useLocale()
     const [selectedGroup, setSelectedGroup] = useState<string>(defaultGroupCode || "")
     const [selectedType, setSelectedType] = useState<string>("Month")
-    // State for Week picker (Single Date)
-    const [singleDate, setSingleDate] = useState<Date | undefined>(undefined)
-    // State for Day picker (Date Range)
-    const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
+    // State for Week picker (Single Date) — default: any day in last week
+    const [singleDate, setSingleDate] = useState<Date | undefined>(() => subWeeks(new Date(), 1))
+    // State for Day picker (Date Range) — default: yesterday
+    const [dateRange, setDateRange] = useState<DateRange | undefined>(() => {
+        const yesterday = subDays(new Date(), 1)
+        return { from: yesterday, to: yesterday }
+    })
 
     // Parse Project Start Date
     const projectStartDateStr = startDate || "2020-01-01"
@@ -122,52 +125,64 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
             startOfToday.setHours(0, 0, 0, 0)
 
             return (
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button
-                            variant={"outline"}
-                            className={cn(
-                                "w-auto min-w-[240px] pl-3 text-left font-normal",
-                                !dateRange && "text-muted-foreground"
-                            )}
-                        >
-                            {dateRange?.from ? (
-                                dateRange.to ? (
-                                    <>
-                                        {format(dateRange.from, "PPP", { locale: locale === "th" ? th : enUS })} -{" "}
-                                        {format(dateRange.to, "PPP", { locale: locale === "th" ? th : enUS })}
-                                    </>
+                <div className="flex items-center gap-1">
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "w-auto min-w-[240px] pl-3 text-left font-normal",
+                                    !dateRange && "text-muted-foreground"
+                                )}
+                            >
+                                {dateRange?.from ? (
+                                    dateRange.to ? (
+                                        <>
+                                            {format(dateRange.from, "PPP", { locale: locale === "th" ? th : enUS })} -{" "}
+                                            {format(dateRange.to, "PPP", { locale: locale === "th" ? th : enUS })}
+                                        </>
+                                    ) : (
+                                        format(dateRange.from, "PPP", { locale: locale === "th" ? th : enUS })
+                                    )
                                 ) : (
-                                    format(dateRange.from, "PPP", { locale: locale === "th" ? th : enUS })
-                                )
-                            ) : (
-                                <span>{t("pickDate")}</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                            mode="range"
-                            selected={dateRange}
-                            onSelect={(val) => {
-                                // Max 15 days logic
-                                if (val?.from && val?.to) {
-                                    const days = differenceInDays(val.to, val.from)
-                                    if (days >= 15) {
-                                        toast.error(t("dateRangeLimit"))
-                                        return // Ignore selection > 15 days
+                                    <span>{t("pickDate")}</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                                mode="range"
+                                selected={dateRange}
+                                onSelect={(val) => {
+                                    // Max 15 days logic
+                                    if (val?.from && val?.to) {
+                                        const days = differenceInDays(val.to, val.from)
+                                        if (days >= 15) {
+                                            toast.error(t("dateRangeLimit"))
+                                            return // Ignore selection > 15 days
+                                        }
                                     }
-                                }
-                                setDateRange(val)
-                            }}
-                            locale={locale === "th" ? th : enUS}
-                            disabled={(date) => date >= startOfToday || date < projectStartDate}
-                            initialFocus
-                            defaultMonth={dateRange?.from}
-                        />
-                    </PopoverContent>
-                </Popover>
+                                    setDateRange(val)
+                                }}
+                                locale={locale === "th" ? th : enUS}
+                                disabled={(date) => date >= startOfToday || date < projectStartDate}
+                                initialFocus
+                                defaultMonth={dateRange?.from}
+                            />
+                        </PopoverContent>
+                    </Popover>
+                    {dateRange && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 shrink-0"
+                            onClick={() => setDateRange(undefined)}
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    )}
+                </div>
             )
         }
 
@@ -176,38 +191,50 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
             startOfToday.setHours(0, 0, 0, 0)
 
             return (
-                <Popover>
-                    <PopoverTrigger asChild>
+                <div className="flex items-center gap-1">
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "w-auto min-w-[240px] pl-3 text-left font-normal",
+                                    !singleDate && "text-muted-foreground"
+                                )}
+                            >
+                                {singleDate ? (
+                                    `${t("weekOf")} ${format(singleDate, "PPP", { locale: locale === "th" ? th : enUS })}`
+                                ) : (
+                                    <span>{t("pickWeek")}</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                                mode="range"
+                                selected={singleDate ? {
+                                    from: startOfWeek(singleDate, { weekStartsOn: 1 }),
+                                    to: endOfWeek(singleDate, { weekStartsOn: 1 })
+                                } : undefined}
+                                onSelect={(_, date) => setSingleDate(date)}
+                                locale={locale === "th" ? th : enUS}
+                                disabled={(date) => date >= startOfToday || date < projectStartDate}
+                                initialFocus
+                                defaultMonth={singleDate}
+                            />
+                        </PopoverContent>
+                    </Popover>
+                    {singleDate && (
                         <Button
-                            variant={"outline"}
-                            className={cn(
-                                "w-auto min-w-[240px] pl-3 text-left font-normal",
-                                !singleDate && "text-muted-foreground"
-                            )}
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 shrink-0"
+                            onClick={() => setSingleDate(undefined)}
                         >
-                            {singleDate ? (
-                                `${t("weekOf")} ${format(singleDate, "PPP", { locale: locale === "th" ? th : enUS })}`
-                            ) : (
-                                <span>{t("pickWeek")}</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                            <X className="h-4 w-4" />
                         </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                            mode="range"
-                            selected={singleDate ? {
-                                from: startOfWeek(singleDate, { weekStartsOn: 1 }),
-                                to: endOfWeek(singleDate, { weekStartsOn: 1 })
-                            } : undefined}
-                            onSelect={(_, date) => setSingleDate(date)}
-                            locale={locale === "th" ? th : enUS}
-                            disabled={(date) => date >= startOfToday || date < projectStartDate}
-                            initialFocus
-                            defaultMonth={singleDate}
-                        />
-                    </PopoverContent>
-                </Popover>
+                    )}
+                </div>
             )
         }
 
@@ -264,74 +291,86 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
             }
 
             return (
-                <Popover>
-                    <PopoverTrigger asChild>
-                        <Button
-                            variant={"outline"}
-                            className={cn(
-                                "w-auto min-w-[240px] pl-3 text-left font-normal",
-                                !monthRange.from && "text-muted-foreground"
-                            )}
-                        >
-                            {monthRange.from ? (
-                                monthRange.to ? (
-                                    <>
-                                        {format(monthRange.from, "MMM yyyy", { locale: locale === "th" ? th : enUS })} -{" "}
-                                        {format(monthRange.to, "MMM yyyy", { locale: locale === "th" ? th : enUS })}
-                                    </>
+                <div className="flex items-center gap-1">
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "w-auto min-w-[240px] pl-3 text-left font-normal",
+                                    !monthRange.from && "text-muted-foreground"
+                                )}
+                            >
+                                {monthRange.from ? (
+                                    monthRange.to ? (
+                                        <>
+                                            {format(monthRange.from, "MMM yyyy", { locale: locale === "th" ? th : enUS })} -{" "}
+                                            {format(monthRange.to, "MMM yyyy", { locale: locale === "th" ? th : enUS })}
+                                        </>
+                                    ) : (
+                                        format(monthRange.from, "MMM yyyy", { locale: locale === "th" ? th : enUS })
+                                    )
                                 ) : (
-                                    format(monthRange.from, "MMM yyyy", { locale: locale === "th" ? th : enUS })
-                                )
-                            ) : (
-                                <span>{t("pickDate")}</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-[280px] p-3" align="start">
-                        <div className="flex items-center justify-between mb-3">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7"
-                                onClick={() => setMonthPickerYear(y => y - 1)}
-                                disabled={monthPickerYear <= startYear}
-                            >
-                                <ChevronLeft className="h-4 w-4" />
+                                    <span>{t("pickDate")}</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                             </Button>
-                            <span className="text-sm font-medium">
-                                {locale === "th" ? monthPickerYear + 543 : monthPickerYear}
-                            </span>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7"
-                                onClick={() => setMonthPickerYear(y => y + 1)}
-                                disabled={monthPickerYear >= currentYear}
-                            >
-                                <ChevronRight className="h-4 w-4" />
-                            </Button>
-                        </div>
-                        <div className="grid grid-cols-3 gap-1.5">
-                            {shortMonths.map((name, i) => (
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[280px] p-3" align="start">
+                            <div className="flex items-center justify-between mb-3">
                                 <Button
-                                    key={i}
-                                    variant={isSelected(i) ? "default" : "ghost"}
-                                    size="sm"
-                                    disabled={isDisabled(i)}
-                                    className={cn(
-                                        "h-9 text-sm",
-                                        isInRange(i) && "bg-accent text-accent-foreground",
-                                        isSelected(i) && "bg-primary text-primary-foreground hover:bg-primary/90"
-                                    )}
-                                    onClick={() => handleMonthClick(i)}
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7"
+                                    onClick={() => setMonthPickerYear(y => y - 1)}
+                                    disabled={monthPickerYear <= startYear}
                                 >
-                                    {name}
+                                    <ChevronLeft className="h-4 w-4" />
                                 </Button>
-                            ))}
-                        </div>
-                    </PopoverContent>
-                </Popover>
+                                <span className="text-sm font-medium">
+                                    {locale === "th" ? monthPickerYear + 543 : monthPickerYear}
+                                </span>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7"
+                                    onClick={() => setMonthPickerYear(y => y + 1)}
+                                    disabled={monthPickerYear >= currentYear}
+                                >
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                            </div>
+                            <div className="grid grid-cols-3 gap-1.5">
+                                {shortMonths.map((name, i) => (
+                                    <Button
+                                        key={i}
+                                        variant={isSelected(i) ? "default" : "ghost"}
+                                        size="sm"
+                                        disabled={isDisabled(i)}
+                                        className={cn(
+                                            "h-9 text-sm",
+                                            isInRange(i) && "bg-accent text-accent-foreground",
+                                            isSelected(i) && "bg-primary text-primary-foreground hover:bg-primary/90"
+                                        )}
+                                        onClick={() => handleMonthClick(i)}
+                                    >
+                                        {name}
+                                    </Button>
+                                ))}
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+                    {monthRange.from && (
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-9 w-9 shrink-0"
+                            onClick={() => setMonthRange({})}
+                        >
+                            <X className="h-4 w-4" />
+                        </Button>
+                    )}
+                </div>
             )
         }
 
@@ -397,11 +436,11 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
     }
 
     return (
-        <div className="flex flex-wrap items-center gap-4 p-4 bg-card rounded-lg shadow-sm border">
-            <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">{t("searchLabel")}</span>
+        <div className="flex flex-col md:flex-row md:flex-wrap items-start md:items-center gap-4 p-4 bg-card rounded-lg shadow-sm border">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full md:w-auto">
+                <span className="text-sm font-medium whitespace-nowrap">{t("searchLabel")}</span>
                 <Select value={selectedGroup} onValueChange={setSelectedGroup}>
-                    <SelectTrigger className="w-[200px]">
+                    <SelectTrigger className="w-full md:w-[200px]">
                         <SelectValue placeholder={t("selectGroupPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
@@ -414,26 +453,31 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                 </Select>
             </div>
 
-            <Select value={selectedType} onValueChange={setSelectedType}>
-                <SelectTrigger className="w-[150px]">
-                    <SelectValue placeholder={t("selectTypePlaceholder")} />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="Now">{t("types.now")}</SelectItem>
-                    <SelectItem value="Day">{t("types.day")}</SelectItem>
-                    <SelectItem value="Week">{t("types.week")}</SelectItem>
-                    <SelectItem value="Month">{t("types.month")}</SelectItem>
-                    <SelectItem value="Quarter">{t("types.quarter")}</SelectItem>
-                    <SelectItem value="Year">{t("types.year")}</SelectItem>
-                </SelectContent>
-            </Select>
+            <div className="w-full md:w-auto">
+                <Select value={selectedType} onValueChange={setSelectedType}>
+                    <SelectTrigger className="w-full md:w-[150px]">
+                        <SelectValue placeholder={t("selectTypePlaceholder")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="Now">{t("types.now")}</SelectItem>
+                        <SelectItem value="Day">{t("types.day")}</SelectItem>
+                        <SelectItem value="Week">{t("types.week")}</SelectItem>
+                        <SelectItem value="Month">{t("types.month")}</SelectItem>
+                        <SelectItem value="Quarter">{t("types.quarter")}</SelectItem>
+                        <SelectItem value="Year">{t("types.year")}</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
 
-            {selectedType !== "Now" && renderDateInput()}
+            <div className="w-full md:w-auto">
+                {selectedType !== "Now" && renderDateInput()}
+            </div>
 
-            <div className="flex items-center gap-2 ml-auto">
+            <div className="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto md:ml-auto mt-2 md:mt-0">
                 <Button
                     variant="destructive"
                     onClick={handleSearch}
+                    className="w-full sm:w-auto"
                 >
                     <Search className="w-4 h-4 mr-2" />
                     {t("searchButton")}
@@ -442,6 +486,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                     variant="secondary"
                     onClick={() => onPrint ? onPrint() : window.print()}
                     disabled={isGeneratingPdf}
+                    className="w-full sm:w-auto"
                 >
                     {isGeneratingPdf ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
                     {t("printButton")}

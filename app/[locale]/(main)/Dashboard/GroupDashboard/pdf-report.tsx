@@ -238,6 +238,7 @@ export function IoTReportPDF({ data, reportTitle, dateRange, energyChartImage, f
                     <>
                         <Text style={styles.sectionTitle}>{t.summaryEnergyConsumption} (kWh)</Text>
                         <View style={styles.chartContainer}>
+                            {/* eslint-disable-next-line jsx-a11y/alt-text */}
                             <Image src={energyChartImage} style={styles.chartImage} />
                         </View>
                     </>
@@ -248,6 +249,7 @@ export function IoTReportPDF({ data, reportTitle, dateRange, energyChartImage, f
                     <>
                         <Text style={styles.sectionTitle}>{t.summaryLampFailure}</Text>
                         <View style={styles.chartContainer}>
+                            {/* eslint-disable-next-line jsx-a11y/alt-text */}
                             <Image src={failureChartImage} style={styles.chartImage} />
                         </View>
                     </>

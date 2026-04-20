@@ -21,7 +21,7 @@ export function SummaryCards({ data, loading }: SummaryCardsProps) {
     const energy = data ? (Math.round(parseFloat(data.toTalAvgUnit) || 0)) : 0
 
     return (
-        <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-sm lg:grid-cols-4">
+        <div className="*:data-[slot=card]:from-primary/5 *:data-[slot=card]:to-card dark:*:data-[slot=card]:bg-card grid grid-cols-1 gap-4 *:data-[slot=card]:bg-gradient-to-t *:data-[slot=card]:shadow-sm lg:grid-cols-4 md:grid-cols-2">
             <Card className="@container/card">
                 <CardHeader>
                     <CardDescription>{t("onlineTotal")}</CardDescription>

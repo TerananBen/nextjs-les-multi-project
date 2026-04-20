@@ -25,6 +25,7 @@ import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
 interface FilterBarProps {
+    defaultGroupCode?: string
     groups: GroupItem[],
     startDate?: string,
     onSearch: (groupCode: string, type: string, date: string) => void,
@@ -32,10 +33,10 @@ interface FilterBarProps {
     isGeneratingPdf?: boolean
 }
 
-export function FilterBar({ groups, startDate, onSearch, onPrint, isGeneratingPdf }: FilterBarProps) {
+export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPrint, isGeneratingPdf }: FilterBarProps) {
     const t = useTranslations("GroupDashboard.filter")
     const locale = useLocale()
-    const [selectedGroup, setSelectedGroup] = useState<string>("")
+    const [selectedGroup, setSelectedGroup] = useState<string>(defaultGroupCode || "")
     const [selectedType, setSelectedType] = useState<string>("Month")
     // State for Week picker (Single Date)
     const [singleDate, setSingleDate] = useState<Date | undefined>(undefined)
@@ -60,7 +61,9 @@ export function FilterBar({ groups, startDate, onSearch, onPrint, isGeneratingPd
     // We'll use separate states for complex pickers to make UI handling easier
     const [selectedYear, setSelectedYear] = useState<string>(String(currentYear))
     // State for Month picker (month range as {from, to} with 1st of month dates)
-    const [monthRange, setMonthRange] = useState<{ from?: Date; to?: Date }>({})
+    const [monthRange, setMonthRange] = useState<{ from?: Date; to?: Date }>({
+        from: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+    })
     const [monthPickerYear, setMonthPickerYear] = useState(currentYear)
 
     const [selectedQuarter, setSelectedQuarter] = useState<string>("1")
@@ -81,6 +84,8 @@ export function FilterBar({ groups, startDate, onSearch, onPrint, isGeneratingPd
                 } else {
                     searchDate = start
                 }
+            } else if (selectedType === "Now" && monthRange?.from) {
+                searchDate = format(new Date(), "yyyy-MM");
             } else if (selectedType === "Month" && monthRange?.from) {
                 const startStr = format(monthRange.from, "yyyy-MM")
                 if (monthRange.to) {

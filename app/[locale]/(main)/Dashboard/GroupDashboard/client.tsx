@@ -222,7 +222,7 @@ export function GroupDashboardClient({ groups, startDate, defaultGroupCode }: Gr
             const title = currentGroupCode ? t("pdf.title", { groupName: activeGroupProps?.group_name || "-" }) : t("pdf.titleAll")
 
             const blob = await pdf(
-                <IoTReportPDF 
+                <IoTReportPDF
                     data={data}
                     reportTitle={title}
                     dateRange={t("pdf.dateRange", { dateRange: currentDateRange })}
@@ -241,14 +241,14 @@ export function GroupDashboardClient({ groups, startDate, defaultGroupCode }: Gr
                         summaryKwh: t("summary.kwh"),
                         summaryPerMonth: t("summary.perMonth"),
                         footerSystem: t("pdf.footerSystem"),
-                        printDate: t("pdf.printDate", { date: new Date().toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric'}) }),
+                        printDate: t("pdf.printDate", { date: new Date().toLocaleDateString(locale, { year: 'numeric', month: 'short', day: 'numeric' }) }),
                         pageStr: t("pdf.page", { pageNumber: "{pageNumber}", totalPages: "{totalPages}" })
                     }}
                 />
             ).toBlob()
 
             const url = URL.createObjectURL(blob)
-            
+
             // Trigger download
             const link = document.createElement('a')
             link.href = url
@@ -257,7 +257,7 @@ export function GroupDashboardClient({ groups, startDate, defaultGroupCode }: Gr
             link.click()
             document.body.removeChild(link)
             URL.revokeObjectURL(url)
-            
+
             toast.success(t("pdf.success"))
         } catch (error) {
             console.error("PDF generation failed:", error)
@@ -269,10 +269,11 @@ export function GroupDashboardClient({ groups, startDate, defaultGroupCode }: Gr
 
     return (
         <div className="space-y-6">
-            <FilterBar 
-                groups={groups} 
-                startDate={startDate} 
-                onSearch={handleSearch} 
+            <FilterBar
+                defaultGroupCode={defaultGroupCode}
+                groups={groups}
+                startDate={startDate}
+                onSearch={handleSearch}
                 onPrint={handlePrint}
                 isGeneratingPdf={isGeneratingPdf}
             />

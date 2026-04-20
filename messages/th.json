@@ -420,7 +420,7 @@
                 "noDataExport": "ไม่พบข้อมูลสำหรับส่งออก"
             },
             "labels": {
-                "selectDateRange": "เลือกช่วงวันที่ :",
+                "selectDateRange": "วันที่ : ",
                 "to": "ถึง",
                 "averagePower": "กำลังเฉลี่ยโหลด",
                 "averageVoltage": "แรงดันเฉลี่ยโหลด",

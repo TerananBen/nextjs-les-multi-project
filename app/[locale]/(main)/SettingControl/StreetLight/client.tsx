@@ -134,12 +134,12 @@ export function StreetLightClient({ defaultGroupCode }: StreetLightClientProps) 
     return (
         <div className="flex flex-col gap-6 w-full">
             {/* Filter Bar */}
-            <div className="flex flex-col md:flex-row gap-4 justify-between items-center w-full">
+            <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center w-full">
 
                 {/* Group Selector (Combobox) */}
-                <div className="flex-1 w-full">
+                <div className="w-full lg:max-w-[400px]">
                     <Combobox value={selectedGroup} onValueChange={setSelectedGroup}>
-                        <ComboboxInput className="h-9 rounded-xl bg-white border-gray-200 shadow-sm" placeholder={t("selectGroupPlaceholder")} />
+                        <ComboboxInput className="h-9 w-full rounded-xl bg-white border-gray-200 shadow-sm" placeholder={t("selectGroupPlaceholder")} />
                         <ComboboxContent searchPlaceholder={t("searchGroupPlaceholder")}>
                             <ComboboxEmpty>{t("noGroupFound")}</ComboboxEmpty>
                             <ComboboxList>
@@ -154,19 +154,19 @@ export function StreetLightClient({ defaultGroupCode }: StreetLightClientProps) 
                 </div>
 
                 {/* Local Search Input */}
-                <div className="flex w-full md:w-auto items-center gap-2">
-                    <div className="relative w-full md:w-[350px]">
+                <div className="flex flex-col sm:flex-row w-full lg:w-auto items-stretch sm:items-center gap-2 shrink-0">
+                    <div className="relative w-full sm:flex-1 lg:w-auto min-w-0 sm:min-w-[200px] lg:w-[300px] xl:w-[350px]">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
                             placeholder={t("searchPlaceholder")}
-                            className="pl-9 h-9 rounded-xl bg-white border-gray-200 shadow-sm"
+                            className="pl-9 h-9 w-full rounded-xl bg-white border-gray-200 shadow-sm"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
                     <Button
                         variant="outline"
-                        className="h-9 whitespace-nowrap bg-green-50 text-green-600 hover:bg-green-100 border-green-200 shadow-sm rounded-xl"
+                        className="h-9 w-full sm:w-auto whitespace-nowrap bg-green-50 text-green-600 hover:bg-green-100 border-green-200 shadow-sm rounded-xl shrink-0"
                         onClick={handleExportExcel}
                         disabled={loading || devices.length === 0}
                     >

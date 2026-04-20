@@ -420,7 +420,7 @@
                 "noDataExport": "No data to export"
             },
             "labels": {
-                "selectDateRange": "Date Range :",
+                "selectDateRange": "Date :",
                 "to": "to",
                 "averagePower": "Average Power",
                 "averageVoltage": "Average Voltage",

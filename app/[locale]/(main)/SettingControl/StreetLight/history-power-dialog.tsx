@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import {
     Dialog,
     DialogContent,
@@ -20,10 +20,16 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { FileText, RefreshCcw, ArrowUpDown, FileSpreadsheet } from "lucide-react"
+import { FileText, RefreshCcw, ArrowUpDown, FileSpreadsheet, Calendar as CalendarIcon, X } from "lucide-react"
 import { StreetLightLog } from "@/types/street-light"
 import { getDataLogStreetLightMongoAction } from "@/app/actions/street-light"
 import { toast } from "sonner"
+import { DateRange } from "react-day-picker"
+import { format, differenceInDays } from "date-fns"
+import { th, enUS } from "date-fns/locale"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 
 interface HistoryPowerDialogProps {
     imei: string
@@ -32,45 +38,37 @@ interface HistoryPowerDialogProps {
 
 export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps) {
     const t = useTranslations("StreetLight") // Adjust namespace if needed
+    const locale = useLocale()
     const [open, setOpen] = React.useState(false)
     const [loading, setLoading] = React.useState(false)
     const [logs, setLogs] = React.useState<StreetLightLog[]>([])
 
     // Dates - specific to this component state
-    const [startDate, setStartDate] = React.useState<string>("")
-    const [endDate, setEndDate] = React.useState<string>("")
+    const [dateRange, setDateRange] = React.useState<DateRange | undefined>()
 
     // Sorting state
     const [sortConfig, setSortConfig] = React.useState<{ key: keyof StreetLightLog; direction: 'asc' | 'desc' } | null>(null)
 
     const fetchData = React.useCallback(async () => {
-        if (!startDate || !endDate) return
+        if (!dateRange?.from || !dateRange?.to) return
 
-        const start = new Date(startDate)
-        const end = new Date(endDate)
+        const start = dateRange.from
+        const end = dateRange.to
 
         if (start > end) {
             toast.error(t("powerHistory.validation.startDateAfterEndDate", { defaultValue: "Start date cannot be after end date" }))
             return
         }
 
-        // Get local "today" string yyyy-mm-dd for string comparison to avoid timezone issues
         const now = new Date()
-        const localTodayStr = now.toLocaleDateString('en-CA') // YYYY-MM-DD
+        now.setHours(23, 59, 59, 999)
 
-        // Block future dates using string comparison
-        if (startDate > localTodayStr) {
+        if (start > now || end > now) {
             toast.error(t("powerHistory.validation.futureDatesNotAllowed", { defaultValue: "Cannot select future dates" }))
             return
         }
 
-        if (endDate > localTodayStr) {
-            toast.error(t("powerHistory.validation.futureDatesNotAllowed", { defaultValue: "Cannot select future dates" }))
-            return
-        }
-
-        const diffTime = Math.abs(end.getTime() - start.getTime())
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+        const diffDays = Math.abs(differenceInDays(end, start))
 
         if (diffDays > 31) {
             toast.error(t("powerHistory.validation.rangeExceeded", { defaultValue: "Date range cannot exceed 1 month (31 days)" }))
@@ -79,10 +77,11 @@ export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps
 
         setLoading(true)
         try {
-            // Convert to Unix timestamp strings
-            // Use T00:00:00 to ensure we get start of day in local time, then unix timestamp
-            const startTs = Math.floor(new Date(startDate + "T00:00:00").getTime() / 1000).toString()
-            const endTs = Math.floor(new Date(endDate + "T23:59:59").getTime() / 1000).toString()
+            const startStr = format(start, 'yyyy-MM-dd')
+            const endStr = format(end, 'yyyy-MM-dd')
+
+            const startTs = Math.floor(new Date(`${startStr}T00:00:00`).getTime() / 1000).toString()
+            const endTs = Math.floor(new Date(`${endStr}T23:59:59`).getTime() / 1000).toString()
 
             const data = await getDataLogStreetLightMongoAction(imei, startTs, endTs)
 
@@ -103,24 +102,21 @@ export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps
         } finally {
             setLoading(false)
         }
-    }, [startDate, endDate, imei, t])
+    }, [dateRange, imei, t])
 
     React.useEffect(() => {
-        if (startDate && endDate) {
+        if (dateRange?.from && dateRange?.to) {
             fetchData()
         }
-    }, [startDate, endDate, fetchData])
+    }, [dateRange, fetchData])
 
     React.useEffect(() => {
-        if (open && !startDate) {
-            // Use local date for initial value
+        if (open && (!dateRange || !dateRange.from)) {
             const now = new Date()
-            const todayStr = now.toLocaleDateString('en-CA')
-
-            setStartDate(todayStr)
-            setEndDate(todayStr)
+            setDateRange({ from: now, to: now })
         }
-    }, [open, startDate])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open])
 
     // Sorting logic - Restored
     const handleSort = (key: keyof StreetLightLog) => {
@@ -160,7 +156,9 @@ export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps
         const url = URL.createObjectURL(blob)
         const link = document.createElement("a")
         link.setAttribute("href", url)
-        link.setAttribute("download", `power_history_${imei}_${startDate}_${endDate}.csv`)
+        const startStr = dateRange?.from ? format(dateRange.from, 'yyyy-MM-dd') : ""
+        const endStr = dateRange?.to ? format(dateRange.to, 'yyyy-MM-dd') : ""
+        link.setAttribute("download", `power_history_${imei}_${startStr}_${endStr}.csv`)
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
@@ -239,22 +237,69 @@ export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps
                         <div className="flex flex-col md:flex-row gap-4 items-center justify-center">
                             <div className="flex items-center gap-2 flex-nowrap overflow-x-auto max-w-full pb-2 md:pb-0">
                                 <Label className="whitespace-nowrap font-medium text-gray-700">{t("powerHistory.labels.selectDateRange", { defaultValue: "Select Date Range :" })}</Label>
-                                <div className="flex items-center gap-2 bg-gray-100 h-10 rounded-lg border px-2">
-                                    <Input
-                                        type="date"
-                                        value={startDate}
-                                        max={new Date().toLocaleDateString('en-CA')}
-                                        onChange={(e) => setStartDate(e.target.value)}
-                                        className="h-8 w-[130px] border-none bg-transparent focus-visible:ring-0 text-sm p-0 shadow-none"
-                                    />
-                                    <span className="text-gray-400 font-light px-1 text-sm">{t("powerHistory.labels.to", { defaultValue: "to" })}</span>
-                                    <Input
-                                        type="date"
-                                        value={endDate}
-                                        max={new Date().toLocaleDateString('en-CA')}
-                                        onChange={(e) => setEndDate(e.target.value)}
-                                        className="h-8 w-[130px] border-none bg-transparent focus-visible:ring-0 text-sm p-0 shadow-none"
-                                    />
+                                <div className="flex items-center gap-1">
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button
+                                                variant={"outline"}
+                                                className={cn(
+                                                    "w-auto min-w-[240px] justify-start text-left font-normal bg-white h-10",
+                                                    !dateRange && "text-muted-foreground"
+                                                )}
+                                            >
+                                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                                {dateRange?.from ? (
+                                                    dateRange.to ? (
+                                                        <>
+                                                            {format(dateRange.from, "PPP", { locale: locale === "th" ? th : enUS })} -{" "}
+                                                            {format(dateRange.to, "PPP", { locale: locale === "th" ? th : enUS })}
+                                                        </>
+                                                    ) : (
+                                                        format(dateRange.from, "PPP", { locale: locale === "th" ? th : enUS })
+                                                    )
+                                                ) : (
+                                                    <span>{t("powerHistory.labels.selectDateRange", { defaultValue: "Pick a date" })}</span>
+                                                )}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-auto p-0" align="start">
+                                            <Calendar
+                                                mode="range"
+                                                selected={dateRange}
+                                                onSelect={(val) => {
+                                                    if (val?.from && val?.to) {
+                                                        const days = Math.abs(differenceInDays(val.to, val.from))
+                                                        if (days > 31) {
+                                                            toast.error(t("powerHistory.validation.rangeExceeded", { defaultValue: "Date range cannot exceed 1 month (31 days)" }))
+                                                            return
+                                                        }
+                                                    }
+                                                    setDateRange(val)
+                                                }}
+                                                locale={locale === "th" ? th : enUS}
+                                                disabled={(date) => {
+                                                    const today = new Date()
+                                                    today.setHours(23, 59, 59, 999)
+                                                    return date > today
+                                                }}
+                                                initialFocus
+                                                defaultMonth={dateRange?.from}
+                                            />
+                                        </PopoverContent>
+                                    </Popover>
+                                    {dateRange?.from && (
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            className="h-10 w-10 shrink-0 text-gray-400 hover:text-gray-600 rounded-lg"
+                                            onClick={() => {
+                                                setDateRange(undefined)
+                                                setLogs([])
+                                            }}
+                                        >
+                                            <X className="h-5 w-5" />
+                                        </Button>
+                                    )}
                                 </div>
                                 <Button
                                     size="icon"

@@ -70,6 +70,7 @@ export const getColumns = (
                 return (
                     <Button
                         variant="ghost"
+                        className="cursor-pointer"
                         size="icon"
                         onClick={() => onEdit(row.original)}
                         title={t('table.edit')}
@@ -88,7 +89,7 @@ export const getColumns = (
                         variant="ghost"
                         size="icon"
                         onClick={() => onDelete(row.original)}
-                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                        className="cursor-pointer text-red-500 hover:text-red-600 hover:bg-red-50"
                         title={t('table.delete')}
                     >
                         <IconTrash className="h-4 w-4" />

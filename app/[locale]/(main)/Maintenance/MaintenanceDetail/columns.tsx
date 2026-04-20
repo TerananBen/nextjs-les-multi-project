@@ -103,10 +103,10 @@ export const useMaintenanceDetailColumns = (onOpenDialog: (id: string) => void) 
             cell: ({ row }) => {
                 return (
                     <div className="flex justify-center">
-                        <Button 
-                            variant="default" 
-                            size="icon" 
-                            className="h-8 w-8 bg-blue-500 hover:bg-blue-600 rounded-lg"
+                        <Button
+                            variant="default"
+                            size="icon"
+                            className="cursor-pointer h-8 w-8 bg-blue-500 hover:bg-blue-600 rounded-lg"
                             onClick={() => onOpenDialog(row.original.detail)}
                         >
                             <Info className="h-4 w-4 text-white" />

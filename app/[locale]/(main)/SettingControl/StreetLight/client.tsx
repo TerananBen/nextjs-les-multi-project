@@ -137,9 +137,9 @@ export function StreetLightClient({ defaultGroupCode }: StreetLightClientProps) 
             <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center w-full">
 
                 {/* Group Selector (Combobox) */}
-                <div className="w-full lg:max-w-[400px]">
+                <div className="cursor-pointer w-full lg:max-w-[400px]">
                     <Combobox value={selectedGroup} onValueChange={setSelectedGroup}>
-                        <ComboboxInput className="h-9 w-full rounded-xl bg-white border-gray-200 shadow-sm" placeholder={t("selectGroupPlaceholder")} />
+                        <ComboboxInput className="cursor-pointer h-9 w-full rounded-xl bg-white border-gray-200 shadow-sm" placeholder={t("selectGroupPlaceholder")} />
                         <ComboboxContent searchPlaceholder={t("searchGroupPlaceholder")}>
                             <ComboboxEmpty>{t("noGroupFound")}</ComboboxEmpty>
                             <ComboboxList>
@@ -166,7 +166,7 @@ export function StreetLightClient({ defaultGroupCode }: StreetLightClientProps) 
                     </div>
                     <Button
                         variant="outline"
-                        className="h-9 w-full sm:w-auto whitespace-nowrap bg-green-50 text-green-600 hover:bg-green-100 border-green-200 shadow-sm rounded-xl shrink-0"
+                        className="cursor-pointer h-9 w-full sm:w-auto whitespace-nowrap bg-green-50 text-green-600 hover:bg-green-100 border-green-200 shadow-sm rounded-xl shrink-0"
                         onClick={handleExportExcel}
                         disabled={loading || devices.length === 0}
                     >

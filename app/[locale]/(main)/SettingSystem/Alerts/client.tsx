@@ -412,7 +412,7 @@ export function AlertsClient({ hiddenConfigAlerts }: Props) {
                     )}
 
                     <div className="flex justify-end">
-                        <Button disabled={isPending} onClick={() => setShowConfirmation(true)} size="lg" className="w-full xl:w-auto min-w-[150px]">
+                        <Button disabled={isPending} onClick={() => setShowConfirmation(true)} size="lg" className="cursor-pointer w-full xl:w-auto min-w-[150px]">
                             <Save className="mr-2 h-4 w-4" />
                             {t("save")}
                         </Button>
@@ -427,8 +427,9 @@ export function AlertsClient({ hiddenConfigAlerts }: Props) {
                                 </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                                <AlertDialogCancel disabled={isPending}>{t("cancel")}</AlertDialogCancel>
+                                <AlertDialogCancel className="cursor-pointer" disabled={isPending}>{t("cancel")}</AlertDialogCancel>
                                 <AlertDialogAction
+                                    className="cursor-pointer"
                                     onClick={(e) => {
                                         e.preventDefault()
                                         handleSave()

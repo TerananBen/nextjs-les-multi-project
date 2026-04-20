@@ -114,7 +114,7 @@ export function LoginForm({
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                        className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                                     >
                                         {showPassword ? (
                                             <EyeOff className="h-4 w-4" />
@@ -128,7 +128,7 @@ export function LoginForm({
                                 </div>
                             </Field>
                             <Field>
-                                <Button type="submit" disabled={isPending || state.isLocked}>
+                                <Button className="cursor-pointer" type="submit" disabled={isPending || state.isLocked}>
                                     {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                     {t("loginButton")}
                                 </Button>
@@ -142,11 +142,11 @@ export function LoginForm({
             </Card>
             <FieldDescription className="px-6 text-center">
                 {t("termsText")}{" "}
-                <button type="button" onClick={() => setTermsOpen(true)} className="underline underline-offset-4 hover:text-primary">
+                <button type="button" onClick={() => setTermsOpen(true)} className="cursor-pointer underline underline-offset-4 hover:text-primary">
                     {t("termsLink")}
                 </button>{" "}
                 {t("and")}{" "}
-                <button type="button" onClick={() => setPrivacyOpen(true)} className="underline underline-offset-4 hover:text-primary">
+                <button type="button" onClick={() => setPrivacyOpen(true)} className="cursor-pointer underline underline-offset-4 hover:text-primary">
                     {t("privacyLink")}
                 </button>.
             </FieldDescription>
@@ -192,7 +192,7 @@ export function LoginForm({
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setTermsOpen(false)}>{t("dialogClose")}</Button>
+                        <Button className="cursor-pointer" variant="outline" onClick={() => setTermsOpen(false)}>{t("dialogClose")}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
@@ -234,7 +234,7 @@ export function LoginForm({
                         </div>
                     </div>
                     <DialogFooter>
-                        <Button variant="outline" onClick={() => setPrivacyOpen(false)}>{t("dialogClose")}</Button>
+                        <Button className="cursor-pointer" variant="outline" onClick={() => setPrivacyOpen(false)}>{t("dialogClose")}</Button>
                     </DialogFooter>
                 </DialogContent>
             </Dialog>

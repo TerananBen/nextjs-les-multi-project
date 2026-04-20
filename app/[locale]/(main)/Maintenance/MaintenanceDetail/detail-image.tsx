@@ -38,9 +38,9 @@ export function DetailImage({ detailId, images, loadingImages, onImagesChanged }
             reader.readAsDataURL(file)
             reader.onload = async () => {
                 const base64String = reader.result as string
-                
+
                 const res = await uploadImageAction({ id: detailId, img_base64_string: base64String })
-                
+
                 if (res.success) {
                     toast.success(t("detail.uploadSuccess", { defaultMessage: "Image uploaded successfully" }))
                     onImagesChanged()
@@ -67,7 +67,7 @@ export function DetailImage({ detailId, images, loadingImages, onImagesChanged }
         setDeletingId(idImg)
         try {
             const res = await deleteImageAction({ id_list: idList, id_img: idImg })
-            
+
             if (res.success) {
                 toast.success(t("detail.deleteSuccess", { defaultMessage: "Image deleted successfully" }))
                 onImagesChanged()
@@ -86,18 +86,18 @@ export function DetailImage({ detailId, images, loadingImages, onImagesChanged }
         <div className="border-t pt-6 mb-8 mt-6">
             <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg text-slate-600 font-medium">{t("detail.repairImage")}</h3>
-                
+
                 <div className="flex items-center gap-2">
                     <label htmlFor="image-upload" className="cursor-pointer">
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors border border-blue-200 text-sm font-medium">
                             {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                             {t("detail.addImage", { defaultMessage: "Add Image" })}
                         </div>
-                        <input 
-                            id="image-upload" 
-                            type="file" 
-                            accept=".jpg,.jpeg,.png,image/jpeg,image/png" 
-                            className="hidden" 
+                        <input
+                            id="image-upload"
+                            type="file"
+                            accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                            className="hidden"
                             onChange={handleFileChange}
                             disabled={uploading}
                         />
@@ -132,12 +132,12 @@ export function DetailImage({ detailId, images, loadingImages, onImagesChanged }
                             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                                 <ImageIcon className="text-white opacity-0 group-hover:opacity-100 h-8 w-8 drop-shadow-md transition-opacity" />
                             </div>
-                            
+
                             {/* Delete Button */}
                             <Button
                                 variant="destructive"
                                 size="icon"
-                                className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                                className="cursor-pointer absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
                                 onClick={(e) => handleDelete(e, img.id_list, img.id_img)}
                                 disabled={deletingId === img.id_img}
                             >
@@ -170,7 +170,7 @@ export function DetailImage({ detailId, images, loadingImages, onImagesChanged }
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="absolute top-2 right-2 h-10 w-10 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
+                            className="cursor-pointer absolute top-2 right-2 h-10 w-10 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setPreviewImage(null);

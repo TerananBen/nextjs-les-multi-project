@@ -61,7 +61,7 @@ export const useScheduleColumns = ({ onEdit, onDelete, onFeedback }: UseSchedule
                 return (
                     <Button
                         size="sm"
-                        className="bg-blue-500 hover:bg-blue-600 text-white gap-2 px-4 shadow-sm"
+                        className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white gap-2 px-4 shadow-sm"
                         onClick={() => onEdit(row.original)}
                     >
                         <Pencil className="h-4 w-4" />
@@ -80,7 +80,7 @@ export const useScheduleColumns = ({ onEdit, onDelete, onFeedback }: UseSchedule
                 return (
                     <Button
                         size="sm"
-                        className="bg-blue-500 hover:bg-blue-600 text-white gap-2 px-4 shadow-sm"
+                        className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white gap-2 px-4 shadow-sm"
                         onClick={() => onFeedback(row.original)}
                     >
                         <Info className="h-4 w-4" />
@@ -100,7 +100,7 @@ export const useScheduleColumns = ({ onEdit, onDelete, onFeedback }: UseSchedule
                     <Button
                         size="icon"
                         variant="destructive"
-                        className="h-9 w-9 shadow-sm"
+                        className="cursor-pointer h-9 w-9 shadow-sm"
                         onClick={() => onDelete(row.original)}
                     >
                         <Trash2 className="h-4 w-4" />

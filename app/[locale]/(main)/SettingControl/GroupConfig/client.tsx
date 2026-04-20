@@ -132,7 +132,7 @@ export function GroupConfigClient() {
                             <Button
                                 size="sm"
                                 className={cn(
-                                    "h-9 w-full md:w-auto rounded-lg px-4 shadow-sm transition-all",
+                                    "cursor-pointer h-9 w-full md:w-auto rounded-lg px-4 shadow-sm transition-all",
                                     canAdd
                                         ? "bg-primary hover:bg-primary/90 text-white hover:scale-[1.02] active:scale-[0.98]"
                                         : "bg-gray-300 text-gray-500 cursor-not-allowed hover:bg-gray-300"
@@ -163,11 +163,11 @@ export function GroupConfigClient() {
                         </div>
                         <DialogFooter>
                             <DialogClose asChild>
-                                <Button type="button" variant="secondary">
+                                <Button className="cursor-pointer" type="button" variant="secondary">
                                     {t("dialog.cancel")}
                                 </Button>
                             </DialogClose>
-                            <Button onClick={handleAddGroup} disabled={isAdding}>
+                            <Button className="cursor-pointer" onClick={handleAddGroup} disabled={isAdding}>
                                 {isAdding && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                 {isAdding ? t("dialog.saving") : t("dialog.save")}
                             </Button>

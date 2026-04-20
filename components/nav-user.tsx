@@ -62,17 +62,17 @@ export function NavUser({
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <Avatar className="h-8 w-8 rounded-lg grayscale">
+              <Avatar className="cursor-pointer h-8 w-8 rounded-lg grayscale">
                 <AvatarImage src={user.avatar} alt={user.name} />
                 <AvatarFallback className="rounded-lg">{getInitials(user.name)}</AvatarFallback>
               </Avatar>
-              <div className="grid flex-1 text-left text-sm leading-tight">
+              <div className="cursor-pointer grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
                 <span className="text-muted-foreground skyblue:text-sidebar-foreground truncate text-xs">
                   {user.role || user.email}
                 </span>
               </div>
-              <IconDotsVertical className="ml-auto size-4" />
+              <IconDotsVertical className="cursor-pointer ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -105,7 +105,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={async () => {
+            <DropdownMenuItem className="cursor-pointer" onClick={async () => {
               await logout()
               router.push('/login')
             }}>

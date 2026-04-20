@@ -95,7 +95,7 @@ function DeviceDetailPopup({ device, tMap, tConfig, onSelectDevice }: DeviceDeta
             </div>
             <Button
                 variant="default"
-                className="w-full bg-green-500 hover:bg-green-600 text-white"
+                className="cursor-pointer w-full bg-green-500 hover:bg-green-600 text-white"
                 onClick={() => onSelectDevice(device)}
             >
                 {tConfig("map.reportIssue")}

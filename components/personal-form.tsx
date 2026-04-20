@@ -173,13 +173,13 @@ export function PersonalForm({
                             <FormLabel>{t('form.role')}</FormLabel>
                             <Select onValueChange={field.onChange} value={field.value}>
                                 <FormControl>
-                                    <SelectTrigger>
+                                    <SelectTrigger className="cursor-pointer">
                                         <SelectValue placeholder={t('form.selectRole')} />
                                     </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
                                     {flattenedRoles.map((role) => (
-                                        <SelectItem key={role.id} value={role.id}>
+                                        <SelectItem className="cursor-pointer" key={role.id} value={role.id}>
                                             {role.name}
                                         </SelectItem>
                                     ))}
@@ -191,10 +191,10 @@ export function PersonalForm({
                 />
 
                 <div className="flex justify-end space-x-2 pt-4">
-                    <Button variant="outline" type="button" onClick={onCancel} disabled={isLoading}>
+                    <Button className="cursor-pointer" variant="outline" type="button" onClick={onCancel} disabled={isLoading}>
                         {t('form.cancel')}
                     </Button>
-                    <Button type="submit" disabled={isLoading}>
+                    <Button className="cursor-pointer" type="submit" disabled={isLoading}>
                         {isLoading ? t('form.saving') : t('form.save')}
                     </Button>
                 </div>

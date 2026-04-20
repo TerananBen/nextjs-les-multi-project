@@ -253,7 +253,7 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
 
                     <Popover open={isAddDeviceOpen} onOpenChange={setIsAddDeviceOpen}>
                         <PopoverTrigger asChild>
-                            <Button variant="outline" role="combobox" aria-expanded={isAddDeviceOpen} className="justify-between">
+                            <Button variant="outline" role="combobox" aria-expanded={isAddDeviceOpen} className="cursor-pointer justify-between">
                                 {selectedImsi
                                     ? selectedImsi
                                     : t("selectDevice", { defaultValue: "Select Device" })}
@@ -289,7 +289,7 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
                             </Command>
                         </PopoverContent>
                     </Popover>
-                    <Button onClick={handleAddDevice} disabled={!selectedImsi || isAddingDevice} className="w-full md:w-auto">
+                    <Button onClick={handleAddDevice} disabled={!selectedImsi || isAddingDevice} className="cursor-pointer w-full md:w-auto">
                         {isAddingDevice && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         <Plus className="mr-2 h-4 w-4" />
                         {t("add", { defaultValue: "Add" })}
@@ -300,86 +300,86 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
                     <div className="flex-1 overflow-auto">
                         <Table className="relative w-full whitespace-nowrap md:whitespace-normal">
                             <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm">
-                            <TableRow>
-                                <TableHead className="w-[200px]">{t("table.name")}</TableHead>
-                                <TableHead>{t("table.imsi")}</TableHead>
-                                <TableHead className="w-[150px]">{t("table.gov")}</TableHead>
-                                <TableHead className="w-[120px]">{t("table.lat")}</TableHead>
-                                <TableHead className="w-[120px]">{t("table.lng")}</TableHead>
-                                <TableHead className="text-right">{t("table.actions")}</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {loading ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-24 text-center">
-                                        <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                            <span>Loading...</span>
-                                        </div>
-                                    </TableCell>
+                                    <TableHead className="w-[200px]">{t("table.name")}</TableHead>
+                                    <TableHead>{t("table.imsi")}</TableHead>
+                                    <TableHead className="w-[150px]">{t("table.gov")}</TableHead>
+                                    <TableHead className="w-[120px]">{t("table.lat")}</TableHead>
+                                    <TableHead className="w-[120px]">{t("table.lng")}</TableHead>
+                                    <TableHead className="text-right">{t("table.actions")}</TableHead>
                                 </TableRow>
-                            ) : paginatedData.length ? (
-                                paginatedData.map((item, index) => (
-                                    <TableRow key={`${item.imsi}-${index}`}>
-                                        <TableCell>
-                                            <Input
-                                                className="min-w-[120px]"
-                                                value={item.street_light_name}
-                                                onChange={(e) => handleInputChange(index, "street_light_name", e.target.value)}
-                                            />
-                                        </TableCell>
-                                        <TableCell>{item.imsi}</TableCell>
-                                        <TableCell>
-                                            <Input
-                                                className="min-w-[120px]"
-                                                value={item.gov_name}
-                                                onChange={(e) => handleInputChange(index, "gov_name", e.target.value)}
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Input
-                                                className="min-w-[100px]"
-                                                value={item.lat || ""}
-                                                onChange={(e) => handleInputChange(index, "lat", e.target.value)}
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Input
-                                                className="min-w-[100px]"
-                                                value={item.lng || ""}
-                                                onChange={(e) => handleInputChange(index, "lng", e.target.value)}
-                                            />
-                                        </TableCell>
-                                        <TableCell className="text-right space-x-2 whitespace-nowrap">
-                                            <ConfirmButton
-                                                initialLabel={<Save className="h-4 w-4" />}
-                                                confirmLabel={<Check className="h-4 w-4" />}
-                                                onConfirm={() => handleSave(item)}
-                                                onCancel={() => toast.info(t("saveCancelled"))}
-                                                size="icon"
-                                                className="h-8 w-8 bg-green-600 hover:bg-green-700 text-white"
-                                            />
-                                            <ConfirmButton
-                                                initialLabel={<Trash2 className="h-4 w-4" />}
-                                                confirmLabel={<Check className="h-4 w-4" />}
-                                                onConfirm={() => handleDelete(item)}
-                                                onCancel={() => toast.info(t("deleteCancelled"))}
-                                                variant="destructive"
-                                                size="icon"
-                                                className="h-8 w-8"
-                                            />
+                            </TableHeader>
+                            <TableBody>
+                                {loading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className="h-24 text-center">
+                                            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                                                <Loader2 className="h-4 w-4 animate-spin" />
+                                                <span>{t("loading", { defaultValue: "Loading..." })}</span>
+                                            </div>
                                         </TableCell>
                                     </TableRow>
-                                ))
-                            ) : (
-                                <TableRow>
-                                    <TableCell colSpan={6} className="h-24 text-center">
-                                        {t("noData")}
-                                    </TableCell>
-                                </TableRow>
-                            )}
-                        </TableBody>
+                                ) : paginatedData.length ? (
+                                    paginatedData.map((item, index) => (
+                                        <TableRow key={`${item.imsi}-${index}`}>
+                                            <TableCell>
+                                                <Input
+                                                    className="min-w-[120px]"
+                                                    value={item.street_light_name}
+                                                    onChange={(e) => handleInputChange(index, "street_light_name", e.target.value)}
+                                                />
+                                            </TableCell>
+                                            <TableCell>{item.imsi}</TableCell>
+                                            <TableCell>
+                                                <Input
+                                                    className="min-w-[120px]"
+                                                    value={item.gov_name}
+                                                    onChange={(e) => handleInputChange(index, "gov_name", e.target.value)}
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Input
+                                                    className="min-w-[100px]"
+                                                    value={item.lat || ""}
+                                                    onChange={(e) => handleInputChange(index, "lat", e.target.value)}
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Input
+                                                    className="min-w-[100px]"
+                                                    value={item.lng || ""}
+                                                    onChange={(e) => handleInputChange(index, "lng", e.target.value)}
+                                                />
+                                            </TableCell>
+                                            <TableCell className="text-right space-x-2 whitespace-nowrap">
+                                                <ConfirmButton
+                                                    initialLabel={<Save className="h-4 w-4" />}
+                                                    confirmLabel={<Check className="h-4 w-4" />}
+                                                    onConfirm={() => handleSave(item)}
+                                                    onCancel={() => toast.info(t("saveCancelled"))}
+                                                    size="icon"
+                                                    className="cursor-pointer h-8 w-8 bg-green-600 hover:bg-green-700 text-white"
+                                                />
+                                                <ConfirmButton
+                                                    initialLabel={<Trash2 className="h-4 w-4" />}
+                                                    confirmLabel={<Check className="h-4 w-4" />}
+                                                    onConfirm={() => handleDelete(item)}
+                                                    onCancel={() => toast.info(t("deleteCancelled"))}
+                                                    variant="destructive"
+                                                    size="icon"
+                                                    className="cursor-pointer h-8 w-8"
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className="h-24 text-center">
+                                            {t("noData")}
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
                         </Table>
                     </div>
                 </div>

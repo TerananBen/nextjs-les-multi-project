@@ -89,23 +89,23 @@ function DetailTableRow({ row, index, getReportCauseIcon, detailId }: { row: Mai
             </TableCell>
             <TableCell>
                 <Select defaultValue={row.maintenance_case || ""} onValueChange={handleMaintenanceCaseChange}>
-                    <SelectTrigger className="h-8 w-[140px]" disabled={updating || !detailId}>
+                    <SelectTrigger className="cursor-pointer h-8 w-[140px]" disabled={updating || !detailId}>
                         <SelectValue placeholder={t("detail.table.selectAction")} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="1">{t("detail.table.changeRtu")}</SelectItem>
-                        <SelectItem value="2">{t("detail.table.changeLamp")}</SelectItem>
-                        <SelectItem value="3">{t("detail.table.repairWiring")}</SelectItem>
-                        <SelectItem value="4">{t("detail.table.other")}</SelectItem>
+                        <SelectItem className="cursor-pointer" value="1">{t("detail.table.changeRtu")}</SelectItem>
+                        <SelectItem className="cursor-pointer" value="2">{t("detail.table.changeLamp")}</SelectItem>
+                        <SelectItem className="cursor-pointer" value="3">{t("detail.table.repairWiring")}</SelectItem>
+                        <SelectItem className="cursor-pointer" value="4">{t("detail.table.other")}</SelectItem>
                     </SelectContent>
                 </Select>
             </TableCell>
             <TableCell className="text-center">
-                <Button 
+                <Button
                     onClick={handleStatusToggle}
                     disabled={updating || !detailId}
-                    size="sm" 
-                    className={`h-8 text-xs ${status === "T" ? "bg-green-500 hover:bg-green-600 text-white" : "bg-red-500 hover:bg-red-600 text-white"}`}
+                    size="sm"
+                    className={`cursor-pointer h-8 text-xs ${status === "T" ? "bg-green-500 hover:bg-green-600 text-white" : "bg-red-500 hover:bg-red-600 text-white"}`}
                 >
                     {updating ? <Loader2 className="h-4 w-4 animate-spin" /> : (status === "T" ? t("detail.status.repaired") : t("detail.status.pending"))}
                 </Button>

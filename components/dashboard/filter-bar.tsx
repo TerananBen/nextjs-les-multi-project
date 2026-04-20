@@ -131,7 +131,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                             <Button
                                 variant={"outline"}
                                 className={cn(
-                                    "w-auto min-w-[240px] pl-3 text-left font-normal",
+                                    "cursor-pointer w-auto min-w-[240px] pl-3 text-left font-normal",
                                     !dateRange && "text-muted-foreground"
                                 )}
                             >
@@ -176,7 +176,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-9 w-9 shrink-0"
+                            className="cursor-pointer h-9 w-9 shrink-0"
                             onClick={() => setDateRange(undefined)}
                         >
                             <X className="h-4 w-4" />
@@ -197,7 +197,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                             <Button
                                 variant={"outline"}
                                 className={cn(
-                                    "w-auto min-w-[240px] pl-3 text-left font-normal",
+                                    "cursor-pointer w-auto min-w-[240px] pl-3 text-left font-normal",
                                     !singleDate && "text-muted-foreground"
                                 )}
                             >
@@ -228,7 +228,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-9 w-9 shrink-0"
+                            className="cursor-pointer h-9 w-9 shrink-0"
                             onClick={() => setSingleDate(undefined)}
                         >
                             <X className="h-4 w-4" />
@@ -297,7 +297,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                             <Button
                                 variant={"outline"}
                                 className={cn(
-                                    "w-auto min-w-[240px] pl-3 text-left font-normal",
+                                    "cursor-pointer w-auto min-w-[240px] pl-3 text-left font-normal",
                                     !monthRange.from && "text-muted-foreground"
                                 )}
                             >
@@ -321,7 +321,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-7 w-7"
+                                    className="cursor-pointer h-7 w-7"
                                     onClick={() => setMonthPickerYear(y => y - 1)}
                                     disabled={monthPickerYear <= startYear}
                                 >
@@ -333,7 +333,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                                 <Button
                                     variant="ghost"
                                     size="icon"
-                                    className="h-7 w-7"
+                                    className="cursor-pointer h-7 w-7"
                                     onClick={() => setMonthPickerYear(y => y + 1)}
                                     disabled={monthPickerYear >= currentYear}
                                 >
@@ -348,7 +348,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                                         size="sm"
                                         disabled={isDisabled(i)}
                                         className={cn(
-                                            "h-9 text-sm",
+                                            "cursor-pointer h-9 text-sm",
                                             isInRange(i) && "bg-accent text-accent-foreground",
                                             isSelected(i) && "bg-primary text-primary-foreground hover:bg-primary/90"
                                         )}
@@ -364,7 +364,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-9 w-9 shrink-0"
+                            className="cursor-pointer h-9 w-9 shrink-0"
                             onClick={() => setMonthRange({})}
                         >
                             <X className="h-4 w-4" />
@@ -381,7 +381,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
             return (
                 <div className="flex gap-2">
                     <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
-                        <SelectTrigger className="w-[140px]">
+                        <SelectTrigger className="cursor-pointer w-[140px]">
                             <SelectValue placeholder="Quarter" />
                         </SelectTrigger>
                         <SelectContent>
@@ -392,7 +392,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                                 const isBeforeStart = Number(selectedYear) === startYear && q < startQuarter
 
                                 return (
-                                    <SelectItem key={q} value={String(q)} disabled={isFuture || isBeforeStart}>
+                                    <SelectItem className="cursor-pointer" key={q} value={String(q)} disabled={isFuture || isBeforeStart}>
                                         {t("quarter")} {q}
                                     </SelectItem>
                                 )
@@ -400,12 +400,12 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                         </SelectContent>
                     </Select>
                     <Select value={selectedYear} onValueChange={setSelectedYear}>
-                        <SelectTrigger className="w-[100px]">
+                        <SelectTrigger className="cursor-pointer w-[100px]">
                             <SelectValue placeholder="Year" />
                         </SelectTrigger>
                         <SelectContent>
                             {years.map(y => (
-                                <SelectItem key={y} value={String(y)}>
+                                <SelectItem className="cursor-pointer" key={y} value={String(y)}>
                                     {locale === "th" ? (y + 543) : y}
                                 </SelectItem>
                             ))}
@@ -418,12 +418,12 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
         if (selectedType === "Year") {
             return (
                 <Select value={selectedYear} onValueChange={setSelectedYear}>
-                    <SelectTrigger className="w-[120px]">
+                    <SelectTrigger className="cursor-pointer w-[120px]">
                         <SelectValue placeholder="Year" />
                     </SelectTrigger>
                     <SelectContent>
                         {years.map(y => (
-                            <SelectItem key={y} value={String(y)}>
+                            <SelectItem className="cursor-pointer" key={y} value={String(y)}>
                                 {locale === "th" ? (y + 543) : y}
                             </SelectItem>
                         ))}
@@ -440,12 +440,12 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full md:w-auto">
                 <span className="text-sm font-medium whitespace-nowrap">{t("searchLabel")}</span>
                 <Select value={selectedGroup} onValueChange={setSelectedGroup}>
-                    <SelectTrigger className="w-full md:w-[200px]">
+                    <SelectTrigger className="cursor-pointer w-full md:w-[200px]">
                         <SelectValue placeholder={t("selectGroupPlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
                         {groups.map((group) => (
-                            <SelectItem key={group.group_code} value={group.group_code}>
+                            <SelectItem className="cursor-pointer" key={group.group_code} value={group.group_code}>
                                 {group.group_name}
                             </SelectItem>
                         ))}
@@ -455,16 +455,16 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
 
             <div className="w-full md:w-auto">
                 <Select value={selectedType} onValueChange={setSelectedType}>
-                    <SelectTrigger className="w-full md:w-[150px]">
+                    <SelectTrigger className="cursor-pointer w-full md:w-[150px]">
                         <SelectValue placeholder={t("selectTypePlaceholder")} />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="Now">{t("types.now")}</SelectItem>
-                        <SelectItem value="Day">{t("types.day")}</SelectItem>
-                        <SelectItem value="Week">{t("types.week")}</SelectItem>
-                        <SelectItem value="Month">{t("types.month")}</SelectItem>
-                        <SelectItem value="Quarter">{t("types.quarter")}</SelectItem>
-                        <SelectItem value="Year">{t("types.year")}</SelectItem>
+                        <SelectItem className="cursor-pointer" value="Now">{t("types.now")}</SelectItem>
+                        <SelectItem className="cursor-pointer" value="Day">{t("types.day")}</SelectItem>
+                        <SelectItem className="cursor-pointer" value="Week">{t("types.week")}</SelectItem>
+                        <SelectItem className="cursor-pointer" value="Month">{t("types.month")}</SelectItem>
+                        <SelectItem className="cursor-pointer" value="Quarter">{t("types.quarter")}</SelectItem>
+                        <SelectItem className="cursor-pointer" value="Year">{t("types.year")}</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -477,7 +477,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                 <Button
                     variant="destructive"
                     onClick={handleSearch}
-                    className="w-full sm:w-auto"
+                    className="cursor-pointer w-full sm:w-auto"
                 >
                     <Search className="w-4 h-4 mr-2" />
                     {t("searchButton")}
@@ -486,7 +486,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                     variant="secondary"
                     onClick={() => onPrint ? onPrint() : window.print()}
                     disabled={isGeneratingPdf}
-                    className="w-full sm:w-auto"
+                    className="cursor-pointer w-full sm:w-auto"
                 >
                     {isGeneratingPdf ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Printer className="w-4 h-4 mr-2" />}
                     {t("printButton")}

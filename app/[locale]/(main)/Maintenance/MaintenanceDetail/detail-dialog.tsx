@@ -157,7 +157,7 @@ export function DetailDialog({ detailId, mapMode, mapOfflineUrl, defaultLat, def
                         <Button
                             variant="ghost"
                             onClick={onClose}
-                            className="font-bold text-gray-700 hover:bg-slate-100"
+                            className="cursor-pointer font-bold text-gray-700 hover:bg-slate-100"
                         >
                             {t("detail.close", { defaultMessage: "Close" })}
                         </Button>

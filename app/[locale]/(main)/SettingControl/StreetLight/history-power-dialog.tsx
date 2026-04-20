@@ -218,7 +218,7 @@ export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="default" size="icon" className="h-8 w-8 bg-green-500 hover:bg-green-600 rounded-lg">
+                <Button variant="default" size="icon" className="cursor-pointer h-8 w-8 bg-green-500 hover:bg-green-600 rounded-lg">
                     <FileText className="h-4 w-4 text-white" />
                 </Button>
             </DialogTrigger>
@@ -242,7 +242,7 @@ export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps
                                             <Button
                                                 variant={"outline"}
                                                 className={cn(
-                                                    "w-auto min-w-[240px] justify-start text-left font-normal bg-white h-10",
+                                                    "cursor-pointer w-auto min-w-[240px] justify-start text-left font-normal bg-white h-10",
                                                     !dateRange && "text-muted-foreground"
                                                 )}
                                             >
@@ -290,7 +290,7 @@ export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps
                                         <Button
                                             variant="ghost"
                                             size="icon"
-                                            className="h-10 w-10 shrink-0 text-gray-400 hover:text-gray-600 rounded-lg"
+                                            className="cursor-pointer h-10 w-10 shrink-0 text-gray-400 hover:text-gray-600 rounded-lg"
                                             onClick={() => {
                                                 setDateRange(undefined)
                                                 setLogs([])
@@ -303,7 +303,7 @@ export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps
                                 <Button
                                     size="icon"
                                     onClick={handleExport}
-                                    className="h-10 w-10 min-w-10 bg-green-500 hover:bg-green-600 text-white ml-2 rounded-lg header-icon-button"
+                                    className="cursor-pointer h-10 w-10 min-w-10 bg-green-500 hover:bg-green-600 text-white ml-2 rounded-lg header-icon-button"
                                     title={t("powerHistory.labels.exportExcel", { defaultValue: "Export to Excel" })}
                                 >
                                     <FileSpreadsheet className="h-5 w-5" />

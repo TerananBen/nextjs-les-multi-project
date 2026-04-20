@@ -134,7 +134,7 @@ function DeleteCell({ row, onSuccess }: DeleteCellProps) {
                         variant="ghost"
                         size="icon"
                         className={cn(
-                            "h-8 w-8",
+                            "cursor-pointer h-8 w-8",
                             canDelete
                                 ? "text-red-500 hover:text-red-600 hover:bg-red-50"
                                 : "text-gray-400 cursor-not-allowed hover:bg-transparent"
@@ -153,9 +153,10 @@ function DeleteCell({ row, onSuccess }: DeleteCellProps) {
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel disabled={loading}>{t("cancel")}</AlertDialogCancel>
+                    <AlertDialogCancel className="cursor-pointer" disabled={loading}>{t("cancel")}</AlertDialogCancel>
                     <Button
                         variant="destructive"
+                        className="cursor-pointer"
                         onClick={(e) => {
                             e.preventDefault()
                             handleDelete()
@@ -186,7 +187,7 @@ function ControlGroupCell({ row }: { row: GroupConfigData }) {
                 variant="outline"
                 size="sm"
                 className={cn(
-                    "h-8",
+                    "cursor-pointer h-8",
                     canControl ? "" : "bg-gray-100 text-gray-400 cursor-not-allowed border-gray-200"
                 )}
                 onClick={() => {
@@ -220,7 +221,7 @@ function AddDeviceCell({ row }: { row: GroupConfigData }) {
                 variant="outline"
                 size="sm"
                 className={cn(
-                    "h-8",
+                    "cursor-pointer h-8",
                     canManage
                         ? "text-blue-600 border-blue-200 hover:bg-blue-50"
                         : "text-gray-400 border-gray-200 bg-gray-100 cursor-not-allowed"
@@ -251,7 +252,7 @@ function AddDeviceCsvCell({ row }: { row: GroupConfigData }) {
                 variant="outline"
                 size="sm"
                 className={cn(
-                    "h-8",
+                    "cursor-pointer h-8",
                     canManage
                         ? "text-green-600 border-green-200 hover:bg-green-50"
                         : "text-gray-400 border-gray-200 bg-gray-100 cursor-not-allowed"
@@ -288,7 +289,7 @@ function EditDeviceCsvCell({ row }: { row: GroupConfigData }) {
                     else toast.error(t("permissionDenied"))
                 }}
                 className={cn(
-                    "h-8 w-8",
+                    "cursor-pointer h-8 w-8",
                     canManage
                         ? "text-orange-500 hover:text-orange-600 hover:bg-orange-100"
                         : "text-gray-400 bg-transparent cursor-not-allowed hover:bg-transparent"

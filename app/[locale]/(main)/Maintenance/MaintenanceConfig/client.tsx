@@ -210,7 +210,7 @@ function AddMaintenanceForm({ mapMode, mapOfflineUrl, defaultLat, defaultLng, de
                 <div className="space-y-1.5 md:col-span-1">
                     <label className="text-sm font-bold text-gray-500">{tForm("operatorName")} <span className="text-red-500">*</span></label>
                     <Select value={operatorId} onValueChange={setOperatorId}>
-                        <SelectTrigger className="bg-gray-50 focus:bg-white transition-colors">
+                        <SelectTrigger className="cursor-pointer bg-gray-50 focus:bg-white transition-colors">
                             <SelectValue placeholder={tForm("selectOperator")} />
                         </SelectTrigger>
                         <SelectContent>
@@ -245,7 +245,7 @@ function AddMaintenanceForm({ mapMode, mapOfflineUrl, defaultLat, defaultLng, de
                             <span className="text-sm font-bold text-gray-500 whitespace-nowrap hidden sm:block">{tForm("searchBy")}</span>
                             <div className="flex-1 w-full sm:w-auto">
                                 <Select value={searchGroup} onValueChange={setSearchGroup}>
-                                    <SelectTrigger className="bg-gray-50">
+                                    <SelectTrigger className="cursor-pointer bg-gray-50">
                                         <SelectValue placeholder="ALL" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -260,7 +260,7 @@ function AddMaintenanceForm({ mapMode, mapOfflineUrl, defaultLat, defaultLng, de
                             </div>
                             <div className="flex-1 w-full sm:w-auto">
                                 <Select value={searchStatus} onValueChange={setSearchStatus}>
-                                    <SelectTrigger className="bg-gray-50">
+                                    <SelectTrigger className="cursor-pointer bg-gray-50">
                                         <SelectValue placeholder={tForm("selectStatus")} />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -274,7 +274,7 @@ function AddMaintenanceForm({ mapMode, mapOfflineUrl, defaultLat, defaultLng, de
                             <Button
                                 onClick={() => handleSearch()}
                                 disabled={isSearching}
-                                className="w-full sm:w-28 bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                                className="cursor-pointer w-full sm:w-28 bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
                             >
                                 {isSearching ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                                 {tForm("search")}
@@ -342,13 +342,13 @@ function AddMaintenanceForm({ mapMode, mapOfflineUrl, defaultLat, defaultLng, de
                     }
                 </div>
                 <div className="flex items-center gap-3 w-full sm:w-auto">
-                    <Button variant="outline" onClick={onCancel} className="flex-1 sm:flex-none text-gray-600 font-semibold px-6 border-gray-300">
+                    <Button variant="outline" onClick={onCancel} className="cursor-pointer flex-1 sm:flex-none text-gray-600 font-semibold px-6 border-gray-300">
                         {tTable("close")}
                     </Button>
                     <Button
                         onClick={handleSave}
                         disabled={isSaving}
-                        className="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white font-semibold px-8 shadow-sm"
+                        className="cursor-pointer flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white font-semibold px-8 shadow-sm"
                     >
                         {isSaving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                         {tTable("save")}
@@ -498,7 +498,6 @@ export function MaintenanceConfigClient({ mapMode, mapOfflineUrl, defaultLat, de
                 <DialogContent className="max-w-[95vw] lg:max-w-[90vw] xl:max-w-[1300px] w-full max-h-[95vh] overflow-y-auto p-4 md:p-6 bg-slate-50 border-0 outline-none focus:outline-none focus-visible:ring-0 rounded-xl">
                     <DialogHeader className="mb-2">
                         <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                            <span className="w-1.5 h-6 bg-blue-500 rounded-full inline-block"></span>
                             {tForm("addTitle")}
                         </DialogTitle>
                         <DialogDescription className="hidden">{tForm("addDescription")}</DialogDescription>
@@ -531,14 +530,14 @@ export function MaintenanceConfigClient({ mapMode, mapOfflineUrl, defaultLat, de
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isDeleting}>{tDelete("cancel")}</AlertDialogCancel>
+                        <AlertDialogCancel className="cursor-pointer" disabled={isDeleting}>{tDelete("cancel")}</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={(e) => {
                                 e.preventDefault()
                                 handleDelete()
                             }}
                             disabled={isDeleting}
-                            className="bg-red-600 hover:bg-red-700 text-white focus:ring-red-600"
+                            className="cursor-pointer bg-red-600 hover:bg-red-700 text-white focus:ring-red-600"
                         >
                             {isDeleting ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                             {tDelete("confirm")}
@@ -556,14 +555,14 @@ export function MaintenanceConfigClient({ mapMode, mapOfflineUrl, defaultLat, de
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isConfirming}>{tConfirm("cancel")}</AlertDialogCancel>
+                        <AlertDialogCancel className="cursor-pointer" disabled={isConfirming}>{tConfirm("cancel")}</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={(e) => {
                                 e.preventDefault()
                                 handleConfirmStatus()
                             }}
                             disabled={isConfirming}
-                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                            className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white"
                         >
                             {isConfirming ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
                             {tConfirm("confirm")}

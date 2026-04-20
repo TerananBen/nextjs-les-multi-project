@@ -85,7 +85,7 @@ export function SelectedTable({ items, onRemoveItem }: SelectedTableProps) {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => onRemoveItem(item.imsi)}
-                                                className="h-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                className="cursor-pointer h-8 text-red-500 hover:text-red-700 hover:bg-red-50"
                                             >
                                                 <Trash2 className="w-4 h-4 mr-1" />
                                             </Button>

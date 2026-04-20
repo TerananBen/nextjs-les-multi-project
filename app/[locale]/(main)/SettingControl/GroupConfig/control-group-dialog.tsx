@@ -385,7 +385,7 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                                 onValueChange={(vals) => setDimPercent(vals[0])}
                                 max={100}
                                 step={1}
-                                className="w-[100px] sm:w-[150px]"
+                                className="w-[100px] sm:w-[150px] cursor-pointer"
                             />
                             <Input
                                 type="number"
@@ -404,7 +404,7 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                     <Button
                         onClick={() => handleSendCommand("1")}
                         disabled={isSending || selectedImsis.size === 0}
-                        className="bg-green-600 hover:bg-green-700 text-white"
+                        className="cursor-pointer bg-green-600 hover:bg-green-700 text-white"
                     >
                         <Zap className="w-4 h-4 mr-2" />
                         {t("on")}
@@ -413,6 +413,7 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                         onClick={() => handleSendCommand("0")}
                         disabled={isSending || selectedImsis.size === 0}
                         variant="destructive"
+                        className="cursor-pointer"
                     >
                         <Power className="w-4 h-4 mr-2" />
                         {t("off")}
@@ -423,7 +424,7 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                             <Button
                                 onClick={handleResend}
                                 variant="outline"
-                                className="gap-2 flex-1 lg:flex-none"
+                                className="cursor-pointer gap-2 flex-1 lg:flex-none"
                                 title={t("resend")}
                             >
                                 <RotateCcw className="w-4 h-4" />
@@ -433,7 +434,7 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                                 onClick={handleCheckStatus}
                                 disabled={isChecking}
                                 variant="outline"
-                                className="gap-2 flex-1 lg:flex-none"
+                                className="cursor-pointer gap-2 flex-1 lg:flex-none"
                             >
                                 <RefreshCw className={cn("w-4 h-4", isChecking && "animate-spin")} />
                                 {t("checkStatus")}
@@ -463,6 +464,7 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                                 <TableRow>
                                     <TableHead className="w-[50px]">
                                         <Checkbox
+                                            className="cursor-pointer"
                                             checked={isIndeterminate ? "indeterminate" : allSelected}
                                             onCheckedChange={handleSelectAll}
                                         />
@@ -483,7 +485,7 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                                         <TableCell colSpan={9} className="h-24 text-center">
                                             <div className="flex items-center justify-center gap-2 text-muted-foreground">
                                                 <Loader2 className="h-4 w-4 animate-spin" />
-                                                <span>Loading...</span>
+                                                <span>{t("loading", { defaultValue: "Loading..." })}</span>
                                             </div>
                                         </TableCell>
                                     </TableRow>

@@ -90,58 +90,58 @@ export function DataTable<TData, TValue>({
                 <div className="overflow-x-auto">
                     <Table className="w-full whitespace-nowrap lg:whitespace-normal">
                         <TableHeader className="bg-muted/50">
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id} className="font-semibold text-gray-700">
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext()
-                                                )}
-                                        </TableHead>
-                                    )
-                                })}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {loading ? (
-                            <TableRow>
-                                <TableCell colSpan={columns.length} className="h-24 text-center">
-                                    <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                        <span>{t("loading")}</span>
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ) : table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={row.getIsSelected() && "selected"}
-                                    className="hover:bg-muted/50"
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="py-3">
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                                        </TableCell>
-                                    ))}
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => {
+                                        return (
+                                            <TableHead key={header.id} className="font-semibold text-gray-700">
+                                                {header.isPlaceholder
+                                                    ? null
+                                                    : flexRender(
+                                                        header.column.columnDef.header,
+                                                        header.getContext()
+                                                    )}
+                                            </TableHead>
+                                        )
+                                    })}
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center"
-                                >
-                                    {t("noData")}
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
+                            ))}
+                        </TableHeader>
+                        <TableBody>
+                            {loading ? (
+                                <TableRow>
+                                    <TableCell colSpan={columns.length} className="h-24 text-center">
+                                        <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                                            <Loader2 className="h-4 w-4 animate-spin" />
+                                            <span>{t("loading")}</span>
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            ) : table.getRowModel().rows?.length ? (
+                                table.getRowModel().rows.map((row) => (
+                                    <TableRow
+                                        key={row.id}
+                                        data-state={row.getIsSelected() && "selected"}
+                                        className="hover:bg-muted/50"
+                                    >
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id} className="py-3">
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={columns.length}
+                                        className="h-24 text-center"
+                                    >
+                                        {t("noData")}
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
                     </Table>
                 </div>
             </div>

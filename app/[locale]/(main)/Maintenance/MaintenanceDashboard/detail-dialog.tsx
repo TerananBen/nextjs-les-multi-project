@@ -192,7 +192,7 @@ export function DetailDialog({ detailId, onClose }: DetailDialogProps) {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="absolute top-2 right-2 h-10 w-10 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
+                                className="cursor-pointer absolute top-2 right-2 h-10 w-10 bg-black/50 hover:bg-black/70 text-white rounded-full transition-colors"
                                 onClick={(e) => {
                                     e.stopPropagation()
                                     setPreviewImage(null)

@@ -115,12 +115,12 @@ export function MenuSettingsClient() {
                 {/* Role Selector */}
                 <div className="w-full md:w-[300px]">
                     <Select value={selectedRole} onValueChange={setSelectedRole}>
-                        <SelectTrigger className="w-full h-9 rounded-lg bg-white border-gray-200 shadow-sm text-foreground">
+                        <SelectTrigger className="cursor-pointer w-full h-9 rounded-lg bg-white border-gray-200 shadow-sm text-foreground">
                             <SelectValue placeholder={t("selectRole")} />
                         </SelectTrigger>
                         <SelectContent>
                             {roles.map((role) => (
-                                <SelectItem key={role.id} value={role.id}>
+                                <SelectItem className="cursor-pointer" key={role.id} value={role.id}>
                                     {role.name}
                                 </SelectItem>
                             ))}

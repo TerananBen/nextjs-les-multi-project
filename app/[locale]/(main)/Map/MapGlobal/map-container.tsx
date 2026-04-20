@@ -258,7 +258,7 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
                     <Button
                         variant="ghost"
                         size="sm"
-                        className={`h-6 px-2 text-xs ${!canControl ? 'text-gray-400 cursor-not-allowed hover:bg-transparent' : 'text-blue-600 hover:text-blue-800'}`}
+                        className={`h-6 px-2 text-xs ${!canControl ? 'text-gray-400 cursor-not-allowed hover:bg-transparent' : 'cursor-pointer text-blue-600 hover:text-blue-800'}`}
                         onClick={handleReadPower}
                         disabled={reading || sending} // Removing !canControl from disabled to allow click for toast
                     >
@@ -273,7 +273,7 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
                         size="sm"
                         onClick={() => handleCommand("1", 100)}
                         disabled={sending || reading}
-                        className={`w-full ${!canControl ? 'bg-gray-300 cursor-not-allowed hover:bg-gray-300' : 'bg-green-600 hover:bg-green-700 text-white'}`}
+                        className={`w-full ${!canControl ? 'bg-gray-300 cursor-not-allowed hover:bg-gray-300' : 'cursor-pointer bg-green-600 hover:bg-green-700 text-white'}`}
                     >
                         {sending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Power className="w-4 h-4 mr-1" />}
                         {t("control.on")}
@@ -283,7 +283,7 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
                         variant="destructive"
                         onClick={() => handleCommand("0", 0)}
                         disabled={sending || reading}
-                        className={`w-full ${!canControl ? 'bg-gray-300 cursor-not-allowed hover:bg-gray-300 text-white' : ''}`}
+                        className={`w-full ${!canControl ? 'bg-gray-300 cursor-not-allowed hover:bg-gray-300 text-white' : 'cursor-pointer'}`}
                     >
                         {sending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Power className="w-4 h-4 mr-1" />}
                         {t("control.off")}
@@ -306,14 +306,14 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
                                 onValueChange={(vals) => setDimValue(vals[0])}
                                 max={100}
                                 step={1}
-                                className={`${!canControl ? 'opacity-50' : ''}`}
+                                className={`${!canControl ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
                                 disabled={sending || reading || !canControl} // detailed interaction with slider is less critical than buttons
                             />
                         </div>
                         <Button
                             size="icon"
                             variant="outline"
-                            className={`h-6 w-8 text-xs ${!canControl ? 'cursor-not-allowed opacity-50 hover:bg-transparent' : ''}`}
+                            className={`h-6 w-8 text-xs ${!canControl ? 'cursor-not-allowed opacity-50 hover:bg-transparent' : 'cursor-pointer'}`}
                             disabled={sending || reading}
                             onClick={() => handleCommand("1", dimValue)}
                         >

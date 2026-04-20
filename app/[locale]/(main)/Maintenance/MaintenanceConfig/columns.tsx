@@ -53,7 +53,7 @@ export const useMaintenanceColumns = ({ onDetail, onStatusChange, onDelete }: Us
                 return (
                     <Button
                         size="icon"
-                        className="bg-blue-500 hover:bg-blue-600 text-white h-9 w-9 shadow-sm"
+                        className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white h-9 w-9 shadow-sm"
                         onClick={() => onDetail(row.original)}
                     >
                         <Info className="h-4 w-4" />
@@ -70,11 +70,10 @@ export const useMaintenanceColumns = ({ onDetail, onStatusChange, onDelete }: Us
                 return (
                     <Button
                         size="sm"
-                        className={`gap-2 px-4 shadow-sm text-white ${
-                            isConfirmed 
-                                ? "bg-green-500 hover:bg-green-600" 
-                                : "bg-pink-500 hover:bg-pink-600"
-                        }`}
+                        className={`cursor-pointer gap-2 px-4 shadow-sm text-white ${isConfirmed
+                            ? "bg-green-500 hover:bg-green-600"
+                            : "bg-pink-500 hover:bg-pink-600"
+                            }`}
                         onClick={() => onStatusChange(row.original)}
                     >
                         {isConfirmed ? (
@@ -100,7 +99,7 @@ export const useMaintenanceColumns = ({ onDetail, onStatusChange, onDelete }: Us
                 return (
                     <Button
                         size="icon"
-                        className="bg-pink-500 hover:bg-pink-600 text-white h-9 w-9 shadow-sm"
+                        className="cursor-pointer bg-pink-500 hover:bg-pink-600 text-white h-9 w-9 shadow-sm"
                         onClick={() => onDelete(row.original)}
                     >
                         <Trash2 className="h-4 w-4" />

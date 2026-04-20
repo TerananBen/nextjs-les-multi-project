@@ -118,11 +118,11 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                         <Tabs defaultValue="general" className="w-full">
                             <TabsList className="grid w-full grid-cols-2 mb-4">
-                                <TabsTrigger value="general" className="flex items-center gap-2">
+                                <TabsTrigger value="general" className="flex items-center gap-2 cursor-pointer">
                                     <UserIcon className="size-4" />
                                     {t('form.generalTab')}
                                 </TabsTrigger>
-                                <TabsTrigger value="security" className="flex items-center gap-2">
+                                <TabsTrigger value="security" className="flex items-center gap-2 cursor-pointer">
                                     <Lock className="size-4" />
                                     {t('form.securityTab')}
                                 </TabsTrigger>
@@ -229,7 +229,7 @@ export function ProfileForm({ initialData }: ProfileFormProps) {
                             />
 
                             <div className="flex justify-end">
-                                <Button type="submit" disabled={isLoading} className="w-full sm:w-auto flex items-center gap-2">
+                                <Button type="submit" disabled={isLoading} className="w-full sm:w-auto flex items-center gap-2 cursor-pointer">
                                     {isLoading ? (
                                         <>{t('form.saving')}</>
                                     ) : (

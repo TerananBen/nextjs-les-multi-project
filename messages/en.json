@@ -517,6 +517,7 @@
             "title": "Manage Group Devices",
             "description": "Add, Edit, or Delete devices in the group.",
             "searchPlaceholder": "Search devices...",
+            "loading": "Loading...",
             "table": {
                 "name": "Streetlight Name",
                 "imsi": "IMSI",
@@ -565,6 +566,7 @@
             "success": "Success",
             "failed": "Failed",
             "pending": "Pending",
+            "loading": "Loading...",
             "table": {
                 "name": "Name",
                 "imsi": "IMSI",

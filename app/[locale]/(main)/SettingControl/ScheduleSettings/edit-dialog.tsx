@@ -363,13 +363,13 @@ export function EditScheduleDialog({
                                     value={typeSchedule}
                                     onValueChange={(val) => setValue("typeSchedule", val)}
                                 >
-                                    <SelectTrigger className="h-10 border-input bg-muted/50 focus:bg-background">
+                                    <SelectTrigger className="cursor-pointer h-10 border-input bg-muted/50 focus:bg-background">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="time">{tTypes("time")}</SelectItem>
-                                        <SelectItem value="light">{tTypes("light")}</SelectItem>
-                                        <SelectItem value="manual">{tTypes("manual")}</SelectItem>
+                                        <SelectItem className="cursor-pointer" value="time">{tTypes("time")}</SelectItem>
+                                        <SelectItem className="cursor-pointer" value="light">{tTypes("light")}</SelectItem>
+                                        <SelectItem className="cursor-pointer" value="manual">{tTypes("manual")}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -383,12 +383,12 @@ export function EditScheduleDialog({
                                 </h3>
                                 <div className="flex gap-2 w-full max-w-sm">
                                     <Select value={selectedGroupToAdd} onValueChange={setSelectedGroupToAdd}>
-                                        <SelectTrigger className="h-9 border-input bg-muted/50 focus:bg-background">
+                                        <SelectTrigger className="cursor-pointer h-9 border-input bg-muted/50 focus:bg-background">
                                             <SelectValue placeholder={t("selectGroup")} />
                                         </SelectTrigger>
                                         <SelectContent>
                                             {groups.map((g) => (
-                                                <SelectItem key={g.groupCode} value={g.groupName}>
+                                                <SelectItem className="cursor-pointer" key={g.groupCode} value={g.groupName}>
                                                     {g.groupName}
                                                 </SelectItem>
                                             ))}
@@ -397,7 +397,7 @@ export function EditScheduleDialog({
                                     <Button
                                         type="button"
                                         size="sm"
-                                        className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm shrink-0"
+                                        className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white shadow-sm shrink-0"
                                         onClick={handleAddGroup}
                                     >
                                         <Plus className="w-4 h-4 mr-1" />
@@ -431,7 +431,7 @@ export function EditScheduleDialog({
                                                             type="button"
                                                             variant="ghost"
                                                             size="icon"
-                                                            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full"
+                                                            className="cursor-pointer h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full"
                                                             onClick={() => {
                                                                 const current = watch("dataGroupName");
                                                                 setValue("dataGroupName", current.filter((_, i) => i !== index))
@@ -464,7 +464,7 @@ export function EditScheduleDialog({
                                         type="button"
                                         size="sm"
                                         variant="outline"
-                                        className="border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-300"
+                                        className="cursor-pointer border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-300"
                                         onClick={() => appendScene({ time: "00:00", dim: "100", open_volt: null, open_time: null, close_volt: null, close_time: null })}
                                     >
                                         <Plus className="w-4 h-4 mr-2" />
@@ -506,7 +506,7 @@ export function EditScheduleDialog({
                                                         <Input
                                                             {...form.register(`listScenes.${index}.time`)}
                                                             type="time"
-                                                            className={`h-9 font-medium border-input focus:border-indigo-500 bg-background ${form.formState.errors.listScenes?.[index]?.time ? "border-destructive" : ""}`}
+                                                            className={`cursor-pointer h-9 font-medium border-input focus:border-indigo-500 bg-background ${form.formState.errors.listScenes?.[index]?.time ? "border-destructive" : ""}`}
                                                         />
                                                         {form.formState.errors.listScenes?.[index]?.time && (
                                                             <span className="text-xs text-red-500 ml-1">
@@ -538,7 +538,7 @@ export function EditScheduleDialog({
                                                             type="button"
                                                             variant="ghost"
                                                             size="icon"
-                                                            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full transition-all"
+                                                            className="cursor-pointer h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full transition-all"
                                                             onClick={() => removeScene(index)}
                                                         >
                                                             <Trash2 className="h-4 w-4" />
@@ -666,7 +666,7 @@ export function EditScheduleDialog({
                     <Button
                         type="button"
                         variant="outline"
-                        className="h-11 px-6 border-input text-foreground bg-background hover:bg-muted shadow-sm"
+                        className="cursor-pointer h-11 px-6 border-input text-foreground bg-background hover:bg-muted shadow-sm"
                         onClick={() => onOpenChange(false)}
                     >
                         {t("cancel")}
@@ -677,7 +677,7 @@ export function EditScheduleDialog({
                             toast.error(t("validateError"));
                         })}
                         disabled={isSaving}
-                        className="h-11 px-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="cursor-pointer h-11 px-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isSaving ? (
                             <>

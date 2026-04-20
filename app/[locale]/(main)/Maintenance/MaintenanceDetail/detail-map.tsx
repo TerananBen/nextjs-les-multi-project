@@ -63,7 +63,7 @@ function MarkerPopup({ item, t }: MarkerPopupProps) {
             <Button
                 variant="default"
                 size="sm"
-                className="w-full bg-green-600 hover:bg-green-700 text-white"
+                className="cursor-pointer w-full bg-green-600 hover:bg-green-700 text-white"
                 onClick={handleNavigate}
             >
                 <Navigation className="w-3 h-3 mr-2" />

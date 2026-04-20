@@ -76,7 +76,7 @@ export default function MaintenanceDashboardClient({ initialUsersData }: ClientP
                                 <Button
                                     variant={"outline"}
                                     className={cn(
-                                        "w-full justify-start text-left font-normal",
+                                        "cursor-pointer w-full justify-start text-left font-normal",
                                         !dateStart && "text-muted-foreground"
                                     )}
                                 >
@@ -101,7 +101,7 @@ export default function MaintenanceDashboardClient({ initialUsersData }: ClientP
                                 <Button
                                     variant={"outline"}
                                     className={cn(
-                                        "w-full justify-start text-left font-normal",
+                                        "cursor-pointer w-full justify-start text-left font-normal",
                                         !dateEnd && "text-muted-foreground"
                                     )}
                                 >
@@ -122,7 +122,7 @@ export default function MaintenanceDashboardClient({ initialUsersData }: ClientP
                     <div className="flex flex-col gap-2">
                         <Label>{t("filter.technician")}</Label>
                         <Select value={technician} onValueChange={setTechnician}>
-                            <SelectTrigger className="w-full">
+                            <SelectTrigger className="cursor-pointer w-full">
                                 <SelectValue placeholder={t("filter.all")} />
                             </SelectTrigger>
                             <SelectContent>
@@ -136,7 +136,7 @@ export default function MaintenanceDashboardClient({ initialUsersData }: ClientP
                     <div className="flex flex-col gap-2">
                         <Label>{t("filter.supervisor")}</Label>
                         <Select value={supervisor} onValueChange={setSupervisor}>
-                            <SelectTrigger className="w-full">
+                            <SelectTrigger className="cursor-pointer w-full">
                                 <SelectValue placeholder={t("filter.all")} />
                             </SelectTrigger>
                             <SelectContent>
@@ -150,7 +150,7 @@ export default function MaintenanceDashboardClient({ initialUsersData }: ClientP
                     <Button
                         onClick={fetchData}
                         disabled={isLoading}
-                        className="bg-[#e91e63] hover:bg-[#d81b60] text-white w-full lg:w-auto mt-auto"
+                        className="cursor-pointer bg-[#e91e63] hover:bg-[#d81b60] text-white w-full lg:w-auto mt-auto"
                     >
                         <Search className="w-4 h-4 mr-2" />
                         {t("filter.search")}
@@ -214,9 +214,9 @@ export default function MaintenanceDashboardClient({ initialUsersData }: ClientP
             />
 
             {/* Detail Modal */}
-            <DetailDialog 
-                detailId={selectedDetailId} 
-                onClose={() => setSelectedDetailId(null)} 
+            <DetailDialog
+                detailId={selectedDetailId}
+                onClose={() => setSelectedDetailId(null)}
             />
         </div>
     )

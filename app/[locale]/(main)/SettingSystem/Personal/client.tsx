@@ -186,7 +186,7 @@ export function PersonalClient({ initialData, roles }: PersonalClientProps) {
                         className="pl-9 h-9 rounded-lg bg-white border-gray-200 shadow-sm"
                     />
                 </div>
-                <Button size="sm" onClick={handleAdd}>
+                <Button size="sm" onClick={handleAdd} className="cursor-pointer">
                     <Plus className="mr-2 h-4 w-4" /> {t('addUser')}
                 </Button>
             </div>
@@ -226,14 +226,14 @@ export function PersonalClient({ initialData, roles }: PersonalClientProps) {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isLoading}>{t('form.cancel')}</AlertDialogCancel>
+                        <AlertDialogCancel className="cursor-pointer" disabled={isLoading}>{t('form.cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={(e) => {
                                 e.preventDefault()
                                 handleDeleteConfirm()
                             }}
                             disabled={isLoading}
-                            className="bg-red-600 focus:ring-red-600"
+                            className="cursor-pointer bg-red-600 focus:ring-red-600"
                         >
                             {isLoading ? t('form.deleting') : t('table.delete')}
                         </AlertDialogAction>
@@ -251,8 +251,9 @@ export function PersonalClient({ initialData, roles }: PersonalClientProps) {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isLoading}>{t('form.cancel')}</AlertDialogCancel>
+                        <AlertDialogCancel className="cursor-pointer" disabled={isLoading}>{t('form.cancel')}</AlertDialogCancel>
                         <AlertDialogAction
+                            className="cursor-pointer"
                             onClick={(e) => {
                                 e.preventDefault()
                                 handleConfirmToggleStatus()

@@ -173,7 +173,7 @@ export function ResponseDialog({
                                 size="sm"
                                 onClick={handleResendAll}
                                 disabled={loading || isResendingAll || !data.some(item => item.status !== "respone")}
-                                className="bg-blue-600 hover:bg-blue-700 text-white w-full"
+                                className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white w-full"
                             >
                                 {isResendingAll ? (
                                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -187,7 +187,7 @@ export function ResponseDialog({
                                 size="sm"
                                 onClick={fetchData}
                                 disabled={loading || isResendingAll}
-                                className="w-full border-dashed border-2 hover:bg-accent hover:text-accent-foreground"
+                                className="cursor-pointer w-full border-dashed border-2 hover:bg-accent hover:text-accent-foreground"
                             >
                                 <RotateCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
                                 {t("reload")}
@@ -227,7 +227,7 @@ export function ResponseDialog({
                                                 <Button
                                                     size="sm"
                                                     variant="default"
-                                                    className="bg-pink-600 hover:bg-pink-700 text-white"
+                                                    className="cursor-pointer bg-pink-600 hover:bg-pink-700 text-white"
                                                     onClick={() => handleResend(item)}
                                                     disabled={resendingImsi === item.imsi}
                                                 >

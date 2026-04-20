@@ -69,15 +69,15 @@ export default function FilterSidebar({
                             {/* Type Selector */}
                             <div className="w-[140px] md:w-[160px] shrink-0">
                                 <Select value={searchType} onValueChange={(val: "group" | "imsi" | "street_light_name") => setSearchType(val)}>
-                                    <SelectTrigger className="h-9 rounded-xl bg-white border-gray-200 shadow-sm text-sm font-medium">
+                                    <SelectTrigger className="cursor-pointer h-9 rounded-xl bg-white border-gray-200 shadow-sm text-sm font-medium">
                                         <div className="flex items-center">
                                             <SelectValue />
                                         </div>
                                     </SelectTrigger>
                                     <SelectContent className="z-[9999]">
-                                        <SelectItem value="group"><div className="flex items-center"><Filter className="mr-2 h-4 w-4 opacity-70" />{t("filters.group")}</div></SelectItem>
-                                        <SelectItem value="imsi"><div className="flex items-center"><Hash className="mr-2 h-4 w-4 opacity-70" />{t("filters.imsi")}</div></SelectItem>
-                                        <SelectItem value="street_light_name"><div className="flex items-center"><MapPin className="mr-2 h-4 w-4 opacity-70" />{t("filters.streetLightName")}</div></SelectItem>
+                                        <SelectItem className="cursor-pointer" value="group"><div className="flex items-center"><Filter className="mr-2 h-4 w-4 opacity-70" />{t("filters.group")}</div></SelectItem>
+                                        <SelectItem className="cursor-pointer" value="imsi"><div className="flex items-center"><Hash className="mr-2 h-4 w-4 opacity-70" />{t("filters.imsi")}</div></SelectItem>
+                                        <SelectItem className="cursor-pointer" value="street_light_name"><div className="flex items-center"><MapPin className="mr-2 h-4 w-4 opacity-70" />{t("filters.streetLightName")}</div></SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -89,7 +89,7 @@ export default function FilterSidebar({
                                 <Combobox value={searchValue} onValueChange={setSearchValue}>
                                     <ComboboxInput
                                         placeholder={t("filters.all")}
-                                        className="h-9 rounded-xl bg-white border-gray-200 shadow-sm"
+                                        className="cursor-pointer h-9 rounded-xl bg-white border-gray-200 shadow-sm"
                                     />
                                     <ComboboxContent className="z-[9999]" searchPlaceholder={t("filters.search")}>
                                         <ComboboxEmpty>{t("filters.noResult")}</ComboboxEmpty>
@@ -115,23 +115,23 @@ export default function FilterSidebar({
                         {/* Status Filter */}
                         <div className="w-full md:w-[240px]">
                             <Select value={statusFilter} onValueChange={setStatusFilter}>
-                                <SelectTrigger className="h-12 md:h-12 w-full rounded-xl bg-white dark:bg-muted border-gray-200 dark:border-border shadow-sm text-sm">
+                                <SelectTrigger className="cursor-pointer h-12 md:h-12 w-full rounded-xl bg-white dark:bg-muted border-gray-200 dark:border-border shadow-sm text-sm">
                                     <div className="flex items-center">
                                         <Activity className="h-4 w-2 mr-2 text-muted-foreground" />
                                         <SelectValue />
                                     </div>
                                 </SelectTrigger>
                                 <SelectContent className="z-[9999]">
-                                    <SelectItem value="all">{t("status.all")}</SelectItem>
-                                    <SelectItem value="3">{t("status.normal")}</SelectItem>
-                                    <SelectItem value="4">{t("status.powerFailure")}</SelectItem>
-                                    <SelectItem value="5">{t("status.commFailure")}</SelectItem>
+                                    <SelectItem className="cursor-pointer" value="all">{t("status.all")}</SelectItem>
+                                    <SelectItem className="cursor-pointer" value="3">{t("status.normal")}</SelectItem>
+                                    <SelectItem className="cursor-pointer" value="4">{t("status.powerFailure")}</SelectItem>
+                                    <SelectItem className="cursor-pointer" value="5">{t("status.commFailure")}</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
 
                         {/* Search Button */}
-                        <Button size="sm" onClick={onSearch} className="h-9 w-full md:w-12 rounded-xl p-0 ml-0 md:ml-4 shadow-md transition-all hover:shadow-lg hover:scale-[1.02] shrink-0">
+                        <Button size="sm" onClick={onSearch} className="cursor-pointer h-9 w-full md:w-12 rounded-xl p-0 ml-0 md:ml-4 shadow-md transition-all hover:shadow-lg hover:scale-[1.02] shrink-0">
                             <Search className="h-4 w-5" />
                         </Button>
                     </div>

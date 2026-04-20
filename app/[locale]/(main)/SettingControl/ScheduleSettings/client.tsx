@@ -146,13 +146,13 @@ export function ScheduleSettingsClient({ versionLightSensor }: ScheduleSettingsC
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel disabled={isDeleting}>{t("deleteDialog.cancel")}</AlertDialogCancel>
+                        <AlertDialogCancel className="cursor-pointer" disabled={isDeleting}>{t("deleteDialog.cancel")}</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={(e) => {
                                 e.preventDefault()
                                 handleDeleteConfirm()
                             }}
-                            className="bg-red-600 hover:bg-red-700 text-white"
+                            className="cursor-pointer bg-red-600 hover:bg-red-700 text-white"
                             disabled={isDeleting}
                         >
                             {isDeleting ? (

@@ -85,9 +85,9 @@ export const useMaintenanceColumns = (onOpenDetail: (detailId: string) => void) 
             header: t("table.detail"),
             cell: ({ row }) => {
                 return (
-                    <Button 
-                        size="sm" 
-                        className="h-8 w-8 p-0 bg-blue-500 hover:bg-blue-600 text-white"
+                    <Button
+                        size="sm"
+                        className="cursor-pointer h-8 w-8 p-0 bg-blue-500 hover:bg-blue-600 text-white"
                         onClick={() => onOpenDetail(row.original.detail)}
                     >
                         <Info className="h-4 w-4" />

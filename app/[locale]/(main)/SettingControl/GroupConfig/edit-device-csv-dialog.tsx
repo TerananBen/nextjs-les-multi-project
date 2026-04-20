@@ -158,7 +158,7 @@ export function EditDeviceCsvDialog({ open, onOpenChange, group }: EditDeviceCsv
                             <Button
                                 variant="outline"
                                 onClick={handleDownloadTemplate}
-                                className="text-blue-600 border-blue-200 hover:bg-blue-50 px-3 whitespace-nowrap h-10"
+                                className="cursor-pointer text-blue-600 border-blue-200 hover:bg-blue-50 px-3 whitespace-nowrap h-10"
                                 title={t("downloadTemplate")}
                             >
                                 <FileSpreadsheet className="h-4 w-4" />
@@ -189,10 +189,11 @@ export function EditDeviceCsvDialog({ open, onOpenChange, group }: EditDeviceCsv
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => onOpenChange(false)} disabled={uploading}>
+                    <Button className="cursor-pointer" variant="outline" onClick={() => onOpenChange(false)} disabled={uploading}>
                         {t("cancel")}
                     </Button>
                     <Button
+                        className="cursor-pointer"
                         onClick={handleUpload}
                         disabled={!file || deviceData.length === 0 || uploading}
                     >
@@ -203,7 +204,7 @@ export function EditDeviceCsvDialog({ open, onOpenChange, group }: EditDeviceCsv
                             </>
                         ) : (
                             <>
-                                <Upload className="mr-2 h-4 w-4" />
+                                <Upload className="cursor-pointer mr-2 h-4 w-4" />
                                 {t("upload")}
                             </>
                         )}

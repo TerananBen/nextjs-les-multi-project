@@ -32,7 +32,7 @@ export function LanguageSwitcher() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label={t("label")}>
+                <Button className="cursor-pointer" variant="ghost" size="icon" aria-label={t("label")}>
                     {currentLang ? (
                         <Image
                             src={currentLang.flag}
@@ -51,7 +51,7 @@ export function LanguageSwitcher() {
                     <DropdownMenuItem
                         key={lang.code}
                         onClick={() => onSelectChange(lang.code)}
-                        className="gap-2"
+                        className="cursor-pointer gap-2"
                     >
                         <Image
                             src={lang.flag}

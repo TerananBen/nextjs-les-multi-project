@@ -667,6 +667,7 @@
             "invalidImage": "Unsupported image format. Please upload .jpg or .png only.",
             "deleteSuccess": "Image deleted successfully",
             "deleteError": "Failed to delete image",
+            "deleteCancelled": "Delete cancelled",
             "actionSuccess": "Action updated successfully",
             "actionError": "Failed to update action",
             "close": "Close"

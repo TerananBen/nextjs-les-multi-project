@@ -4,8 +4,9 @@ import { useState } from "react"
 import { useTranslations } from "next-intl"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Loader2, X, Image as ImageIcon, Upload, Trash2 } from "lucide-react"
+import { Loader2, X, Image as ImageIcon, Upload, Trash2, Check } from "lucide-react"
 import { MaintenanceImageRecord, uploadImageAction, deleteImageAction } from "@/app/actions/maintenance"
+import { ConfirmButton } from "@/components/ui/confirm-button"
 import { toast } from "sonner"
 
 interface DetailImageProps {
@@ -58,12 +59,7 @@ export function DetailImage({ detailId, images, loadingImages, onImagesChanged }
         }
     }
 
-    const handleDelete = async (e: React.MouseEvent, idList: string, idImg: string) => {
-        e.stopPropagation()
-        if (!confirm(t("detail.confirmDelete", { defaultMessage: "Are you sure you want to delete this image?" }))) {
-            return
-        }
-
+    const handleDelete = async (idList: string, idImg: string) => {
         setDeletingId(idImg)
         try {
             const res = await deleteImageAction({ id_list: idList, id_img: idImg })
@@ -134,19 +130,16 @@ export function DetailImage({ detailId, images, loadingImages, onImagesChanged }
                             </div>
 
                             {/* Delete Button */}
-                            <Button
+                            <ConfirmButton
+                                initialLabel={<Trash2 className="h-4 w-4" />}
+                                confirmLabel={<Check className="h-4 w-4" />}
+                                onConfirm={() => handleDelete(img.id_list, img.id_img)}
+                                onCancel={() => toast.info(t("detail.deleteCancelled", { defaultMessage: "Delete cancelled" }))}
                                 variant="destructive"
                                 size="icon"
-                                className="cursor-pointer absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={(e) => handleDelete(e, img.id_list, img.id_img)}
-                                disabled={deletingId === img.id_img}
-                            >
-                                {deletingId === img.id_img ? (
-                                    <Loader2 className="h-3 w-3 animate-spin" />
-                                ) : (
-                                    <Trash2 className="h-3 w-3" />
-                                )}
-                            </Button>
+                                className="top-2 left-2 h-8 w-8 rounded-full cursor-pointer"
+                                loading={deletingId === img.id_img}
+                            />
                         </div>
                     ))}
                 </div>

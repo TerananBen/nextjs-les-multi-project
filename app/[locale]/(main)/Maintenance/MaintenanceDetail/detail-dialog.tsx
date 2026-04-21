@@ -108,12 +108,12 @@ export function DetailDialog({ detailId, mapMode, mapOfflineUrl, defaultLat, def
             if (!open) onClose()
         }}>
             <DialogContent className="w-[95vw] md:max-w-[80vw] lg:max-w-[70vw] xl:max-w-[1200px] max-h-[90vh] overflow-y-auto p-0 border shadow-xl">
-                <DialogHeader className="p-4 border-b flex flex-row items-center justify-between bg-white sticky top-0 z-10">
-                    <DialogTitle className="text-xl text-slate-600 font-medium tracking-wide">
+                <DialogHeader className="p-4 border-b flex flex-row items-center justify-between bg-background sticky top-0 z-10">
+                    <DialogTitle className="text-xlfont-medium tracking-wide">
                         {t("detail.title", { defaultMessage: "Maintenance Detail" })}
                     </DialogTitle>
                     <DialogClose asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 !mt-0 relative left-1 text-gray-500 hover:text-black">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 !mt-0 relative left-1 text-foreground hover:text-foreground">
                             <X className="h-5 w-5" />
                         </Button>
                     </DialogClose>
@@ -121,7 +121,7 @@ export function DetailDialog({ detailId, mapMode, mapOfflineUrl, defaultLat, def
 
                 <div className="p-6">
                     {/* Legend */}
-                    <div className="bg-slate-100 flex items-center gap-6 p-3 rounded-md mb-6 w-full text-sm text-gray-500 font-medium">
+                    <div className="bg-background flex items-center gap-6 p-3 rounded-md mb-6 w-full text-sm text-foreground font-medium bg-muted/50">
                         <LegendItem icons={[{ color: "blue", badge: "A" }]} text={tMap("legend.disconnect")} />
                         <LegendItem icons={[{ color: "green", badge: "⚡" }]} text={tMap("legend.abnormal")} />
                         <LegendItem icons={[{ color: "red", badge: null }]} text={tMap("legend.failure")} />
@@ -157,7 +157,7 @@ export function DetailDialog({ detailId, mapMode, mapOfflineUrl, defaultLat, def
                         <Button
                             variant="ghost"
                             onClick={onClose}
-                            className="cursor-pointer font-bold text-gray-700 hover:bg-slate-100"
+                            className="cursor-pointer font-bold text-foreground hover:bg-background"
                         >
                             {t("detail.close", { defaultMessage: "Close" })}
                         </Button>

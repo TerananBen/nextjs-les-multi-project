@@ -643,7 +643,10 @@
                 "changeRtu": "Change RTU",
                 "changeLamp": "Change Lamp",
                 "repairWiring": "Repair Wiring",
-                "other": "Other"
+                "other": "Other",
+                "next": "Next",
+                "previous": "Previous",
+                "showing": "Showing {start} to {end} of {total} entries"
             },
             "status": {
                 "repaired": "Repaired",

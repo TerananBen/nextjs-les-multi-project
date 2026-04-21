@@ -157,7 +157,7 @@ export function DetailDataTable({ data, detailId }: DetailDataTableProps) {
     return (
         <div className="rounded-md border">
             <Table>
-                <TableHeader className="bg-slate-50">
+                <TableHeader className="bg-background">
                     <TableRow>
                         <TableHead className="w-[50px] text-center">#</TableHead>
                         <TableHead>{t("detail.table.poleName")}</TableHead>

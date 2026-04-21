@@ -229,9 +229,9 @@ export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps
                     <div className="text-sm text-muted-foreground">{t("device", { defaultValue: "Device" })}: {imei} {deviceName ? `(${deviceName})` : ''}</div>
                 </DialogHeader>
 
-                <div className="flex flex-col flex-1 overflow-hidden bg-gray-50/50">
+                <div className="flex flex-col flex-1 overflow-hidden bg-muted/20">
                     {/* Controls Bar */}
-                    <div className="p-4 bg-white border-b space-y-4">
+                    <div className="p-4 bg-background border-b space-y-4">
                         {/* Row 1: Date Range & Actions (Centered) */}
                         <div className="flex flex-col md:flex-row gap-4 items-center justify-center">
                             <div className="flex items-center gap-2 flex-nowrap overflow-x-auto max-w-full pb-2 md:pb-0">
@@ -242,7 +242,7 @@ export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps
                                             <Button
                                                 variant={"outline"}
                                                 className={cn(
-                                                    "cursor-pointer w-auto min-w-[240px] justify-start text-left font-normal bg-white h-10",
+                                                    "cursor-pointer w-auto min-w-[240px] justify-start text-left font-normal bg-background h-10",
                                                     !dateRange && "text-muted-foreground"
                                                 )}
                                             >
@@ -331,28 +331,28 @@ export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps
 
                     {/* Table Area */}
                     <div className="flex-1 overflow-y-auto p-4">
-                        <div className="rounded-md border bg-white shadow-sm overflow-hidden">
+                        <div className="rounded-md border bg-background shadow-sm overflow-hidden">
                             <Table>
-                                <TableHeader className="bg-gray-50 sticky top-0 z-10">
+                                <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm">
                                     <TableRow>
-                                        <TableHead className="w-[60px] font-bold text-gray-600">#</TableHead>
-                                        <TableHead onClick={() => handleSort('date')} className="font-bold text-gray-600 cursor-pointer hover:bg-gray-100"><span className="flex items-center gap-1">{t("powerHistory.table.dateTime", { defaultValue: "Date-Time" })} <ArrowUpDown className="h-4 w-4" /></span></TableHead>
-                                        <TableHead onClick={() => handleSort('i')} className="font-bold text-gray-600 cursor-pointer hover:bg-gray-100"><span className="flex items-center gap-1">{t("powerHistory.table.i", { defaultValue: "I (mA)" })} <ArrowUpDown className="h-4 w-4" /></span></TableHead>
-                                        <TableHead onClick={() => handleSort('v')} className="font-bold text-gray-600 cursor-pointer hover:bg-gray-100"><span className="flex items-center gap-1">{t("powerHistory.table.v", { defaultValue: "V (V)" })} <ArrowUpDown className="h-4 w-4" /></span></TableHead>
-                                        <TableHead onClick={() => handleSort('w')} className="font-bold text-gray-600 cursor-pointer hover:bg-gray-100"><span className="flex items-center gap-1">{t("powerHistory.table.w", { defaultValue: "P (W)" })} <ArrowUpDown className="h-4 w-4" /></span></TableHead>
-                                        <TableHead onClick={() => handleSort('pf')} className="font-bold text-gray-600 cursor-pointer hover:bg-gray-100"><span className="flex items-center gap-1">{t("powerHistory.table.pf", { defaultValue: "PF" })} <ArrowUpDown className="h-4 w-4" /></span></TableHead>
+                                        <TableHead className="w-[60px] font-bold">#</TableHead>
+                                        <TableHead onClick={() => handleSort('date')} className="font-bold cursor-pointer"><span className="flex items-center gap-1">{t("powerHistory.table.dateTime", { defaultValue: "Date-Time" })} <ArrowUpDown className="h-4 w-4" /></span></TableHead>
+                                        <TableHead onClick={() => handleSort('i')} className="font-bold cursor-pointer"><span className="flex items-center gap-1">{t("powerHistory.table.i", { defaultValue: "I (mA)" })} <ArrowUpDown className="h-4 w-4" /></span></TableHead>
+                                        <TableHead onClick={() => handleSort('v')} className="font-bold cursor-pointer"><span className="flex items-center gap-1">{t("powerHistory.table.v", { defaultValue: "V (V)" })} <ArrowUpDown className="h-4 w-4" /></span></TableHead>
+                                        <TableHead onClick={() => handleSort('w')} className="font-boldcursor-pointer"><span className="flex items-center gap-1">{t("powerHistory.table.w", { defaultValue: "P (W)" })} <ArrowUpDown className="h-4 w-4" /></span></TableHead>
+                                        <TableHead onClick={() => handleSort('pf')} className="font-bold cursor-pointer"><span className="flex items-center gap-1">{t("powerHistory.table.pf", { defaultValue: "PF" })} <ArrowUpDown className="h-4 w-4" /></span></TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {sortedLogs.length > 0 ? (
                                         sortedLogs.map((log, index) => (
-                                            <TableRow key={index} className="hover:bg-gray-50 even:bg-white odd:bg-gray-50/30">
-                                                <TableCell className="font-medium text-gray-500">{index + 1}</TableCell>
-                                                <TableCell className="text-gray-700">{log.date} {log.time}</TableCell>
-                                                <TableCell className="text-gray-700">{log.i}</TableCell>
-                                                <TableCell className="text-gray-700">{log.v}</TableCell>
-                                                <TableCell className="text-gray-700">{log.w}</TableCell>
-                                                <TableCell className="text-gray-700">{log.pf}</TableCell>
+                                            <TableRow key={index} className="">
+                                                <TableCell className="font-medium">{index + 1}</TableCell>
+                                                <TableCell>{log.date} {log.time}</TableCell>
+                                                <TableCell>{log.i}</TableCell>
+                                                <TableCell>{log.v}</TableCell>
+                                                <TableCell>{log.w}</TableCell>
+                                                <TableCell>{log.pf}</TableCell>
                                             </TableRow>
                                         ))
                                     ) : (

@@ -85,7 +85,7 @@ export function DetailImage({ detailId, images, loadingImages, onImagesChanged }
 
                 <div className="flex items-center gap-2">
                     <label htmlFor="image-upload" className="cursor-pointer">
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors border border-blue-200 text-sm font-medium">
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-background text-foreground rounded-md hover:bg-background transition-colors border border-blue-200 text-sm font-medium">
                             {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
                             {t("detail.addImage", { defaultMessage: "Add Image" })}
                         </div>

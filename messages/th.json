@@ -643,7 +643,10 @@
                 "changeRtu": "เปลี่ยน RTU",
                 "changeLamp": "เปลี่ยนโคมไฟ",
                 "repairWiring": "ซ่อมสายไฟ",
-                "other": "อื่นๆ"
+                "other": "อื่นๆ",
+                "next": "ถัดไป",
+                "previous": "ก่อนหน้า",
+                "showing": "แสดง {start} ถึง {end} จาก {total} รายการ"
             },
             "status": {
                 "repaired": "ซ่อมแล้ว",

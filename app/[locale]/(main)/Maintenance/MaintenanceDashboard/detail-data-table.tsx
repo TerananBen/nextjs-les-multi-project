@@ -54,12 +54,12 @@ export function DetailDataTable<TData, TValue>({
         <div className="space-y-4">
             <div className="rounded-md border overflow-hidden">
                 <Table>
-                    <TableHeader className="bg-slate-50">
+                    <TableHeader className="bg-background">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                        <TableHead key={header.id} className="font-semibold text-slate-700">
+                                        <TableHead key={header.id} className="font-semibold">
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
@@ -105,11 +105,11 @@ export function DetailDataTable<TData, TValue>({
                     </TableBody>
                 </Table>
             </div>
-            
+
             {!loading && totalRows > 0 && (
                 <div className="flex items-center justify-between">
                     <div className="text-sm text-muted-foreground">
-                        Showing {startRow} to {endRow} of {totalRows} entries
+                        {t("detail.table.showing", { start: startRow, end: endRow, total: totalRows })}
                     </div>
                     <div className="flex items-center space-x-2">
                         <Button
@@ -117,9 +117,9 @@ export function DetailDataTable<TData, TValue>({
                             size="sm"
                             onClick={() => table.previousPage()}
                             disabled={!table.getCanPreviousPage()}
-                            className="text-gray-500 font-normal hover:bg-slate-100"
+                            className="font-normal hover:bg-slate-100"
                         >
-                            Previous
+                            {t("detail.table.previous")}
                         </Button>
                         <div className="flex items-center gap-1">
                             {Array.from({ length: table.getPageCount() }).map((_, i) => (
@@ -139,9 +139,9 @@ export function DetailDataTable<TData, TValue>({
                             size="sm"
                             onClick={() => table.nextPage()}
                             disabled={!table.getCanNextPage()}
-                            className="text-gray-500 font-normal hover:bg-slate-100"
+                            className="font-normal hover:bg-slate-100"
                         >
-                            Next
+                            {t("detail.table.next")}
                         </Button>
                     </div>
                 </div>

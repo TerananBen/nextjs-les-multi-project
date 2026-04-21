@@ -45,10 +45,10 @@ export function SelectedTable({ items, onRemoveItem }: SelectedTableProps) {
     const tMap = useTranslations("MapGlobal")
 
     return (
-        <div className="flex flex-col h-full bg-white border rounded-md overflow-hidden">
+        <div className="flex flex-col h-full bg-background border rounded-md overflow-hidden">
             <div className="flex-1 overflow-auto">
                 <table className="w-full text-sm text-center border-collapse">
-                    <thead className="bg-[#f8f9fa] sticky top-0 z-10 font-bold border-b text-slate-700">
+                    <thead className="bg-background sticky top-0 z-10 font-bold border-b">
                         <tr>
                             <th className="py-3 px-2 whitespace-nowrap">{t("poleName")}</th>
                             <th className="py-3 px-2 whitespace-nowrap">{t("deviceNumber")}</th>
@@ -60,7 +60,7 @@ export function SelectedTable({ items, onRemoveItem }: SelectedTableProps) {
                     <tbody>
                         {items.length === 0 ? (
                             <tr>
-                                <td colSpan={5} className="py-8 text-center text-muted-foreground border-b bg-slate-50">
+                                <td colSpan={5} className="py-8 text-center text-muted-foreground border-b bg-background">
                                     {t("noData")}
                                 </td>
                             </tr>
@@ -68,7 +68,7 @@ export function SelectedTable({ items, onRemoveItem }: SelectedTableProps) {
                             items.map((item) => {
                                 const config = getMarkerConfig(item, tMap);
                                 return (
-                                    <tr key={item.imsi} className="border-b last:border-0 hover:bg-slate-50 transition-colors">
+                                    <tr key={item.imsi} className="border-b last:border-0 transition-colors">
                                         <td className="py-3 px-2">{item.street_light_name || "-"}</td>
                                         <td className="py-3 px-2">{item.imsi}</td>
                                         <td className="py-3 px-2">{item.lat}, {item.lng}</td>
@@ -85,7 +85,7 @@ export function SelectedTable({ items, onRemoveItem }: SelectedTableProps) {
                                                 variant="ghost"
                                                 size="sm"
                                                 onClick={() => onRemoveItem(item.imsi)}
-                                                className="cursor-pointer h-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                                                className="cursor-pointer h-8 text-red-500"
                                             >
                                                 <Trash2 className="w-4 h-4 mr-1" />
                                             </Button>

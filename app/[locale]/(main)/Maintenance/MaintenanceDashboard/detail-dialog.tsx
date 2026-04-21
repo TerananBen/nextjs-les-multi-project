@@ -93,12 +93,12 @@ export function DetailDialog({ detailId, onClose }: DetailDialogProps) {
             if (!open) onClose()
         }}>
             <DialogContent className="w-[95vw] md:max-w-[80vw] lg:max-w-[60vw] max-h-[90vh] overflow-y-auto p-0 border shadow-xl">
-                <DialogHeader className="p-4 border-b flex flex-row items-center justify-between bg-white sticky top-0 z-10">
-                    <DialogTitle className="text-xl text-slate-600 font-medium tracking-wide">
+                <DialogHeader className="p-4 border-b flex flex-row items-center justify-between bg-background sticky top-0 z-10">
+                    <DialogTitle className="text-xl font-medium tracking-wide">
                         {t("detail.title")}
                     </DialogTitle>
                     <DialogClose asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 !mt-0 relative left-1 text-gray-500 hover:text-black">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 !mt-0 relative left-1 hover:text-muted-foreground">
                             <X className="h-5 w-5" />
                         </Button>
                     </DialogClose>
@@ -106,7 +106,7 @@ export function DetailDialog({ detailId, onClose }: DetailDialogProps) {
 
                 <div className="p-6">
                     {/* Legend */}
-                    <div className="bg-slate-100 flex items-center gap-6 p-3 rounded-md mb-6 w-full text-sm text-gray-500 font-medium">
+                    <div className="bg-muted/50 flex items-center gap-6 p-3 rounded-md mb-6 w-full text-sm font-medium">
                         <LegendItem icons={[{ color: "blue", badge: "A" }]} text={tMap("legend.disconnect")} />
                         <LegendItem icons={[{ color: "green", badge: "⚡" }]} text={tMap("legend.abnormal")} />
                         <LegendItem icons={[{ color: "red", badge: null }]} text={tMap("legend.failure")} />
@@ -115,7 +115,7 @@ export function DetailDialog({ detailId, onClose }: DetailDialogProps) {
                     {/* Table */}
                     <div className="min-h-[200px] mb-8 relative">
                         {loading && (
-                            <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/50">
+                            <div className="absolute inset-0 z-10 flex items-center justify-center bg-background">
                                 <Loader2 className="animate-spin h-8 w-8 text-slate-400" />
                             </div>
                         )}
@@ -128,13 +128,13 @@ export function DetailDialog({ detailId, onClose }: DetailDialogProps) {
 
                     {/* Repair Report Image */}
                     <div className="border-t pt-6 mb-8">
-                        <h3 className="text-lg text-slate-600 font-medium mb-4">{t("detail.repairImage")}</h3>
+                        <h3 className="text-lg font-medium mb-4">{t("detail.repairImage")}</h3>
                         {loadingImages ? (
-                            <div className="flex items-center justify-center p-8 bg-slate-50 rounded-lg border border-dashed">
+                            <div className="flex items-center justify-center p-8 bg-background rounded-lg border border-dashed">
                                 <Loader2 className="animate-spin h-6 w-6 text-slate-400 mr-2" />
                             </div>
                         ) : images.length > 0 ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            <div className="bg-background grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                                 {images.map((img) => (
                                     <div
                                         key={img.id_img}
@@ -160,7 +160,7 @@ export function DetailDialog({ detailId, onClose }: DetailDialogProps) {
                                 ))}
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center justify-center p-8 bg-slate-50 rounded-lg border border-dashed text-gray-400">
+                            <div className="flex flex-col items-center justify-center p-8 bg-background rounded-lg border border-dashed text-gray-400">
                                 <ImageIcon className="h-10 w-10 mb-2 opacity-50" />
                                 <span className="text-sm">{t("detail.noImages")}</span>
                             </div>

@@ -195,22 +195,22 @@ function AddMaintenanceForm({ mapMode, mapOfflineUrl, defaultLat, defaultLng, de
     }
 
     return (
-        <div className="flex flex-col gap-5 w-full">
+        <div className="bg-background flex flex-col gap-5 w-full">
             {/* Headers / Form Data */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-background p-4 rounded-lg shadow-sm border rounded-md bg-muted/20">
                 <div className="space-y-1.5 md:col-span-1">
-                    <label className="text-sm font-bold text-gray-500">{tForm("itemName")} <span className="text-red-500">*</span></label>
+                    <label className="text-sm font-bold">{tForm("itemName")} <span className="text-red-500">*</span></label>
                     <Input
                         value={itemName}
                         onChange={e => setItemName(e.target.value)}
-                        className="bg-gray-50 focus:bg-white transition-colors"
+                        className="transition-colors"
                         placeholder={tForm("itemNamePlaceholder")}
                     />
                 </div>
                 <div className="space-y-1.5 md:col-span-1">
-                    <label className="text-sm font-bold text-gray-500">{tForm("operatorName")} <span className="text-red-500">*</span></label>
+                    <label className="text-sm font-bold">{tForm("operatorName")} <span className="text-red-500">*</span></label>
                     <Select value={operatorId} onValueChange={setOperatorId}>
-                        <SelectTrigger className="cursor-pointer bg-gray-50 focus:bg-white transition-colors">
+                        <SelectTrigger className="cursor-pointer transition-colors">
                             <SelectValue placeholder={tForm("selectOperator")} />
                         </SelectTrigger>
                         <SelectContent>
@@ -222,12 +222,12 @@ function AddMaintenanceForm({ mapMode, mapOfflineUrl, defaultLat, defaultLng, de
                     </Select>
                 </div>
                 <div className="space-y-1.5 md:col-span-1">
-                    <label className="text-sm font-bold text-gray-500">{tForm("reporterName")}</label>
+                    <label className="text-sm font-bold">{tForm("reporterName")}</label>
                     <Input
                         value={reporterName}
                         readOnly
                         disabled
-                        className="bg-gray-100 text-gray-500 cursor-not-allowed border-gray-200"
+                        className="cursor-not-allowed"
                     />
                 </div>
             </div>
@@ -238,14 +238,14 @@ function AddMaintenanceForm({ mapMode, mapOfflineUrl, defaultLat, defaultLng, de
                 {/* Left Column: Map & Search (7 columns on large screens) */}
                 <div className="flex flex-col lg:col-span-7 xl:col-span-8 h-full">
                     {/* Unified Container */}
-                    <div className="flex flex-col flex-1 bg-white border border-gray-100 rounded-lg shadow-sm overflow-hidden min-h-[500px]">
+                    <div className="flex flex-col flex-1 bg-background border rounded-md bg-muted/20 rounded-lg shadow-sm overflow-hidden min-h-[500px]">
 
                         {/* Search Bar */}
-                        <div className="flex flex-col sm:flex-row gap-3 items-end sm:items-center bg-white p-3 border-b border-gray-100 z-10 shrink-0">
-                            <span className="text-sm font-bold text-gray-500 whitespace-nowrap hidden sm:block">{tForm("searchBy")}</span>
+                        <div className="flex flex-col sm:flex-row gap-3 items-end sm:items-center bg-background p-3 border-b border-gray-100 z-10 shrink-0">
+                            <span className="text-sm font-bold whitespace-nowrap hidden sm:block">{tForm("searchBy")}</span>
                             <div className="flex-1 w-full sm:w-auto">
                                 <Select value={searchGroup} onValueChange={setSearchGroup}>
-                                    <SelectTrigger className="cursor-pointer bg-gray-50">
+                                    <SelectTrigger className="cursor-pointer bg-background">
                                         <SelectValue placeholder="ALL" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -260,7 +260,7 @@ function AddMaintenanceForm({ mapMode, mapOfflineUrl, defaultLat, defaultLng, de
                             </div>
                             <div className="flex-1 w-full sm:w-auto">
                                 <Select value={searchStatus} onValueChange={setSearchStatus}>
-                                    <SelectTrigger className="cursor-pointer bg-gray-50">
+                                    <SelectTrigger className="cursor-pointer bg-background">
                                         <SelectValue placeholder={tForm("selectStatus")} />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -283,7 +283,7 @@ function AddMaintenanceForm({ mapMode, mapOfflineUrl, defaultLat, defaultLng, de
 
                         {/* Map View */}
                         <div className="flex flex-col flex-1 relative min-h-[400px]">
-                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2 p-2.5 bg-gray-50 border-b text-xs sm:text-sm font-medium text-gray-600 z-10 relative">
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2 p-2.5 bg-background border-b text-xs sm:text-sm font-medium z-10 relative">
                                 <LegendItem icons={[{ color: "blue", badge: "A" }]} text={tMap("legend.disconnect")} />
                                 <LegendItem icons={[{ color: "green", badge: "⚡" }, { color: "gray", badge: "⚡" }]} text={tMap("legend.abnormal")} />
                                 <LegendItem icons={[{ color: "red", badge: null }]} text={tMap("legend.failure")} />
@@ -310,19 +310,19 @@ function AddMaintenanceForm({ mapMode, mapOfflineUrl, defaultLat, defaultLng, de
                 {/* Right Column: Selected Table (5 columns on large screens) */}
                 <div className="flex flex-col lg:col-span-5 xl:col-span-4 h-full">
                     {/* Unified Container */}
-                    <div className="flex flex-col flex-1 bg-white border border-gray-100 rounded-lg shadow-sm overflow-hidden min-h-[400px]">
+                    <div className="flex flex-col flex-1 bg-background border rounded-md bg-muted/20 rounded-lg shadow-sm overflow-hidden min-h-[400px]">
 
                         {/* Header for Table */}
-                        <div className="flex items-center justify-between bg-white p-3 border-b border-gray-100 z-10 shrink-0 h-auto sm:h-[65px]">
+                        <div className="flex items-center justify-between bg-background p-3 border-b border-gray-100 z-10 shrink-0 h-auto sm:h-[65px]">
                             {/* h-[65px] matches typical SM height of search bar with inputs + padding */}
-                            <span className="font-bold text-gray-700 text-sm">{tTable("title")}</span>
+                            <span className="font-bold text-sm">{tTable("title")}</span>
                             <span className="text-xs font-semibold bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
                                 {tTable("selectedCount", { count: selectedDevices.length })}
                             </span>
                         </div>
 
                         {/* Table Area */}
-                        <div className="flex-1 w-full bg-white flex flex-col h-[300px] lg:h-auto overflow-hidden">
+                        <div className="flex-1 w-full bg-background flex flex-col h-[300px] lg:h-auto overflow-hidden">
                             <SelectedTable
                                 items={selectedDevices}
                                 onUpdateReason={handleUpdateReason}
@@ -495,7 +495,7 @@ export function MaintenanceConfigClient({ mapMode, mapOfflineUrl, defaultLat, de
             </div>
 
             <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-                <DialogContent className="max-w-[95vw] lg:max-w-[90vw] xl:max-w-[1300px] w-full max-h-[95vh] overflow-y-auto p-4 md:p-6 bg-slate-50 border-0 outline-none focus:outline-none focus-visible:ring-0 rounded-xl">
+                <DialogContent className="max-w-[95vw] lg:max-w-[90vw] xl:max-w-[1300px] w-full max-h-[95vh] overflow-y-auto p-4 md:p-6 bg-background border-0 outline-none focus:outline-none focus-visible:ring-0 rounded-xl">
                     <DialogHeader className="mb-2">
                         <DialogTitle className="text-xl font-bold flex items-center gap-2">
                             {tForm("addTitle")}

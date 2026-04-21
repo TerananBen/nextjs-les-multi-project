@@ -1,2 +1,5 @@
 [tools]
 node = "24.12.0"
+
+[tasks]
+lint = "eslint . --fix --max-warnings=0"

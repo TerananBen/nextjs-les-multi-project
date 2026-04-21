@@ -5,7 +5,7 @@ import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import { LatLongData, getDataDetailIMSIAction, ImsiDetail, sendCommandMqttAction, readDataMqttAction } from "@/app/actions/map-actions"
 import { GoogleMap, useJsApiLoader, Marker as GoogleMarker, InfoWindow } from "@react-google-maps/api"
-import { Loader2, Power, Sun, RefreshCcw, ChevronDown, ChevronUp } from "lucide-react"
+import { Loader2, Power, Sun, RefreshCcw, ChevronDown, ChevronUp, PowerOff } from "lucide-react"
 import { getLeafletIconUrl, getGoogleMapsIconHtml, MarkerColor, MarkerBadge } from "@/lib/map-icons"
 import { useTranslations } from "next-intl"
 import { createRoot } from "react-dom/client"
@@ -285,7 +285,7 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
                         disabled={sending || reading}
                         className={`w-full ${!canControl ? 'bg-gray-300 cursor-not-allowed hover:bg-gray-300 text-white' : 'cursor-pointer'}`}
                     >
-                        {sending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <Power className="w-4 h-4 mr-1" />}
+                        {sending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <PowerOff className="w-4 h-4 mr-1" />}
                         {t("control.off")}
                     </Button>
                 </div>

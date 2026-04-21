@@ -21,7 +21,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, Loader2, Search, Trash2, Save, Check, Plus, ChevronsUpDown } from "lucide-react"
+import { ChevronLeft, ChevronRight, Loader2, Search, Trash2, Save, Check, PlusSquare, ChevronsUpDown } from "lucide-react"
 import { ConfirmButton } from "@/components/ui/confirm-button"
 import { configLatLongLampAndPoleAction, deleteImsiGroupConfigAction, getListDataIMSIAllAction, addRtuToGroupAction } from "@/app/actions/group-config"
 import { toast } from "sonner"
@@ -291,7 +291,7 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
                     </Popover>
                     <Button onClick={handleAddDevice} disabled={!selectedImsi || isAddingDevice} className="cursor-pointer w-full md:w-auto">
                         {isAddingDevice && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        <Plus className="mr-2 h-4 w-4" />
+                        <PlusSquare className="mr-2 h-4 w-4" />
                         {t("add", { defaultValue: "Add" })}
                     </Button>
                 </div>

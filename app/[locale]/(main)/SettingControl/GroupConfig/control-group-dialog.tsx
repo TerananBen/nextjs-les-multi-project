@@ -39,7 +39,7 @@ import {
     RefreshCw,
     RotateCcw,
     Power,
-    Zap
+    PowerOff
 } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -406,7 +406,7 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                         disabled={isSending || selectedImsis.size === 0}
                         className="cursor-pointer bg-green-600 hover:bg-green-700 text-white"
                     >
-                        <Zap className="w-4 h-4 mr-2" />
+                        <Power className="w-4 h-4 mr-2" />
                         {t("on")}
                     </Button>
                     <Button
@@ -415,7 +415,7 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                         variant="destructive"
                         className="cursor-pointer"
                     >
-                        <Power className="w-4 h-4 mr-2" />
+                        <PowerOff className="w-4 h-4 mr-2" />
                         {t("off")}
                     </Button>
 

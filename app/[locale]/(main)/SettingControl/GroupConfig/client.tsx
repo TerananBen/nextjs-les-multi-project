@@ -9,7 +9,7 @@ import { DataTable } from "./data-table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
-import { Search, Plus, Loader2 } from "lucide-react"
+import { Search, Loader2, PlusSquare } from "lucide-react"
 import {
     Dialog,
     DialogContent,
@@ -139,7 +139,7 @@ export function GroupConfigClient() {
                                 )}
                                 disabled={!canAdd}
                             >
-                                <Plus className="mr-2 h-4 w-4" />
+                                <PlusSquare className="mr-2 h-4 w-4" />
                                 {t("addGroup")}
                             </Button>
                         </div>

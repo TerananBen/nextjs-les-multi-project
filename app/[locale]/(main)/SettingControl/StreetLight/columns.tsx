@@ -130,7 +130,7 @@ const CommandCell = ({
                         <div className="text-center text-sm text-muted-foreground">{imei}</div>
                     </DialogHeader>
 
-                    <div className="py-6 space-y-6">
+                    <div className="space-y-6">
                         {/* Slider Section */}
                         <div className="space-y-4">
                             <div className="flex justify-between items-center px-1 gap-4">

@@ -96,12 +96,12 @@ export function LoginForm({
                             <Field>
                                 <div className="flex items-center">
                                     <FieldLabel htmlFor="password">{t("passwordLabel")}</FieldLabel>
-                                    <a
+                                    {/* <a
                                         href="#"
                                         className="ml-auto text-sm underline-offset-4 hover:underline"
                                     >
                                         {t("forgotPassword")}
-                                    </a>
+                                    </a> */}
                                 </div>
                                 <div className="relative">
                                     <Input
@@ -132,8 +132,12 @@ export function LoginForm({
                                     {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                                     {t("loginButton")}
                                 </Button>
-                                <FieldDescription className="text-center">
+                                {/* <FieldDescription className="text-center">
                                     {t("noAccount")} <a href="#">{t("signUp")}</a>
+                                </FieldDescription> */}
+
+                                <FieldDescription className="text-center">
+                                    {"© 2026 Lighting and Equipment PCL"}
                                 </FieldDescription>
                             </Field>
                         </FieldGroup>

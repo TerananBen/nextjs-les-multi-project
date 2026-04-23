@@ -150,44 +150,73 @@ export function DataTable<TData, TValue>({
             <div className="flex items-center justify-center space-x-2 py-4">
                 <Button
                     variant="outline"
-                    className="h-8 w-8 p-0"
+                    className="h-8 w-8 p-0 cursor-pointer"
                     onClick={() => table.previousPage()}
                     disabled={!table.getCanPreviousPage()}
                 >
-                    <span className="sr-only">Go to previous page</span>
                     <ChevronLeft className="h-4 w-4" />
                 </Button>
 
                 <div className="flex items-center gap-1">
-                    {Array.from({ length: Math.min(5, table.getPageCount()) }, (_, i) => (
-                        <Button
-                            key={i}
-                            variant={pagination.pageIndex === i ? "default" : "outline"}
-                            className="h-8 w-8 p-0"
-                            onClick={() => table.setPageIndex(i)}
-                        >
-                            {i + 1}
-                        </Button>
-                    ))}
-                    {table.getPageCount() > 5 && <span className="text-muted-foreground">...</span>}
-                    {table.getPageCount() > 5 && (
-                        <Button
-                            variant={pagination.pageIndex === table.getPageCount() - 1 ? "default" : "outline"}
-                            className="h-8 w-8 p-0"
-                            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                        >
-                            {table.getPageCount()}
-                        </Button>
-                    )}
+                    {(() => {
+                        const pageCount = table.getPageCount();
+                        const current = pagination.pageIndex;
+                        const maxVisible = 5;
+
+                        let start = Math.max(0, current - Math.floor(maxVisible / 2));
+                        const end = Math.min(pageCount, start + maxVisible);
+                        start = Math.max(0, end - maxVisible);
+
+                        const pages: number[] = [];
+                        for (let i = start; i < end; i++) pages.push(i);
+
+                        return (
+                            <>
+                                {start > 0 && (
+                                    <>
+                                        <Button
+                                            variant="outline"
+                                            className="h-8 w-8 p-0 cursor-pointer"
+                                            onClick={() => table.setPageIndex(0)}
+                                        >
+                                            1
+                                        </Button>
+                                        {start > 1 && <span className="text-muted-foreground">...</span>}
+                                    </>
+                                )}
+                                {pages.map((p) => (
+                                    <Button
+                                        key={p}
+                                        variant={current === p ? "default" : "outline"}
+                                        className="h-8 w-8 p-0 cursor-pointer"
+                                        onClick={() => table.setPageIndex(p)}
+                                    >
+                                        {p + 1}
+                                    </Button>
+                                ))}
+                                {end < pageCount && (
+                                    <>
+                                        {end < pageCount - 1 && <span className="text-muted-foreground">...</span>}
+                                        <Button
+                                            variant="outline"
+                                            className="h-8 w-8 p-0 cursor-pointer"
+                                            onClick={() => table.setPageIndex(pageCount - 1)}
+                                        >
+                                            {pageCount}
+                                        </Button>
+                                    </>
+                                )}
+                            </>
+                        );
+                    })()}
                 </div>
 
                 <Button
                     variant="outline"
-                    className="h-8 w-8 p-0"
+                    className="h-8 w-8 p-0 cursor-pointer"
                     onClick={() => table.nextPage()}
                     disabled={!table.getCanNextPage()}
                 >
-                    <span className="sr-only">Go to next page</span>
                     <ChevronRight className="h-4 w-4" />
                 </Button>
             </div>

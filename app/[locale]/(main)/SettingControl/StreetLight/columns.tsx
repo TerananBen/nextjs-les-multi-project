@@ -299,7 +299,7 @@ export const useStreetLightColumns = () => {
             cell: ({ row }) => {
                 return (
                     <div className="flex flex-col">
-                        <span className="font-semibold text-sm">{row.original.streetLightName || "-"}</span>
+                        <span>{row.original.streetLightName || "-"}</span>
                     </div>
                 )
             },

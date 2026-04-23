@@ -10,7 +10,6 @@ import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
 import { Search, FileDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import * as XLSX from "xlsx"
 import {
     Combobox,
     ComboboxContent,
@@ -114,21 +113,52 @@ export function StreetLightClient({ defaultGroupCode }: StreetLightClientProps) 
             return
         }
 
-        const dataToExport = devices.map((d, index) => ({
-            [t("table.index")]: index + 1,
-            [t("table.streetLightName")]: d.streetLightName || "",
-            [t("table.gov")]: d.streetLightSerial || "",
-            [t("table.deviceNo")]: d.imeI_Name || "",
-            [t("table.groupName")]: d.streetLightGroups?.join(", ") || "",
-            [t("table.lastUpdate")]: d.streetLightLastUpdate || "-",
-            [t("table.lifeTime")]: d.lifeTime || "-",
-            [`${t("table.lastPower")} (W)`]: d.lastPower || "0"
-        }))
+        const escapeCSV = (val: string | number | null | undefined) => {
+            const str = String(val ?? "");
+            if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+                return `"${str.replace(/"/g, '""')}"`;
+            }
+            return str;
+        };
 
-        const ws = XLSX.utils.json_to_sheet(dataToExport)
-        const wb = XLSX.utils.book_new()
-        XLSX.utils.book_append_sheet(wb, ws, "Devices")
-        XLSX.writeFile(wb, `StreetLight_Group_${selectedGroup}_${new Date().toISOString().split('T')[0]}.xlsx`)
+        const headers = [
+            t("table.index", { defaultValue: "Index" }),
+            t("table.streetLightName", { defaultValue: "Street Light Name" }),
+            t("table.gov", { defaultValue: "Group" }),
+            t("table.deviceNo", { defaultValue: "Device No" }),
+            t("table.groupName", { defaultValue: "Group Name" }),
+            t("table.lastUpdate", { defaultValue: "Last Update" }),
+            t("table.lifeTime", { defaultValue: "Life Time" }),
+            t("table.lastPower", { defaultValue: "Last Power (W)" })
+        ]
+
+        const csvContent = [
+            headers.join(","),
+            ...devices.map((d, index) => [
+                index + 1,
+                escapeCSV(d.streetLightName),
+                escapeCSV(d.streetLightSerial),
+                escapeCSV(d.imeI_Name),
+                escapeCSV(d.streetLightGroups?.join(", ")),
+                escapeCSV(d.streetLightLastUpdate),
+                escapeCSV(d.lifeTime),
+                escapeCSV(d.lastPower)
+            ].join(","))
+        ].join("\n")
+
+        const blob = new Blob([`\uFEFF${csvContent}`], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        const now = new Date();
+        const dateStr = now.toISOString().split('T')[0];
+        const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
+        const fileName = `device_list_${selectedGroup}_${dateStr}_${timeStr}.csv`;
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
     }
 
     return (

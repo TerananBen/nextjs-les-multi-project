@@ -143,7 +143,7 @@ export function HistoryPowerDialog({ imei, deviceName }: HistoryPowerDialogProps
         const csvContent = [
             headers.join(","),
             ...logs.map(log => [
-                `${log.date} ${log.time}`,
+                `"${log.date} ${log.time}"`,
                 log.i,
                 log.v,
                 log.w,

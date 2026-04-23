@@ -48,7 +48,7 @@ export function StreetLightClient({ defaultGroupCode }: StreetLightClientProps) 
                     // Ensure "ALL" exists or prepend it
                     const hasAll = data.some(g => g.groupName === "ALL")
                     if (!hasAll) {
-                        setGroups([{ groupCode: defaultGroupCode || "oPIvy3ef9VITLORALOCAL", groupName: "ALL" }, ...data])
+                        setGroups([{ groupCode: defaultGroupCode || "", groupName: "ALL" }, ...data])
                     } else {
                         setGroups(data)
                     }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo, useCallback } from "react"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import {
@@ -13,15 +13,41 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
 import { GroupConfigData } from "@/types/group-config"
 import { addRtuToGroupAction } from "@/app/actions/group-config"
 import { toast } from "sonner"
-import { Loader2, FileSpreadsheet, Upload } from "lucide-react"
+import { Loader2, FileSpreadsheet, Upload, ChevronLeft, ChevronRight } from "lucide-react"
 
 interface AddDeviceCsvDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     group: GroupConfigData
+}
+
+const PREVIEW_PAGE_SIZE = 10
+
+/**
+ * Attempt to decode an ArrayBuffer as UTF-8. If the result contains
+ * the Unicode replacement character (U+FFFD), fall back to Windows-874
+ * (Thai) encoding.
+ */
+const decodeFileBuffer = (buffer: ArrayBuffer): string => {
+    const utf8 = new TextDecoder("utf-8").decode(buffer)
+    if (!utf8.includes("\uFFFD")) return utf8
+
+    try {
+        return new TextDecoder("windows-874").decode(buffer)
+    } catch {
+        return utf8
+    }
 }
 
 export function AddDeviceCsvDialog({ open, onOpenChange, group }: AddDeviceCsvDialogProps) {
@@ -30,34 +56,49 @@ export function AddDeviceCsvDialog({ open, onOpenChange, group }: AddDeviceCsvDi
     const [uploading, setUploading] = useState(false)
     const [imsis, setImsis] = useState<string[]>([])
     const [progress, setProgress] = useState(0)
+    const [previewPage, setPreviewPage] = useState(0)
 
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const previewTotalPages = useMemo(
+        () => Math.max(1, Math.ceil(imsis.length / PREVIEW_PAGE_SIZE)),
+        [imsis.length],
+    )
+
+    const paginatedImsis = useMemo(
+        () => imsis.slice(previewPage * PREVIEW_PAGE_SIZE, (previewPage + 1) * PREVIEW_PAGE_SIZE),
+        [imsis, previewPage],
+    )
+
+    const handleFileChange = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0]
-        if (selectedFile) {
-            setFile(selectedFile)
-            const text = await selectedFile.text()
-            const lines = text.split(/\r\n|\n/)
-            // Simple parsing: extract text from each line
-            const extractedIds = lines
-                .map(line => line.trim())
-                .filter(line => line.length > 0)
-                // Filter out header row if it exists
-                .filter(line => line.toLowerCase() !== "device id" && line.toLowerCase() !== "imsi")
-                // Allow alphanumeric (letters and numbers)
-                .filter(line => /^[a-zA-Z0-9]+$/.test(line))
+        if (!selectedFile) return
 
-            if (extractedIds.length === 0) {
-                toast.error(t("noDeviceIdFound"))
-                setFile(null)
-                setImsis([])
-                return
-            }
+        setFile(selectedFile)
 
-            setImsis(extractedIds)
+        const buffer = await selectedFile.arrayBuffer()
+        const text = decodeFileBuffer(buffer)
+        const lines = text.split(/\r\n|\n/)
+
+        // Simple parsing: extract text from each line
+        const extractedIds = lines
+            .map(line => line.trim())
+            .filter(line => line.length > 0)
+            // Filter out header row if it exists
+            .filter(line => line.toLowerCase() !== "device id" && line.toLowerCase() !== "imsi")
+            // Allow alphanumeric (letters and numbers)
+            .filter(line => /^[a-zA-Z0-9]+$/.test(line))
+
+        if (extractedIds.length === 0) {
+            toast.error(t("noDeviceIdFound"))
+            setFile(null)
+            setImsis([])
+            return
         }
-    }
 
-    const handleUpload = async () => {
+        setImsis(extractedIds)
+        setPreviewPage(0)
+    }, [t])
+
+    const handleUpload = useCallback(async () => {
         if (!imsis.length) return
         setUploading(true)
         setProgress(0)
@@ -95,9 +136,9 @@ export function AddDeviceCsvDialog({ open, onOpenChange, group }: AddDeviceCsvDi
         } else {
             toast.warning(t("uploadPartial", { success: successCount, failed: failureCount }))
         }
-    }
+    }, [imsis, group.group_code, group.group_name, onOpenChange, t])
 
-    const handleDownloadTemplate = () => {
+    const handleDownloadTemplate = useCallback(() => {
         const csvContent = "Device ID\n123456789012345\n987654321098765"
         const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" })
         const link = document.createElement("a")
@@ -108,11 +149,11 @@ export function AddDeviceCsvDialog({ open, onOpenChange, group }: AddDeviceCsvDi
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
-    }
+    }, [])
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="w-[95vw] sm:max-w-[500px] p-4 sm:p-6 rounded-lg">
+            <DialogContent className="w-[95vw] sm:max-w-[500px] max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-lg">
                 <DialogHeader>
                     <DialogTitle>{t("title")}</DialogTitle>
                     <DialogDescription>
@@ -145,13 +186,68 @@ export function AddDeviceCsvDialog({ open, onOpenChange, group }: AddDeviceCsvDi
                     </div>
 
                     {imsis.length > 0 && (
-                        <div className="rounded-md bg-muted p-4">
+                        <div className="rounded-md bg-muted p-4 space-y-4">
                             <div className="flex items-center gap-2 text-sm font-medium">
                                 <FileSpreadsheet className="h-4 w-4" />
                                 {t("totalFound", { count: imsis.length })}
                             </div>
+
+                            {/* Preview Table */}
+                            <div className="rounded-md border bg-background">
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            <TableHead className="w-[40px] text-center">#</TableHead>
+                                            <TableHead>{t("previewHeaders.deviceId")}</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {paginatedImsis.map((imsi, idx) => (
+                                            <TableRow key={`${imsi}-${previewPage}-${idx}`}>
+                                                <TableCell className="text-center text-muted-foreground">
+                                                    {previewPage * PREVIEW_PAGE_SIZE + idx + 1}
+                                                </TableCell>
+                                                <TableCell className="font-mono text-xs">{imsi}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            </div>
+
+                            {/* Pagination */}
+                            {previewTotalPages > 1 && (
+                                <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                    <span>
+                                        {t("previewPagination", {
+                                            page: previewPage + 1,
+                                            totalPages: previewTotalPages,
+                                        })}
+                                    </span>
+                                    <div className="flex gap-1">
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-7 w-7 cursor-pointer"
+                                            disabled={previewPage === 0}
+                                            onClick={() => setPreviewPage(p => p - 1)}
+                                        >
+                                            <ChevronLeft className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-7 w-7 cursor-pointer"
+                                            disabled={previewPage >= previewTotalPages - 1}
+                                            onClick={() => setPreviewPage(p => p + 1)}
+                                        >
+                                            <ChevronRight className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
+
                             {uploading && (
-                                <div className="mt-4 space-y-2">
+                                <div className="space-y-2">
                                     <div className="h-2 w-full rounded-full bg-secondary">
                                         <div
                                             className="h-full rounded-full bg-primary transition-all duration-300"

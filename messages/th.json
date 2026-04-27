@@ -496,7 +496,11 @@
             "uploadPartial": "สำเร็จ {success} รายการ, ล้มเหลว {failed} รายการ",
             "cancel": "ยกเลิก",
             "noDeviceIdFound": "ไม่พบ Device ID ในไฟล์",
-            "downloadTemplate": "ดาวน์โหลดไฟล์ตัวอย่าง"
+            "downloadTemplate": "ดาวน์โหลดไฟล์ตัวอย่าง",
+            "previewHeaders": {
+                "deviceId": "รหัสอุปกรณ์"
+            },
+            "previewPagination": "หน้า {page} จาก {totalPages}"
         },
         "editCsvDialog": {
             "title": "แก้ไขอุปกรณ์ด้วยไฟล์ CSV",
@@ -511,7 +515,15 @@
             "uploadPartial": "สำเร็จ {success} รายการ, ล้มเหลว {failed} รายการ",
             "cancel": "ยกเลิก",
             "noDataFound": "ไม่พบข้อมูลที่ถูกต้องในไฟล์",
-            "downloadTemplate": "ดาวน์โหลดไฟล์ตัวอย่าง"
+            "downloadTemplate": "ดาวน์โหลดไฟล์ตัวอย่าง",
+            "previewHeaders": {
+                "deviceId": "รหัสอุปกรณ์",
+                "latitude": "ละติจูด",
+                "longitude": "ลองจิจูด",
+                "poleName": "ชื่อเสา",
+                "govName": "ครุภัณฑ์"
+            },
+            "previewPagination": "หน้า {page} จาก {totalPages}"
         },
         "addDeviceDialog": {
             "title": "จัดการอุปกรณ์ในกลุ่ม",

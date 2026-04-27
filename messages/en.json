@@ -496,7 +496,11 @@
             "uploadPartial": "Added {success} devices, failed {failed}",
             "cancel": "Cancel",
             "noDeviceIdFound": "No valid Device ID found in the file",
-            "downloadTemplate": "Download Template"
+            "downloadTemplate": "Download Template",
+            "previewHeaders": {
+                "deviceId": "Device ID"
+            },
+            "previewPagination": "Page {page} of {totalPages}"
         },
         "editCsvDialog": {
             "title": "Edit Devices via CSV",
@@ -511,7 +515,15 @@
             "uploadPartial": "Updated {success} devices, failed {failed}",
             "cancel": "Cancel",
             "noDataFound": "No valid data found in the file",
-            "downloadTemplate": "Download Template"
+            "downloadTemplate": "Download Template",
+            "previewHeaders": {
+                "deviceId": "Device ID",
+                "latitude": "Latitude",
+                "longitude": "Longitude",
+                "poleName": "Pole Name",
+                "govName": "Gov Name"
+            },
+            "previewPagination": "Page {page} of {totalPages}"
         },
         "addDeviceDialog": {
             "title": "Manage Group Devices",

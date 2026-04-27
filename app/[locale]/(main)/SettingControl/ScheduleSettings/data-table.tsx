@@ -36,10 +36,8 @@ export function DataTable<TData, TValue>({
     columns,
     data,
     loading = false,
-    onAdd,
 }: DataTableProps<TData, TValue>) {
     const t = useTranslations("ScheduleSettings")
-    const tButtons = useTranslations("ScheduleSettings.buttons") // assuming "add" key is in buttons
     const [pagination, setPagination] = React.useState<PaginationState>({
         pageIndex: 0,
         pageSize: 10,

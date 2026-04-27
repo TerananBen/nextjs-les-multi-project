@@ -36,7 +36,6 @@ export function DataTable<TData, TValue>({
     columns,
     data,
     loading = false,
-    onAdd,
 }: DataTableProps<TData, TValue>) {
     const t = useTranslations("MaintenanceConfig")
     const [pagination, setPagination] = React.useState<PaginationState>({

@@ -130,6 +130,7 @@ export function GroupConfigClient() {
                             }}
                         >
                             <Button
+                                variant="outline"
                                 size="sm"
                                 className={cn(
                                     "cursor-pointer h-9 w-full md:w-auto rounded-lg px-4 shadow-sm transition-all",

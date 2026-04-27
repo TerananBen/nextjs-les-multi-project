@@ -30,7 +30,7 @@ export const useGroupConfigColumns = (onDeleteSuccess?: () => void) => {
                     </Button>
                 )
             },
-            cell: ({ row }) => <div className="ml-4 font-medium">{row.getValue("group_name")}</div>,
+            cell: ({ row }) => <div className="ml-4">{row.getValue("group_name")}</div>,
         },
         {
             id: "control",
@@ -131,7 +131,7 @@ function DeleteCell({ row, onSuccess }: DeleteCellProps) {
                     }}
                 >
                     <Button
-                        variant="ghost"
+                        variant="outline"
                         size="icon"
                         className={cn(
                             "cursor-pointer h-8 w-8",
@@ -282,7 +282,7 @@ function EditDeviceCsvCell({ row }: { row: GroupConfigData }) {
     return (
         <div className="flex justify-center">
             <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
                 onClick={() => {
                     if (canManage) setOpen(true)

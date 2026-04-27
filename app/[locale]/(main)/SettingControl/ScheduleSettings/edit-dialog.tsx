@@ -378,7 +378,7 @@ export function EditScheduleDialog({
                         {/* Groups Section */}
                         <div className="space-y-4">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-sm font-semibold text-foreground border-l-4 border-primary pl-2">
+                                <h3 className="text-sm font-semibold text-foreground">
                                     {t("groupNameHeader")}
                                 </h3>
                                 <div className="flex gap-2 w-full max-w-sm">
@@ -457,7 +457,7 @@ export function EditScheduleDialog({
                         {typeSchedule === "time" && (
                             <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-sm font-semibold text-foreground border-l-4 border-indigo-500 pl-2">
+                                    <h3 className="text-sm font-semibold text-foreground">
                                         {t("workTimeHeader")}
                                     </h3>
                                     <Button
@@ -555,7 +555,7 @@ export function EditScheduleDialog({
                         {/* TYPE: LIGHT */}
                         {typeSchedule === "light" && (
                             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                <h3 className="text-sm font-semibold text-foreground border-l-4 border-amber-500 pl-2">
+                                <h3 className="text-sm font-semibold text-foreground">
                                     {t("lightIntensitySetting")}
                                 </h3>
 

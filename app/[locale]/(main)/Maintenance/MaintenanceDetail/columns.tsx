@@ -29,7 +29,7 @@ export const useMaintenanceDetailColumns = (onOpenDialog: (id: string) => void) 
                     </Button>
                 )
             },
-            cell: ({ row }) => <div className="text-sm font-medium px-4">{row.original.list_name}</div>,
+            cell: ({ row }) => <div className="text-sm px-4">{row.original.list_name}</div>,
         },
         {
             accessorKey: "name_operator",

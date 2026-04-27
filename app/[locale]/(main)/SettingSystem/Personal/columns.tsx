@@ -28,7 +28,7 @@ export const getColumns = (
                 const firstName = row.original.first_name
                 const lastName = row.original.last_name
                 return (
-                    <div className="font-medium">
+                    <div>
                         {firstName} - {lastName}
                     </div>
                 )

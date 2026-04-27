@@ -104,7 +104,7 @@ export function DetailDialog({ detailId, onClose }: DetailDialogProps) {
                     </DialogClose>
                 </DialogHeader>
 
-                <div className="p-6">
+                <div className="pb-3 pl-3 pr-3">
                     {/* Legend */}
                     <div className="bg-muted/50 flex items-center gap-6 p-3 rounded-md mb-6 w-full text-sm font-medium">
                         <LegendItem icons={[{ color: "blue", badge: "A" }]} text={tMap("legend.disconnect")} />

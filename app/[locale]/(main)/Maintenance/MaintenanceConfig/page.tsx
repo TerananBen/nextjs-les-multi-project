@@ -19,7 +19,7 @@ const googleMapsApiKey = process.env.GOOGLE_MAPS_KEY || ""
 
 export default function Page() {
     return (
-        <div className="flex flex-1 flex-col gap-4 p-4 md:gap-6 md:p-6">
+        <div className="flex flex-1 flex-col gap-4 p-4 md:gap-3 md:p-3">
             <MaintenanceConfigClient mapMode={mapMode as "online" | "offline"} mapOfflineUrl={mapOfflineUrl} defaultLat={defaultLat} defaultLng={defaultLng} defaultZoom={defaultZoom} iconScale={iconScale} googleMapsApiKey={googleMapsApiKey} />
         </div>
     )

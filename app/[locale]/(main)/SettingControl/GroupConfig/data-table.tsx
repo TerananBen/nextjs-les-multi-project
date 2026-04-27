@@ -86,39 +86,39 @@ export function DataTable<TData, TValue>({
                 </div>
             </div>
 
-            <div className="rounded-xl border bg-card text-card-foreground shadow-sm overflow-hidden">
-                <div className="overflow-x-auto">
-                    <Table className="w-full whitespace-nowrap lg:whitespace-normal">
-                        <TableHeader className="bg-muted/50">
-                            {table.getHeaderGroups().map((headerGroup) => (
-                                <TableRow key={headerGroup.id}>
-                                    {headerGroup.headers.map((header) => {
-                                        return (
-                                            <TableHead key={header.id} className="font-semibold text-gray-700">
-                                                {header.isPlaceholder
-                                                    ? null
-                                                    : flexRender(
-                                                        header.column.columnDef.header,
-                                                        header.getContext()
-                                                    )}
-                                            </TableHead>
-                                        )
-                                    })}
-                                </TableRow>
-                            ))}
-                        </TableHeader>
-                        <TableBody>
-                            {loading ? (
-                                <TableRow>
-                                    <TableCell colSpan={columns.length} className="h-24 text-center">
-                                        <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                                            <Loader2 className="h-4 w-4 animate-spin" />
-                                            <span>{t("loading")}</span>
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            ) : table.getRowModel().rows?.length ? (
-                                table.getRowModel().rows.map((row) => (
+            <div className="mt-4 rounded-xl border bg-card text-card-foreground shadow-sm">
+                <Table>
+                    <TableHeader className="bg-muted/50">
+                        {table.getHeaderGroups().map((headerGroup) => (
+                            <TableRow key={headerGroup.id}>
+                                {headerGroup.headers.map((header) => {
+                                    return (
+                                        <TableHead key={header.id}>
+                                            {header.isPlaceholder
+                                                ? null
+                                                : flexRender(
+                                                    header.column.columnDef.header,
+                                                    header.getContext()
+                                                )}
+                                        </TableHead>
+                                    )
+                                })}
+                            </TableRow>
+                        ))}
+                    </TableHeader>
+                    <TableBody>
+                        {loading ? (
+                            <TableRow>
+                                <TableCell colSpan={columns.length} className="h-24 text-center">
+                                    <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                        <span>{t("loading")}</span>
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        ) : table.getRowModel().rows?.length ? (
+                            <>
+                                {table.getRowModel().rows.map((row) => (
                                     <TableRow
                                         key={row.id}
                                         data-state={row.getIsSelected() && "selected"}
@@ -130,8 +130,18 @@ export function DataTable<TData, TValue>({
                                             </TableCell>
                                         ))}
                                     </TableRow>
-                                ))
-                            ) : (
+                                ))}
+                                {/* Render empty rows to keep table height consistent */}
+                                {Array.from({ length: pagination.pageSize - table.getRowModel().rows.length }).map((_, i) => (
+                                    <TableRow key={`empty-${i}`} className="pointer-events-none">
+                                        <TableCell colSpan={columns.length} className="h-[57px] py-3">
+                                            &nbsp;
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </>
+                        ) : (
+                            <>
                                 <TableRow>
                                     <TableCell
                                         colSpan={columns.length}
@@ -140,14 +150,22 @@ export function DataTable<TData, TValue>({
                                         {t("noData")}
                                     </TableCell>
                                 </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
-                </div>
+                                {/* Render empty rows for no-data state too */}
+                                {Array.from({ length: pagination.pageSize - 1 }).map((_, i) => (
+                                    <TableRow key={`empty-${i}`} className="pointer-events-none">
+                                        <TableCell colSpan={columns.length} className="h-[45px] p-0">
+                                            &nbsp;
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </>
+                        )}
+                    </TableBody>
+                </Table>
             </div>
 
             {/* Pagination */}
-            <div className="flex items-center justify-center space-x-2 py-4">
+            <div className="mt-4 flex items-center justify-center space-x-2 py-4">
                 <Button
                     variant="outline"
                     className="h-8 w-8 p-0 cursor-pointer"

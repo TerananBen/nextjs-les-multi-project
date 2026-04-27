@@ -20,7 +20,7 @@ export default async function MaintenanceDetailPage() {
     const googleMapsApiKey = process.env.GOOGLE_MAPS_KEY || ""
 
     return (
-        <div className="flex flex-1 flex-col gap-4 p-4 md:gap-6 md:p-6">
+        <div className="flex flex-1 flex-col gap-4 p-4 md:gap-3 md:p-3">
             <MaintenanceDetailClient defaultLat={defaultLat} defaultLng={defaultLng} defaultZoom={defaultZoom} iconScale={iconScale} mapMode={mapMode as "offline" | "online"} mapOfflineUrl={mapOfflineUrl} googleMapsApiKey={googleMapsApiKey} initialData={data || []} />
         </div>
     )

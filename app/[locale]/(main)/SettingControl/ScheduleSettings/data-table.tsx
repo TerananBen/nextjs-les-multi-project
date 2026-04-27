@@ -89,14 +89,14 @@ export function DataTable<TData, TValue>({
                 </div>
             </div>
 
-            <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
+            <div className="mt-4 rounded-xl border bg-card text-card-foreground shadow-sm">
                 <Table>
                     <TableHeader className="bg-muted/50">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                        <TableHead key={header.id} className="font-semibold text-muted-foreground">
+                                        <TableHead key={header.id}>
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
@@ -110,23 +110,6 @@ export function DataTable<TData, TValue>({
                         ))}
                     </TableHeader>
                     <TableBody>
-                        {/* Render Add Row on First Page if onAdd is provided */}
-                        {onAdd && pagination.pageIndex === 0 && !loading && (
-                            <TableRow
-                                className="hover:bg-primary/5 cursor-pointer group transition-colors border-b-2 border-dashed border-primary/20"
-                                onClick={onAdd}
-                            >
-                                <TableCell colSpan={columns.length} className="h-14 text-center py-2">
-                                    <div className="flex items-center justify-center gap-2 text-primary font-medium group-hover:text-primary/80">
-                                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                                            <span className="text-lg leading-none mb-0.5">+</span>
-                                        </div>
-                                        {tButtons("add")}
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        )}
-
                         {loading ? (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">
@@ -137,21 +120,31 @@ export function DataTable<TData, TValue>({
                                 </TableCell>
                             </TableRow>
                         ) : table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={row.getIsSelected() && "selected"}
-                                    className="hover:bg-muted/50"
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="py-3">
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            <>
+                                {table.getRowModel().rows.map((row) => (
+                                    <TableRow
+                                        key={row.id}
+                                        data-state={row.getIsSelected() && "selected"}
+                                        className="hover:bg-muted/50"
+                                    >
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id} className="py-3">
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                                {/* Render empty rows to keep table height consistent */}
+                                {Array.from({ length: pagination.pageSize - table.getRowModel().rows.length }).map((_, i) => (
+                                    <TableRow key={`empty-${i}`} className="pointer-events-none">
+                                        <TableCell colSpan={columns.length} className="h-[61px] py-3">
+                                            &nbsp;
                                         </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
+                                    </TableRow>
+                                ))}
+                            </>
                         ) : (
-                            !onAdd && ( // Only show No Data if we didn't render an Add row (or if we prefer showing it below add row? Standard usually hides if there's an add row, but here we can show both or just add row. If empty data, table shows add row then no data row? Let's keep no data row if absolutely no data found)
+                            <>
                                 <TableRow>
                                     <TableCell
                                         colSpan={columns.length}
@@ -160,54 +153,91 @@ export function DataTable<TData, TValue>({
                                         {t("noData")}
                                     </TableCell>
                                 </TableRow>
-                            )
+                                {/* Render empty rows for no-data state too */}
+                                {Array.from({ length: pagination.pageSize - 1 }).map((_, i) => (
+                                    <TableRow key={`empty-${i}`} className="pointer-events-none">
+                                        <TableCell colSpan={columns.length} className="h-[45px] p-0">
+                                            &nbsp;
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </>
                         )}
                     </TableBody>
                 </Table>
             </div>
 
             {/* Pagination */}
-            <div className="flex items-center justify-center space-x-2 py-4">
+            <div className="mt-4 flex items-center justify-center space-x-2 py-4">
                 <Button
                     variant="outline"
-                    className="h-8 w-8 p-0"
+                    className="h-8 w-8 p-0 cursor-pointer"
                     onClick={() => table.previousPage()}
                     disabled={!table.getCanPreviousPage()}
                 >
-                    <span className="sr-only">Go to previous page</span>
                     <ChevronLeft className="h-4 w-4" />
                 </Button>
 
                 <div className="flex items-center gap-1">
-                    {Array.from({ length: Math.min(5, table.getPageCount()) }, (_, i) => (
-                        <Button
-                            key={i}
-                            variant={pagination.pageIndex === i ? "default" : "outline"}
-                            className="h-8 w-8 p-0"
-                            onClick={() => table.setPageIndex(i)}
-                        >
-                            {i + 1}
-                        </Button>
-                    ))}
-                    {table.getPageCount() > 5 && <span className="text-muted-foreground">...</span>}
-                    {table.getPageCount() > 5 && (
-                        <Button
-                            variant={pagination.pageIndex === table.getPageCount() - 1 ? "default" : "outline"}
-                            className="h-8 w-8 p-0"
-                            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                        >
-                            {table.getPageCount()}
-                        </Button>
-                    )}
+                    {(() => {
+                        const pageCount = table.getPageCount();
+                        const current = pagination.pageIndex;
+                        const maxVisible = 5;
+
+                        let start = Math.max(0, current - Math.floor(maxVisible / 2));
+                        const end = Math.min(pageCount, start + maxVisible);
+                        start = Math.max(0, end - maxVisible);
+
+                        const pages: number[] = [];
+                        for (let i = start; i < end; i++) pages.push(i);
+
+                        return (
+                            <>
+                                {start > 0 && (
+                                    <>
+                                        <Button
+                                            variant="outline"
+                                            className="h-8 w-8 p-0 cursor-pointer"
+                                            onClick={() => table.setPageIndex(0)}
+                                        >
+                                            1
+                                        </Button>
+                                        {start > 1 && <span className="text-muted-foreground">...</span>}
+                                    </>
+                                )}
+                                {pages.map((p) => (
+                                    <Button
+                                        key={p}
+                                        variant={current === p ? "default" : "outline"}
+                                        className="h-8 w-8 p-0 cursor-pointer"
+                                        onClick={() => table.setPageIndex(p)}
+                                    >
+                                        {p + 1}
+                                    </Button>
+                                ))}
+                                {end < pageCount && (
+                                    <>
+                                        {end < pageCount - 1 && <span className="text-muted-foreground">...</span>}
+                                        <Button
+                                            variant="outline"
+                                            className="h-8 w-8 p-0 cursor-pointer"
+                                            onClick={() => table.setPageIndex(pageCount - 1)}
+                                        >
+                                            {pageCount}
+                                        </Button>
+                                    </>
+                                )}
+                            </>
+                        );
+                    })()}
                 </div>
 
                 <Button
                     variant="outline"
-                    className="h-8 w-8 p-0"
+                    className="h-8 w-8 p-0 cursor-pointer"
                     onClick={() => table.nextPage()}
                     disabled={!table.getCanNextPage()}
                 >
-                    <span className="sr-only">Go to next page</span>
                     <ChevronRight className="h-4 w-4" />
                 </Button>
             </div>

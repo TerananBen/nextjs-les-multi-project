@@ -30,7 +30,7 @@ export const useScheduleColumns = ({ onEdit, onDelete, onFeedback }: UseSchedule
                     </Button>
                 )
             },
-            cell: ({ row }) => <div className="font-medium text-foreground">{row.getValue("scheduleName")}</div>,
+            cell: ({ row }) => <div className="ml-2">{row.getValue("scheduleName")}</div>,
         },
         {
             accessorKey: "typeSchedule",

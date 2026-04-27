@@ -24,7 +24,7 @@ export const useMenuSettingsColumns = (
                 // But for safety, let's just use t().
 
                 return (
-                    <div className="font-medium">
+                    <div>
                         {t(translationKey as never)}
                     </div>
                 )

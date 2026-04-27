@@ -19,17 +19,17 @@ export const useMaintenanceColumns = ({ onDetail, onStatusChange, onDelete }: Us
         {
             id: "index",
             header: () => <div className="font-semibold text-foreground">{t("table.no")}</div>,
-            cell: ({ row }) => <div className="font-medium text-foreground">{row.index + 1}</div>,
+            cell: ({ row }) => <div className="text-sm px-4">{row.index + 1}</div>,
         },
         {
             accessorKey: "list_name",
             header: () => <div className="font-semibold text-foreground">{t("table.listName")}</div>,
-            cell: ({ row }) => <div className="font-medium text-foreground">{row.getValue("list_name")}</div>,
+            cell: ({ row }) => <div className="text-sm px-4">{row.getValue("list_name")}</div>,
         },
         {
             accessorKey: "name_operator",
             header: () => <div className="font-semibold text-foreground">{t("table.operatorName")}</div>,
-            cell: ({ row }) => <div className="font-medium text-foreground">{row.getValue("name_operator")}</div>,
+            cell: ({ row }) => <div className="text-sm px-4">{row.getValue("name_operator")}</div>,
         },
         {
             accessorKey: "repair_all",
@@ -52,11 +52,12 @@ export const useMaintenanceColumns = ({ onDetail, onStatusChange, onDelete }: Us
             cell: ({ row }) => {
                 return (
                     <Button
+                        variant="default"
                         size="icon"
-                        className="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white h-9 w-9 shadow-sm"
+                        className="cursor-pointer h-8 w-8 bg-blue-500 hover:bg-blue-600 rounded-lg"
                         onClick={() => onDetail(row.original)}
                     >
-                        <Info className="h-4 w-4" />
+                        <Info className="h-4 w-4 text-white" />
                     </Button>
                 )
             },
@@ -69,6 +70,7 @@ export const useMaintenanceColumns = ({ onDetail, onStatusChange, onDelete }: Us
                 const isConfirmed = row.original.confrime === "T" || row.original.confrime === "1" || row.original.confrime?.toLowerCase() === "true"
                 return (
                     <Button
+                        variant="default"
                         size="sm"
                         className={`cursor-pointer gap-2 px-4 shadow-sm text-white ${isConfirmed
                             ? "bg-green-500 hover:bg-green-600"
@@ -98,11 +100,12 @@ export const useMaintenanceColumns = ({ onDetail, onStatusChange, onDelete }: Us
             cell: ({ row }) => {
                 return (
                     <Button
+                        variant="default"
                         size="icon"
-                        className="cursor-pointer bg-pink-500 hover:bg-pink-600 text-white h-9 w-9 shadow-sm"
+                        className="cursor-pointer bg-pink-500 hover:bg-pink-600 text-white h-8 w-8 shadow-sm"
                         onClick={() => onDelete(row.original)}
                     >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4 text-white" />
                     </Button>
                 )
             },

@@ -60,7 +60,7 @@ export function DataTable<TData, TValue>({
     })
 
     return (
-        <div className="space-y-4">
+        <div className="flex flex-col">
             {/* Top Controls: Total Count & Rows per page */}
             <div className="flex items-center justify-between text-sm text-muted-foreground px-1">
                 <div>{t("totalDevice")} {table.getFilteredRowModel().rows.length}</div>
@@ -86,7 +86,7 @@ export function DataTable<TData, TValue>({
                 </div>
             </div>
 
-            <div className="rounded-xl border bg-card text-card-foreground shadow-sm">
+            <div className="mt-4 rounded-xl border bg-card text-card-foreground shadow-sm">
                 <Table>
                     <TableHeader className="bg-muted/50">
                         {table.getHeaderGroups().map((headerGroup) => (
@@ -117,35 +117,55 @@ export function DataTable<TData, TValue>({
                                 </TableCell>
                             </TableRow>
                         ) : table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    data-state={row.getIsSelected() && "selected"}
-                                    className="hover:bg-muted/50"
-                                >
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="py-3">
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            <>
+                                {table.getRowModel().rows.map((row) => (
+                                    <TableRow
+                                        key={row.id}
+                                        data-state={row.getIsSelected() && "selected"}
+                                        className="hover:bg-muted/50"
+                                    >
+                                        {row.getVisibleCells().map((cell) => (
+                                            <TableCell key={cell.id} className="py-3">
+                                                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                            </TableCell>
+                                        ))}
+                                    </TableRow>
+                                ))}
+                                {/* Render empty rows to keep table height consistent */}
+                                {Array.from({ length: pagination.pageSize - table.getRowModel().rows.length }).map((_, i) => (
+                                    <TableRow key={`empty-${i}`} className="pointer-events-none">
+                                        <TableCell colSpan={columns.length} className="h-[57px] py-3">
+                                            &nbsp;
                                         </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
+                                    </TableRow>
+                                ))}
+                            </>
                         ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center"
-                                >
-                                    {t("noData")}
-                                </TableCell>
-                            </TableRow>
+                            <>
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={columns.length}
+                                        className="h-24 text-center"
+                                    >
+                                        {t("noData")}
+                                    </TableCell>
+                                </TableRow>
+                                {/* Render empty rows for no-data state too */}
+                                {Array.from({ length: pagination.pageSize - 1 }).map((_, i) => (
+                                    <TableRow key={`empty-${i}`} className="pointer-events-none">
+                                        <TableCell colSpan={columns.length} className="h-[45px] p-0">
+                                            &nbsp;
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </>
                         )}
                     </TableBody>
                 </Table>
             </div>
 
             {/* Pagination */}
-            <div className="flex items-center justify-center space-x-2 py-4">
+            <div className="mt-4 flex items-center justify-center space-x-2 py-4">
                 <Button
                     variant="outline"
                     className="h-8 w-8 p-0 cursor-pointer"

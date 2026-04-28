@@ -67,9 +67,9 @@ export default function FilterSidebar({
                         {/* Search Criteria Group */}
                         <div className="flex flex-col md:flex-row w-full md:flex-1 gap-2 items-center bg-muted/30 p-1 rounded-xl">
                             {/* Type Selector */}
-                            <div className="w-[140px] md:w-[160px] shrink-0">
+                            <div className="w-full md:w-auto shrink-0">
                                 <Select value={searchType} onValueChange={(val: "group" | "imsi" | "street_light_name") => setSearchType(val)}>
-                                    <SelectTrigger className="cursor-pointer h-9 rounded-xl bg-white border-gray-200 shadow-sm text-sm font-medium">
+                                    <SelectTrigger className="cursor-pointer h-9 w-full rounded-xl bg-white border-gray-200 shadow-sm text-sm font-medium">
                                         <div className="flex items-center">
                                             <SelectValue />
                                         </div>

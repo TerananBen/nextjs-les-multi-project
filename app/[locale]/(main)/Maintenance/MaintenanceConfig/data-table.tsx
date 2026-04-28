@@ -36,6 +36,7 @@ export function DataTable<TData, TValue>({
     columns,
     data,
     loading = false,
+    onAdd,
 }: DataTableProps<TData, TValue>) {
     const t = useTranslations("MaintenanceConfig")
     const [pagination, setPagination] = React.useState<PaginationState>({
@@ -108,6 +109,23 @@ export function DataTable<TData, TValue>({
                         ))}
                     </TableHeader>
                     <TableBody>
+                        {/* Render Add Row on First Page if onAdd is provided */}
+                        {onAdd && pagination.pageIndex === 0 && !loading && (
+                            <TableRow
+                                className="hover:bg-primary/5 cursor-pointer group transition-colors border-b-2 border-dashed border-primary/20"
+                                onClick={onAdd}
+                            >
+                                <TableCell colSpan={columns.length} className="h-14 py-2">
+                                    <div className="flex items-center justify-center gap-2 text-primary font-medium group-hover:text-primary/80">
+                                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                                            <span className="text-lg leading-none mb-0.5">+</span>
+                                        </div>
+                                        {t("buttons.add")}
+                                    </div>
+                                </TableCell>
+                            </TableRow>
+                        )}
+
                         {loading ? (
                             <TableRow>
                                 <TableCell colSpan={columns.length} className="h-24 text-center">

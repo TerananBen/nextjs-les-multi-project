@@ -776,6 +776,8 @@
             "scheduleNamePlaceholder": "กรอกชื่อการตั้งค่า...",
             "addGroup": "เพิ่มกลุ่ม",
             "selectGroup": "-- เลือก กลุ่ม --",
+            "searchGroupPlaceholder": "ค้นหากลุ่ม...",
+            "noGroupFound": "ไม่พบกลุ่ม",
             "typeLabel": "ประเภท",
             "groupNameHeader": "ชื่อกลุ่ม",
             "deleteHeader": "ลบ",

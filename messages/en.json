@@ -776,6 +776,8 @@
             "scheduleNamePlaceholder": "Enter schedule name...",
             "addGroup": "Add Group",
             "selectGroup": "-- Select Group --",
+            "searchGroupPlaceholder": "Search group...",
+            "noGroupFound": "No group found.",
             "typeLabel": "Type",
             "groupNameHeader": "Group Name",
             "deleteHeader": "Delete",

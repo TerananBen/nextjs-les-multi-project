@@ -21,6 +21,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import {
+    Combobox,
+    ComboboxContent,
+    ComboboxEmpty,
+    ComboboxInput,
+    ComboboxItem,
+    ComboboxList,
+} from "@/components/ui/combobox"
 import { Trash2, Plus, Clock } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
@@ -363,7 +371,7 @@ export function EditScheduleDialog({
                                     value={typeSchedule}
                                     onValueChange={(val) => setValue("typeSchedule", val)}
                                 >
-                                    <SelectTrigger className="cursor-pointer h-10 border-input bg-muted/50 focus:bg-background">
+                                    <SelectTrigger className="w-full max-w-sm cursor-pointer h-10 border-input bg-muted/50 focus:bg-background">
                                         <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -382,22 +390,25 @@ export function EditScheduleDialog({
                                     {t("groupNameHeader")}
                                 </h3>
                                 <div className="flex gap-2 w-full max-w-sm">
-                                    <Select value={selectedGroupToAdd} onValueChange={setSelectedGroupToAdd}>
-                                        <SelectTrigger className="cursor-pointer h-9 border-input bg-muted/50 focus:bg-background">
-                                            <SelectValue placeholder={t("selectGroup")} />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            {groups.map((g) => (
-                                                <SelectItem className="cursor-pointer" key={g.groupCode} value={g.groupName}>
-                                                    {g.groupName}
-                                                </SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <div className="flex-1">
+                                        <Combobox value={selectedGroupToAdd} onValueChange={setSelectedGroupToAdd}>
+                                            <ComboboxInput className="cursor-pointer h-8 w-full rounded-md border-input bg-muted/50 focus:bg-background" placeholder={t("selectGroup")} />
+                                            <ComboboxContent searchPlaceholder={t("searchGroupPlaceholder")}>
+                                                <ComboboxEmpty>{t("noGroupFound")}</ComboboxEmpty>
+                                                <ComboboxList>
+                                                    {groups.map((g) => (
+                                                        <ComboboxItem key={g.groupCode} value={g.groupName}>
+                                                            {g.groupName}
+                                                        </ComboboxItem>
+                                                    ))}
+                                                </ComboboxList>
+                                            </ComboboxContent>
+                                        </Combobox>
+                                    </div>
                                     <Button
                                         type="button"
                                         size="sm"
-                                        className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white shadow-sm shrink-0"
+                                        className="cursor-pointer h-8 bg-blue-600 hover:bg-blue-700 text-white shadow-sm shrink-0"
                                         onClick={handleAddGroup}
                                     >
                                         <Plus className="w-4 h-4 mr-1" />

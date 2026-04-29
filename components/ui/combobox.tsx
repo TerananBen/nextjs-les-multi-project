@@ -61,7 +61,7 @@ export function Combobox({ children, value: controlledValue, onValueChange }: Co
 
     return (
         <ComboboxContext.Provider value={{ value, onValueChange: handleValueChange, open, setOpen }}>
-            <Popover open={open} onOpenChange={setOpen}>
+            <Popover open={open} onOpenChange={setOpen} modal={true}>
                 {children}
             </Popover>
         </ComboboxContext.Provider>

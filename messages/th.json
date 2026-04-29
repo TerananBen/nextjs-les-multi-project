@@ -641,6 +641,7 @@
                 "networkFailure": "เครือข่ายขัดข้อง"
             },
             "table": {
+                "id": "รหัสอุปกรณ์",
                 "poleNumber": "หมายเลขเสา",
                 "oldDeviceId": "รหัสอุปกรณ์เดิม",
                 "newDeviceId": "รหัสอุปกรณ์ใหม่",

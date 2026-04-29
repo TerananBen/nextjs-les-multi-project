@@ -641,6 +641,7 @@
                 "networkFailure": "Network failure"
             },
             "table": {
+                "id": "ID",
                 "poleNumber": "Pole number",
                 "oldDeviceId": "Old Device Id",
                 "newDeviceId": "New Device Id",

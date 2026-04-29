@@ -56,9 +56,8 @@ function MarkerPopup({ item, t }: MarkerPopupProps) {
     return (
         <div className="font-sans min-w-[220px] text-gray-800 text-sm space-y-3 p-1">
             <div className="space-y-1">
-                <p className="font-bold text-base">{item.street_light_name || "-"}</p>
-                <p><span className="text-gray-500 font-medium">ID: </span>{item.imsi_befor}</p>
-                <p><span className="text-gray-500 font-medium">{t("detail.table.issueReason")}: </span>{item.lamp_case || "-"}</p>
+                <p>{item.street_light_name || "-"}</p>
+                <p><span>{t("detail.table.id", { defaultMessage: "ID" })}: </span>{item.imsi_befor}</p>
             </div>
             <Button
                 variant="default"

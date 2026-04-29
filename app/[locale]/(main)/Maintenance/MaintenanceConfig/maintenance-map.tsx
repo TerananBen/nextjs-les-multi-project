@@ -110,10 +110,15 @@ function GoogleMapComponent({ defaultLat, defaultLng, defaultZoom, iconScale, go
     const tMap = useTranslations("MapGlobal");
     const tConfig = useTranslations("MaintenanceConfig");
     const locale = useLocale();
-    if (loadedMapLang === null) {
-        loadedMapLang = locale;
-    }
-    const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: googleMapsApiKey || "", language: loadedMapLang })
+    const mapLang = loadedMapLang || locale;
+    
+    useEffect(() => {
+        if (loadedMapLang === null) {
+            loadedMapLang = locale;
+        }
+    }, [locale]);
+    
+    const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: googleMapsApiKey || "", language: mapLang })
     const [map, setMap] = useState<google.maps.Map | null>(null)
     const [zoom, setZoom] = useState(defaultZoom)
     const [selectedDevice, setSelectedDevice] = useState<LatLongData | null>(null)

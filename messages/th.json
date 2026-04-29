@@ -242,7 +242,9 @@
         },
         "charts": {
             "energyConsumption": "การใช้พลังงาน (kWh)",
+            "energyTooltip": "การใช้พลังงาน : {value} kWh",
             "lampFailure": "โคมเสีย (จำนวน)",
+            "lampFailureTooltip": "โคมเสีย : {value} โคม",
             "noData": "ไม่พบข้อมูล",
             "time": "เวลา"
         },

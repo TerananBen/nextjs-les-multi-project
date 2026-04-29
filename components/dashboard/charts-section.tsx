@@ -116,9 +116,15 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
                             />
                             <Tooltip
                                 contentStyle={{ borderRadius: "8px" }}
+                                separator=""
+                                formatter={(value: unknown) => [t("energyTooltip", { value: Number(value) }), ""]}
                                 labelFormatter={(value) => {
                                     if (isHourly) return `${t("time")}: ${value}`
-                                    return new Date(value).toLocaleDateString(locale)
+                                    return new Date(value).toLocaleDateString(locale, {
+                                        day: "numeric",
+                                        month: "short",
+                                        year: "numeric"
+                                    })
                                 }}
                             />
                             <Area
@@ -127,6 +133,7 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
                                 stroke="var(--chart-1)"
                                 fillOpacity={1}
                                 fill="url(#colorEnergy)"
+
                             />
                         </AreaChart>,
                         hasEnergyData
@@ -166,7 +173,15 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
                             <Tooltip
                                 cursor={{ fill: 'transparent' }}
                                 contentStyle={{ borderRadius: "8px" }}
-                                labelFormatter={(value) => new Date(value).toLocaleDateString(locale)}
+                                separator=""
+                                formatter={(value: unknown) => [t("lampFailureTooltip", { value: Number(value) }), ""]}
+                                labelFormatter={(value) => {
+                                    return new Date(value).toLocaleDateString(locale, {
+                                        day: "numeric",
+                                        month: "short",
+                                        year: "numeric"
+                                    })
+                                }}
                             />
                             <Bar
                                 dataKey="value"

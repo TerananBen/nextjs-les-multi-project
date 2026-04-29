@@ -242,7 +242,9 @@
         },
         "charts": {
             "energyConsumption": "Energy Consumption (kWh)",
+            "energyTooltip": "Energy Consumption : {value} kWh",
             "lampFailure": "Lamp Failure (Unit)",
+            "lampFailureTooltip": "Lamp Failure : {value} Lamps",
             "noData": "No data available",
             "time": "Time"
         },

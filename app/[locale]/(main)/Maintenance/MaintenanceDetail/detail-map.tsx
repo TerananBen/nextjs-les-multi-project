@@ -206,13 +206,18 @@ let loadedMapLang: string | null = null;
 function GoogleMapComponent({ googleMapsApiKey, devices, defaultLat, defaultLng, defaultZoom, iconScale }: { googleMapsApiKey?: string, devices: MaintenanceDetailRecord[], defaultLat: number, defaultLng: number, defaultZoom: number, iconScale: number }) {
     const t = useTranslations("MaintenanceDashboard")
     const locale = useLocale()
-    if (loadedMapLang === null) {
-        loadedMapLang = locale;
-    }
+    const mapLang = loadedMapLang || locale;
+    
+    useEffect(() => {
+        if (loadedMapLang === null) {
+            loadedMapLang = locale;
+        }
+    }, [locale]);
+
     const { isLoaded } = useJsApiLoader({
         id: "google-map-script",
         googleMapsApiKey: googleMapsApiKey || "",
-        language: loadedMapLang
+        language: mapLang
     })
     const [map, setMap] = useState<google.maps.Map | null>(null)
     const [zoom, setZoom] = useState(defaultZoom)

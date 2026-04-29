@@ -7,7 +7,7 @@ import { LatLongData } from "@/app/actions/map-actions"
 import { GoogleMap, useJsApiLoader, Marker as GoogleMarker, InfoWindow } from "@react-google-maps/api"
 import { Loader2 } from "lucide-react"
 import { getLeafletIconUrl, getGoogleMapsIconHtml, MarkerColor, MarkerBadge } from "@/lib/map-icons"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import { createRoot } from "react-dom/client"
 import { Button } from "@/components/ui/button"
 import { isValidGPS } from "../../Map/MapGlobal/map-utils"
@@ -107,7 +107,8 @@ function DeviceDetailPopup({ device, tMap, tConfig, onSelectDevice }: DeviceDeta
 function GoogleMapComponent({ defaultLat, defaultLng, defaultZoom, iconScale, googleMapsApiKey, devices, onSelectDevice, selectedImsis }: { defaultLat?: number, defaultLng?: number, defaultZoom?: number, iconScale?: number, googleMapsApiKey?: string, devices: LatLongData[], onSelectDevice: (device: LatLongData) => void, selectedImsis: string[] }) {
     const tMap = useTranslations("MapGlobal");
     const tConfig = useTranslations("MaintenanceConfig");
-    const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: googleMapsApiKey || "", language: "th" })
+    const locale = useLocale();
+    const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: googleMapsApiKey || "", language: locale })
     const [map, setMap] = useState<google.maps.Map | null>(null)
     const [zoom, setZoom] = useState(defaultZoom)
     const [selectedDevice, setSelectedDevice] = useState<LatLongData | null>(null)
@@ -286,7 +287,7 @@ function UseTranslationsProvider({ children }: { children: React.ReactNode }) {
     return <>{children}</>
 }
 
-export default function MaintenanceMapComponent({ mapMode, mapOfflineUrl, devices, defaultLat, defaultLng, defaultZoom, iconScale, onSelectDevice, selectedImsis }: MapProps) {
+export default function MaintenanceMapComponent({ mapMode, mapOfflineUrl, devices, defaultLat, defaultLng, defaultZoom, iconScale, googleMapsApiKey, onSelectDevice, selectedImsis }: MapProps) {
     if (mapMode === "online") {
         return (
             <div className="h-full w-full rounded-lg overflow-hidden border relative">
@@ -295,6 +296,7 @@ export default function MaintenanceMapComponent({ mapMode, mapOfflineUrl, device
                     defaultLng={parseFloat(defaultLng || "0")}
                     defaultZoom={parseFloat(defaultZoom || "13")}
                     iconScale={parseFloat(iconScale || "1")}
+                    googleMapsApiKey={googleMapsApiKey}
                     devices={devices}
                     onSelectDevice={onSelectDevice}
                     selectedImsis={selectedImsis} />

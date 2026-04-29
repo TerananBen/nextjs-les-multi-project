@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import { createRoot } from "react-dom/client"
 import { Button } from "@/components/ui/button"
 import { Navigation } from "lucide-react"
@@ -204,10 +204,11 @@ const containerStyle = { width: "100%", height: "100%" }
 
 function GoogleMapComponent({ googleMapsApiKey, devices, defaultLat, defaultLng, defaultZoom, iconScale }: { googleMapsApiKey?: string, devices: MaintenanceDetailRecord[], defaultLat: number, defaultLng: number, defaultZoom: number, iconScale: number }) {
     const t = useTranslations("MaintenanceDashboard")
+    const locale = useLocale()
     const { isLoaded } = useJsApiLoader({
         id: "google-map-script",
         googleMapsApiKey: googleMapsApiKey || "",
-        language: "th"
+        language: locale
     })
     const [map, setMap] = useState<google.maps.Map | null>(null)
     const [zoom, setZoom] = useState(defaultZoom)

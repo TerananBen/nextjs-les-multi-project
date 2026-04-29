@@ -7,7 +7,7 @@ import { LatLongData, getDataDetailIMSIAction, ImsiDetail, sendCommandMqttAction
 import { GoogleMap, useJsApiLoader, Marker as GoogleMarker, InfoWindow } from "@react-google-maps/api"
 import { Loader2, Power, Sun, RefreshCcw, ChevronDown, ChevronUp, PowerOff } from "lucide-react"
 import { getLeafletIconUrl, getGoogleMapsIconHtml, MarkerColor, MarkerBadge } from "@/lib/map-icons"
-import { useTranslations } from "next-intl"
+import { useTranslations, useLocale } from "next-intl"
 import { createRoot } from "react-dom/client"
 import { Slider } from "@/components/ui/slider"
 import { Button } from "@/components/ui/button"
@@ -336,7 +336,8 @@ function GoogleMapComponent({ googleMapsApiKey, devices, defaultLat, defaultLng,
     const t = useTranslations("MapGlobal");
     const { getPermission } = usePermission();
     const { control: canControl } = getPermission("V_MapGlobal");
-    const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: googleMapsApiKey || "", language: "th" })
+    const locale = useLocale();
+    const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: googleMapsApiKey || "", language: locale })
     const [map, setMap] = useState<google.maps.Map | null>(null)
     const [zoom, setZoom] = useState(parseFloat(defaultZoom || "13"))
     const [selectedDevice, setSelectedDevice] = useState<LatLongData | null>(null)
@@ -490,11 +491,11 @@ function LeafletMapComponent({ offlineUrl, devices, defaultLat, defaultLng, defa
     return <div ref={containerRef} className="h-full w-full" style={{ zIndex: 0 }} />
 }
 
-export default function MapContainerComponent({ mode, offlineUrl, devices, defaultLat, defaultLng, defaultZoom, iconScale }: MapProps) {
+export default function MapContainerComponent({ mode, offlineUrl, devices, defaultLat, defaultLng, defaultZoom, iconScale, googleMapsApiKey }: MapProps) {
     if (mode === "online") {
         return (
             <div className="h-full w-full rounded-lg overflow-hidden border relative">
-                <GoogleMapComponent devices={devices} defaultLat={defaultLat} defaultLng={defaultLng} defaultZoom={defaultZoom} iconScale={iconScale} />
+                <GoogleMapComponent googleMapsApiKey={googleMapsApiKey} devices={devices} defaultLat={defaultLat} defaultLng={defaultLng} defaultZoom={defaultZoom} iconScale={iconScale} />
                 <MapLegend />
             </div>
         )

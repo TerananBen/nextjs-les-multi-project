@@ -104,11 +104,16 @@ function DeviceDetailPopup({ device, tMap, tConfig, onSelectDevice }: DeviceDeta
     )
 }
 
+let loadedMapLang: string | null = null;
+
 function GoogleMapComponent({ defaultLat, defaultLng, defaultZoom, iconScale, googleMapsApiKey, devices, onSelectDevice, selectedImsis }: { defaultLat?: number, defaultLng?: number, defaultZoom?: number, iconScale?: number, googleMapsApiKey?: string, devices: LatLongData[], onSelectDevice: (device: LatLongData) => void, selectedImsis: string[] }) {
     const tMap = useTranslations("MapGlobal");
     const tConfig = useTranslations("MaintenanceConfig");
     const locale = useLocale();
-    const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: googleMapsApiKey || "", language: locale })
+    if (loadedMapLang === null) {
+        loadedMapLang = locale;
+    }
+    const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: googleMapsApiKey || "", language: loadedMapLang })
     const [map, setMap] = useState<google.maps.Map | null>(null)
     const [zoom, setZoom] = useState(defaultZoom)
     const [selectedDevice, setSelectedDevice] = useState<LatLongData | null>(null)

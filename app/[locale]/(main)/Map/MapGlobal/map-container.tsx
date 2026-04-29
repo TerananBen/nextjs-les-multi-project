@@ -331,13 +331,18 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
     )
 }
 
+let loadedMapLang: string | null = null;
+
 // Google Map Component
 function GoogleMapComponent({ googleMapsApiKey, devices, defaultLat, defaultLng, defaultZoom, iconScale }: { googleMapsApiKey?: string, devices: LatLongData[], defaultLat?: string, defaultLng?: string, defaultZoom?: string, iconScale?: string }) {
     const t = useTranslations("MapGlobal");
     const { getPermission } = usePermission();
     const { control: canControl } = getPermission("V_MapGlobal");
     const locale = useLocale();
-    const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: googleMapsApiKey || "", language: locale })
+    if (loadedMapLang === null) {
+        loadedMapLang = locale;
+    }
+    const { isLoaded } = useJsApiLoader({ id: 'google-map-script', googleMapsApiKey: googleMapsApiKey || "", language: loadedMapLang })
     const [map, setMap] = useState<google.maps.Map | null>(null)
     const [zoom, setZoom] = useState(parseFloat(defaultZoom || "13"))
     const [selectedDevice, setSelectedDevice] = useState<LatLongData | null>(null)

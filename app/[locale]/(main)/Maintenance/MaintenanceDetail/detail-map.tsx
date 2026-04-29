@@ -201,14 +201,18 @@ function LeafletMapComponent({
 // Google Maps (online) component
 // ─────────────────────────────────────────────
 const containerStyle = { width: "100%", height: "100%" }
+let loadedMapLang: string | null = null;
 
 function GoogleMapComponent({ googleMapsApiKey, devices, defaultLat, defaultLng, defaultZoom, iconScale }: { googleMapsApiKey?: string, devices: MaintenanceDetailRecord[], defaultLat: number, defaultLng: number, defaultZoom: number, iconScale: number }) {
     const t = useTranslations("MaintenanceDashboard")
     const locale = useLocale()
+    if (loadedMapLang === null) {
+        loadedMapLang = locale;
+    }
     const { isLoaded } = useJsApiLoader({
         id: "google-map-script",
         googleMapsApiKey: googleMapsApiKey || "",
-        language: locale
+        language: loadedMapLang
     })
     const [map, setMap] = useState<google.maps.Map | null>(null)
     const [zoom, setZoom] = useState(defaultZoom)

@@ -206,6 +206,8 @@
         "filter": {
             "searchLabel": "Search :",
             "selectGroupPlaceholder": "-- Select Group --",
+            "searchGroupPlaceholder": "Search group...",
+            "noGroupFound": "No group found.",
             "selectTypePlaceholder": "Select Type",
             "types": {
                 "now": "Now",

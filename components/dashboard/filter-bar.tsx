@@ -9,6 +9,14 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import {
+    Combobox,
+    ComboboxContent,
+    ComboboxEmpty,
+    ComboboxInput,
+    ComboboxItem,
+    ComboboxList,
+} from "@/components/ui/combobox"
 import { DateRange } from "react-day-picker"
 import { GroupItem } from "@/app/actions/dashboard"
 import { Printer, Search, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Loader2, X } from "lucide-react"
@@ -435,22 +443,37 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
         return null
     }
 
+    const selectedGroupName = groups.find((g) => g.group_code === selectedGroup)?.group_name || selectedGroup;
+
     return (
         <div className="flex flex-col md:flex-row md:flex-wrap items-start md:items-center gap-4 p-4 bg-card rounded-lg shadow-sm border">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full md:w-auto">
                 <span className="text-sm font-medium whitespace-nowrap">{t("searchLabel")}</span>
-                <Select value={selectedGroup} onValueChange={setSelectedGroup}>
-                    <SelectTrigger className="cursor-pointer w-full md:w-[200px]">
-                        <SelectValue placeholder={t("selectGroupPlaceholder")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {groups.map((group) => (
-                            <SelectItem className="cursor-pointer" key={group.group_code} value={group.group_code}>
-                                {group.group_name}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
+                <div className="cursor-pointer w-full md:w-[250px]">
+                    <Combobox 
+                        value={selectedGroupName} 
+                        onValueChange={(val) => {
+                            const group = groups.find(g => g.group_name === val);
+                            if (group) {
+                                setSelectedGroup(group.group_code);
+                            } else {
+                                setSelectedGroup(val);
+                            }
+                        }}
+                    >
+                        <ComboboxInput className="cursor-pointer h-9 w-full rounded-xl bg-white border-gray-200 shadow-sm" placeholder={t("selectGroupPlaceholder")} />
+                        <ComboboxContent searchPlaceholder={t("searchGroupPlaceholder")}>
+                            <ComboboxEmpty>{t("noGroupFound")}</ComboboxEmpty>
+                            <ComboboxList>
+                                {groups.map((group) => (
+                                    <ComboboxItem key={group.group_code} value={group.group_name}>
+                                        {group.group_name}
+                                    </ComboboxItem>
+                                ))}
+                            </ComboboxList>
+                        </ComboboxContent>
+                    </Combobox>
+                </div>
             </div>
 
             <div className="w-full md:w-auto">

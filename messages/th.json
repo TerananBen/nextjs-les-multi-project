@@ -206,6 +206,8 @@
         "filter": {
             "searchLabel": "ค้นหา :",
             "selectGroupPlaceholder": "-- เลือกกลุ่ม --",
+            "searchGroupPlaceholder": "ค้นหากลุ่ม...",
+            "noGroupFound": "ไม่พบกลุ่ม",
             "selectTypePlaceholder": "เลือกประเภท",
             "types": {
                 "now": "ปัจจุบัน",

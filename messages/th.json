@@ -499,6 +499,8 @@
             "cancel": "ยกเลิก",
             "noDeviceIdFound": "ไม่พบ Device ID ในไฟล์",
             "downloadTemplate": "ดาวน์โหลดไฟล์ตัวอย่าง",
+            "chooseFile": "เลือกไฟล์",
+            "noFileChosen": "ไม่ได้เลือกไฟล์ใด",
             "previewHeaders": {
                 "deviceId": "รหัสอุปกรณ์"
             },
@@ -518,6 +520,8 @@
             "cancel": "ยกเลิก",
             "noDataFound": "ไม่พบข้อมูลที่ถูกต้องในไฟล์",
             "downloadTemplate": "ดาวน์โหลดไฟล์ตัวอย่าง",
+            "chooseFile": "เลือกไฟล์",
+            "noFileChosen": "ไม่ได้เลือกไฟล์ใด",
             "previewHeaders": {
                 "deviceId": "รหัสอุปกรณ์",
                 "latitude": "ละติจูด",

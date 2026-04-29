@@ -499,6 +499,8 @@
             "cancel": "Cancel",
             "noDeviceIdFound": "No valid Device ID found in the file",
             "downloadTemplate": "Download Template",
+            "chooseFile": "Choose File",
+            "noFileChosen": "No file chosen",
             "previewHeaders": {
                 "deviceId": "Device ID"
             },
@@ -518,6 +520,8 @@
             "cancel": "Cancel",
             "noDataFound": "No valid data found in the file",
             "downloadTemplate": "Download Template",
+            "chooseFile": "Choose File",
+            "noFileChosen": "No file chosen",
             "previewHeaders": {
                 "deviceId": "Device ID",
                 "latitude": "Latitude",

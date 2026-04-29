@@ -191,14 +191,24 @@ export function EditDeviceCsvDialog({ open, onOpenChange, group }: EditDeviceCsv
                     <div className="flex flex-col gap-4">
                         <Label htmlFor="csv-update-file">{t("selectFile")}</Label>
                         <div className="flex gap-2 items-center">
-                            <Input
-                                id="csv-update-file"
-                                type="file"
-                                accept=".csv,.txt"
-                                onChange={handleFileChange}
-                                className="cursor-pointer file:cursor-pointer flex-1 h-10"
-                                disabled={uploading}
-                            />
+                            <div className="relative flex-1">
+                                <Input
+                                    id="csv-update-file"
+                                    type="file"
+                                    accept=".csv,.txt"
+                                    onChange={handleFileChange}
+                                    className="absolute inset-0 w-full h-full opacity-0 disabled:opacity-0 cursor-pointer z-10"
+                                    disabled={uploading}
+                                />
+                                <div className={`flex h-10 w-full items-center rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background ${uploading ? "opacity-50 cursor-not-allowed" : ""}`}>
+                                    <div className="bg-secondary text-secondary-foreground hover:bg-secondary/80 px-3 py-1 rounded-md text-xs font-medium mr-3 whitespace-nowrap transition-colors">
+                                        {t("chooseFile")}
+                                    </div>
+                                    <span className="text-muted-foreground truncate">
+                                        {file ? file.name : t("noFileChosen")}
+                                    </span>
+                                </div>
+                            </div>
                             <Button
                                 variant="outline"
                                 onClick={handleDownloadTemplate}

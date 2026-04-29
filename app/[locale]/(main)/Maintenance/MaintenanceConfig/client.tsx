@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Combobox, ComboboxInput, ComboboxContent, ComboboxEmpty, ComboboxList, ComboboxItem } from "@/components/ui/combobox"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
@@ -209,17 +210,28 @@ function AddMaintenanceForm({ mapMode, mapOfflineUrl, defaultLat, defaultLng, de
                 </div>
                 <div className="space-y-1.5 md:col-span-1">
                     <label className="text-sm font-bold">{tForm("operatorName")} <span className="text-red-500">*</span></label>
-                    <Select value={operatorId} onValueChange={setOperatorId}>
-                        <SelectTrigger className="cursor-pointer transition-colors">
-                            <SelectValue placeholder={tForm("selectOperator")} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="0">{tForm("selectOperator")}</SelectItem>
-                            {operators.map(op => (
-                                <SelectItem key={op.id} value={op.id}>{op.full_name}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <Combobox 
+                        value={operatorId === "0" || operatorId === tForm("selectOperator") ? tForm("selectOperator") : operators.find(op => op.id === operatorId)?.full_name || tForm("selectOperator")} 
+                        onValueChange={(val) => {
+                            if (val === tForm("selectOperator")) {
+                                setOperatorId("0");
+                            } else {
+                                const found = operators.find(op => op.full_name === val);
+                                setOperatorId(found ? found.id : "0");
+                            }
+                        }}
+                    >
+                        <ComboboxInput className="cursor-pointer h-9 w-full bg-background transition-colors" placeholder={tForm("selectOperator")} />
+                        <ComboboxContent searchPlaceholder={tForm("searchOperatorPlaceholder")}>
+                            <ComboboxEmpty>{tForm("noOperatorFound")}</ComboboxEmpty>
+                            <ComboboxList>
+                                <ComboboxItem key={0} value={tForm("selectOperator")}>{tForm("selectOperator")}</ComboboxItem>
+                                {operators.map(op => (
+                                    <ComboboxItem key={op.id} value={op.full_name}>{op.full_name}</ComboboxItem>
+                                ))}
+                            </ComboboxList>
+                        </ComboboxContent>
+                    </Combobox>
                 </div>
                 <div className="space-y-1.5 md:col-span-1">
                     <label className="text-sm font-bold">{tForm("reporterName")}</label>
@@ -244,19 +256,20 @@ function AddMaintenanceForm({ mapMode, mapOfflineUrl, defaultLat, defaultLng, de
                         <div className="flex flex-col sm:flex-row gap-3 items-end sm:items-center bg-background p-3 border-b border-gray-100 z-10 shrink-0">
                             <span className="text-sm font-bold whitespace-nowrap hidden sm:block">{tForm("searchBy")}</span>
                             <div className="flex-1 w-full sm:w-auto">
-                                <Select value={searchGroup} onValueChange={setSearchGroup}>
-                                    <SelectTrigger className="cursor-pointer bg-background">
-                                        <SelectValue placeholder="ALL" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="ALL">ALL</SelectItem>
-                                        {groups.map((group) => (
-                                            <SelectItem key={group.groupCode} value={group.groupCode}>
-                                                {group.groupName}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
+                                <Combobox value={searchGroup} onValueChange={setSearchGroup}>
+                                    <ComboboxInput className="cursor-pointer h-9 w-full bg-background transition-colors" placeholder="ALL" />
+                                    <ComboboxContent searchPlaceholder={tForm("searchGroupPlaceholder")}>
+                                        <ComboboxEmpty>{tForm("noGroupFound")}</ComboboxEmpty>
+                                        <ComboboxList>
+                                            <ComboboxItem value="ALL">ALL</ComboboxItem>
+                                            {groups.map((group) => (
+                                                <ComboboxItem key={group.groupCode} value={group.groupName}>
+                                                    {group.groupName}
+                                                </ComboboxItem>
+                                            ))}
+                                        </ComboboxList>
+                                    </ComboboxContent>
+                                </Combobox>
                             </div>
                             <div className="flex-1 w-full sm:w-auto">
                                 <Select value={searchStatus} onValueChange={setSearchStatus}>

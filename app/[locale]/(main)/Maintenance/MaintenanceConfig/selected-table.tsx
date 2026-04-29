@@ -45,7 +45,7 @@ export function SelectedTable({ items, onRemoveItem }: SelectedTableProps) {
     const tMap = useTranslations("MapGlobal")
 
     return (
-        <div className="flex flex-col max-h-[450px] bg-background border rounded-md overflow-hidden">
+        <div className="flex flex-col max-h-[450px] bg-background border overflow-hidden">
             <div className="flex-1 overflow-auto">
                 <table className="w-full text-sm text-center border-collapse">
                     <thead className="bg-background sticky top-0 z-0 font-bold border-b">

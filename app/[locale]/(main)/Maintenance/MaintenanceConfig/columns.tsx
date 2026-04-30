@@ -18,37 +18,37 @@ export const useMaintenanceColumns = ({ onDetail, onStatusChange, onDelete }: Us
     const columns: ColumnDef<MaintenanceConfigRecord>[] = [
         {
             id: "index",
-            header: () => <div className="font-semibold text-foreground">{t("table.no")}</div>,
-            cell: ({ row }) => <div className="text-sm px-4">{row.index + 1}</div>,
+            header: () => <div className="ml-4">{t("table.no")}</div>,
+            cell: ({ row }) => <div className="ml-4">{row.index + 1}</div>,
         },
         {
-            accessorKey: "list_name",
-            header: () => <div className="font-semibold text-foreground">{t("table.listName")}</div>,
-            cell: ({ row }) => <div className="text-sm px-4">{row.getValue("list_name")}</div>,
+            id: "list_name",
+            header: () => <div>{t("table.listName")}</div>,
+            cell: ({ row }) => <div>{row.original.list_name}</div>,
         },
         {
             accessorKey: "name_operator",
-            header: () => <div className="font-semibold text-foreground">{t("table.operatorName")}</div>,
-            cell: ({ row }) => <div className="text-sm px-4">{row.getValue("name_operator")}</div>,
+            header: () => <div>{t("table.operatorName")}</div>,
+            cell: ({ row }) => <div>{row.original.name_operator}</div>,
         },
         {
             accessorKey: "repair_all",
-            header: () => <div className="font-semibold text-foreground">{t("table.repaired")}</div>,
-            cell: ({ row }) => <div className="text-foreground">{row.getValue("repair_all")}</div>,
+            header: () => <div>{t("table.repaired")}</div>,
+            cell: ({ row }) => <div>{row.getValue("repair_all")}</div>,
         },
         {
             accessorKey: "wait_repair",
-            header: () => <div className="font-semibold text-foreground">{t("table.pending")}</div>,
-            cell: ({ row }) => <div className="text-foreground">{row.getValue("wait_repair")}</div>,
+            header: () => <div>{t("table.pending")}</div>,
+            cell: ({ row }) => <div>{row.getValue("wait_repair")}</div>,
         },
         {
             accessorKey: "count_lamp_all",
-            header: () => <div className="font-semibold text-foreground">{t("table.all")}</div>,
-            cell: ({ row }) => <div className="text-foreground">{row.getValue("count_lamp_all")}</div>,
+            header: () => <div>{t("table.all")}</div>,
+            cell: ({ row }) => <div>{row.getValue("count_lamp_all")}</div>,
         },
         {
             id: "detail",
-            header: () => <div className="font-semibold text-foreground">{t("table.detail")}</div>,
+            header: () => <div>{t("table.detail")}</div>,
             cell: ({ row }) => {
                 return (
                     <Button
@@ -65,7 +65,7 @@ export const useMaintenanceColumns = ({ onDetail, onStatusChange, onDelete }: Us
         },
         {
             id: "status",
-            header: () => <div className="font-semibold text-foreground">{t("table.status")}</div>,
+            header: () => <div>{t("table.status")}</div>,
             cell: ({ row }) => {
                 const isConfirmed = row.original.confrime === "T" || row.original.confrime === "1" || row.original.confrime?.toLowerCase() === "true"
                 return (
@@ -96,7 +96,7 @@ export const useMaintenanceColumns = ({ onDetail, onStatusChange, onDelete }: Us
         },
         {
             id: "delete",
-            header: () => <div className="font-semibold text-foreground">{t("table.delete")}</div>,
+            header: () => <div>{t("table.delete")}</div>,
             cell: ({ row }) => {
                 return (
                     <Button

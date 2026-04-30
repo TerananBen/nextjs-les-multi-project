@@ -13,6 +13,7 @@ import { Search, Loader2, PlusSquare } from "lucide-react"
 import {
     Dialog,
     DialogContent,
+    DialogDescription,
     DialogHeader,
     DialogTitle,
     DialogFooter,
@@ -148,6 +149,9 @@ export function GroupConfigClient() {
                     <DialogContent className="sm:max-w-[425px]">
                         <DialogHeader>
                             <DialogTitle>{t("dialog.title")}</DialogTitle>
+                            <DialogDescription aria-hidden="true" className="sr-only">
+                                {t("dialog.title")}
+                            </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-4 items-center gap-4">

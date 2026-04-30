@@ -5,6 +5,7 @@ import { PersonalItem } from "@/app/actions/personal"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { IconEdit, IconTrash } from "@tabler/icons-react"
+import { ArrowUpDown } from "lucide-react"
 
 export type PersonalColumnActions = {
     onEdit: (personal: PersonalItem) => void
@@ -23,24 +24,64 @@ export const getColumns = (
         {
             accessorFn: (row) => `${row.first_name} ${row.last_name}`,
             id: "fullName",
-            header: t('table.name'),
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        className="hover:bg-transparent cursor-pointer"
+                    >
+                        {t("table.name")}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                )
+            },
             cell: ({ row }) => {
                 const firstName = row.original.first_name
                 const lastName = row.original.last_name
                 return (
-                    <div>
+                    <div className="ml-4">
                         {firstName} - {lastName}
                     </div>
                 )
             },
         },
         {
-            accessorKey: "personal_username",
-            header: t('table.username'),
+            id: "personal_username",
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        className="hover:bg-transparent cursor-pointer"
+                    >
+                        {t("table.username")}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                )
+            },
+            cell: ({ row }) => {
+                return (
+                    <div className="ml-4">
+                        {row.original.personal_username}
+                    </div>
+                )
+            }
         },
         {
             accessorKey: "roleName",
-            header: t('table.role'),
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        className="hover:bg-transparent cursor-pointer"
+                    >
+                        {t("table.role")}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                )
+            },
             cell: ({ row }) => <Badge variant="outline">{row.original.roleName}</Badge>,
         },
         {

@@ -333,18 +333,18 @@ export function EditScheduleDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto p-0 gap-0">
-                <DialogHeader className="p-6 pb-2 border-b sticky top-0 z-10 bg-background">
+            <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto p-3 sm:p-3 rounded-lg">
+                <DialogHeader>
                     <div className="flex justify-between items-center mr-8">
-                        <DialogTitle className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                        <DialogTitle>
                             {schedule ? t("title") : t("addTitle")}
                         </DialogTitle>
                     </div>
                 </DialogHeader>
 
-                <div className="p-6 space-y-8 min-h-[60vh] bg-background">
-                    <form onSubmit={handleSubmit((data) => onSubmit(data, versionLightSensor))} className="space-y-8">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="p-3 space-y-3 min-h-[60vh] bg-background">
+                    <form onSubmit={handleSubmit((data) => onSubmit(data, versionLightSensor))} className="space-y-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             {/* Schedule Name */}
                             <div className="space-y-2">
                                 <label className="text-sm font-semibold text-foreground">
@@ -385,11 +385,11 @@ export function EditScheduleDialog({
 
                         {/* Groups Section */}
                         <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-sm font-semibold text-foreground">
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                <h3 className="text-sm font-semibold text-foreground shrink-0">
                                     {t("groupNameHeader")}
                                 </h3>
-                                <div className="flex gap-2 w-full max-w-sm">
+                                <div className="flex gap-2 w-full sm:max-w-sm">
                                     <div className="flex-1">
                                         <Combobox value={selectedGroupToAdd} onValueChange={setSelectedGroupToAdd}>
                                             <ComboboxInput className="cursor-pointer h-8 w-full rounded-md border-input bg-muted/50 focus:bg-background" placeholder={t("selectGroup")} />
@@ -673,11 +673,11 @@ export function EditScheduleDialog({
                     </form>
                 </div>
 
-                <div className="p-6 border-t bg-muted/40 rounded-b-lg flex justify-end gap-3 sticky bottom-0 z-10">
+                <div className="p-3 border-t bg-muted/40 rounded-b-lg flex justify-end gap-3 sticky bottom-0 z-10">
                     <Button
                         type="button"
                         variant="outline"
-                        className="cursor-pointer h-11 px-6 border-input text-foreground bg-background hover:bg-muted shadow-sm"
+                        className="cursor-pointer h-8 px-6 border-input text-foreground bg-background hover:bg-muted shadow-sm"
                         onClick={() => onOpenChange(false)}
                     >
                         {t("cancel")}
@@ -688,7 +688,7 @@ export function EditScheduleDialog({
                             toast.error(t("validateError"));
                         })}
                         disabled={isSaving}
-                        className="cursor-pointer h-11 px-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="cursor-pointer h-8 px-8 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {isSaving ? (
                             <>

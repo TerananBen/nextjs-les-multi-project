@@ -158,11 +158,11 @@ export function ResponseDialog({
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl max-h-[80vh] flex flex-col">
-                <DialogHeader className="pb-4">
+            <DialogContent className="sm:max-w-[500px] max-h-[70vh] overflow-y-auto p-3 sm:p-3 rounded-lg">
+                <DialogHeader>
                     <div className="flex flex-col gap-4">
                         <div className="flex flex-col gap-1">
-                            <DialogTitle className="leading-snug text-xl">{t("title")} - {scheduleName}</DialogTitle>
+                            <DialogTitle>{t("title")} - {scheduleName}</DialogTitle>
                             <DialogDescription className="sr-only">
                                 {t("description")}
                             </DialogDescription>

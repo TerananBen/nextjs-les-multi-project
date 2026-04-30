@@ -13,89 +13,69 @@ export const useMaintenanceDetailColumns = (onOpenDialog: (id: string) => void) 
     const columns: ColumnDef<MaintenanceDetailListRecord>[] = [
         {
             id: "index",
-            header: "#",
-            cell: ({ row }) => <div className="text-center text-sm">{row.index + 1}</div>,
+            header: () => {
+                return (
+                    <div className="ml-4">
+                        {t("index")}
+                    </div>
+                )
+            },
+            cell: ({ row }) => <div className="ml-4">{row.index + 1}</div>,
         },
         {
             accessorKey: "list_name",
-            header: ({ column }) => {
+            header: () => {
                 return (
-                    <Button
-                        variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
+                    <div>
                         {t("listName")}
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
+                    </div>
                 )
             },
-            cell: ({ row }) => <div className="text-sm px-4">{row.original.list_name}</div>,
+            cell: ({ row }) => <div>{row.original.list_name}</div>,
         },
         {
             accessorKey: "name_operator",
-            header: ({ column }) => {
+            header: () => {
                 return (
-                    <Button
-                        variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
+                    <div>
                         {t("operatorName")}
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
+                    </div>
                 )
             },
-            cell: ({ row }) => <div className="text-sm px-4">{row.original.name_operator}</div>,
+            cell: ({ row }) => <div>{row.original.name_operator}</div>,
         },
         {
             accessorKey: "repair_all",
-            header: ({ column }) => {
+            header: () => {
                 return (
-                    <div className="text-center">
-                        <Button
-                            variant="ghost"
-                            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                        >
-                            {t("repaired")}
-                            <ArrowUpDown className="ml-2 h-4 w-4" />
-                        </Button>
+                    <div>
+                        {t("repaired")}
                     </div>
                 )
             },
-            cell: ({ row }) => <div className="text-center text-sm">{row.original.repair_all}</div>,
+            cell: ({ row }) => <div>{row.original.repair_all}</div>,
         },
         {
             accessorKey: "wait_repair",
-            header: ({ column }) => {
+            header: () => {
                 return (
-                    <div className="text-center">
-                        <Button
-                            variant="ghost"
-                            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                        >
-                            {t("waitingRepair")}
-                            <ArrowUpDown className="ml-2 h-4 w-4" />
-                        </Button>
+                    <div>
+                        {t("waitingRepair")}
                     </div>
                 )
             },
-            cell: ({ row }) => <div className="text-center text-sm text-red-500 font-medium">{row.original.wait_repair}</div>,
+            cell: ({ row }) => <div>{row.original.wait_repair}</div>,
         },
         {
             accessorKey: "count_lamp_all",
-            header: ({ column }) => {
+            header: () => {
                 return (
                     <div className="text-center">
-                        <Button
-                            variant="ghost"
-                            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                        >
-                            {t("total")}
-                            <ArrowUpDown className="ml-2 h-4 w-4" />
-                        </Button>
+                        {t("total")}
                     </div>
                 )
             },
-            cell: ({ row }) => <div className="text-center text-sm">{row.original.count_lamp_all}</div>,
+            cell: ({ row }) => <div>{row.original.count_lamp_all}</div>,
         },
         {
             id: "details",

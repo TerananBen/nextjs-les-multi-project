@@ -13,7 +13,7 @@ export const useMenuSettingsColumns = (
     return [
         {
             accessorKey: "menu_name",
-            header: t("menuName"),
+            header: () => <div className="ml-4">{t("menuName")}</div>,
             cell: ({ row }) => {
                 const rawName = row.original.menu_name;
                 const translationKey = `menuNames.txt_list_name_${rawName}`;
@@ -24,7 +24,7 @@ export const useMenuSettingsColumns = (
                 // But for safety, let's just use t().
 
                 return (
-                    <div>
+                    <div className="ml-4">
                         {t(translationKey as never)}
                     </div>
                 )

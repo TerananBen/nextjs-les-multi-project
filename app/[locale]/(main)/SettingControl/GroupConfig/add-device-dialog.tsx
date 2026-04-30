@@ -21,26 +21,12 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, Loader2, Search, Trash2, Save, Check, PlusSquare, ChevronsUpDown } from "lucide-react"
+import { ChevronLeft, ChevronRight, Loader2, Search, Trash2, Save, Check, PlusSquare } from "lucide-react"
 import { ConfirmButton } from "@/components/ui/confirm-button"
 import { configLatLongLampAndPoleAction, deleteImsiGroupConfigAction, getListDataIMSIAllAction, addRtuToGroupAction } from "@/app/actions/group-config"
 import { toast } from "sonner"
-import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-} from "@/components/ui/command"
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
 
-// ... imports
+import { Combobox, ComboboxContent, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList } from "@/components/ui/combobox"
 
 interface AddDeviceDialogProps {
     open: boolean
@@ -62,7 +48,6 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
     // Add Device State
     const [availableImsis, setAvailableImsis] = React.useState<string[]>([])
     const [selectedImsi, setSelectedImsi] = React.useState("")
-    const [isAddDeviceOpen, setIsAddDeviceOpen] = React.useState(false)
     const [isAddingDevice, setIsAddingDevice] = React.useState(false)
 
     // Pagination State
@@ -216,7 +201,6 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
                     setData(mergedData)
                 }
 
-                setIsAddDeviceOpen(false)
                 setSelectedImsi("")
             } else {
                 toast.error(result.message || t("addError", { defaultValue: "Failed to add device" }))
@@ -232,7 +216,7 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="w-[95vw] md:max-w-[85vw] lg:max-w-[75vw] h-[95vh] md:h-[85vh] flex flex-col p-4 sm:p-6 overflow-hidden">
+            <DialogContent className="sm:max-w-[95vw] md:max-w-[95vw] lg:max-w-[50vw] h-[95vh] md:h-[85vh] flex flex-col p-3 sm:p-3 overflow-hidden">
                 <DialogHeader>
                     <DialogTitle>{t("title")}</DialogTitle>
                     <DialogDescription>
@@ -251,44 +235,21 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
                         />
                     </div>
 
-                    <Popover open={isAddDeviceOpen} onOpenChange={setIsAddDeviceOpen}>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline" role="combobox" aria-expanded={isAddDeviceOpen} className="cursor-pointer justify-between">
-                                {selectedImsi
-                                    ? selectedImsi
-                                    : t("selectDevice", { defaultValue: "Select Device" })}
-                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[300px] p-0">
-                            <Command>
-                                <CommandInput placeholder={t("searchDevice", { defaultValue: "Search IMSI..." })} />
-                                <CommandList>
-                                    <CommandEmpty>{t("noDeviceFound", { defaultValue: "No device found." })}</CommandEmpty>
-                                    <CommandGroup>
-                                        {availableImsis.map((imsi) => (
-                                            <CommandItem
-                                                key={imsi}
-                                                value={imsi}
-                                                onSelect={(currentValue) => {
-                                                    setSelectedImsi(currentValue === selectedImsi ? "" : currentValue)
-                                                    setIsAddDeviceOpen(false)
-                                                }}
-                                            >
-                                                <Check
-                                                    className={cn(
-                                                        "mr-2 h-4 w-4",
-                                                        selectedImsi === imsi ? "opacity-100" : "opacity-0"
-                                                    )}
-                                                />
-                                                {imsi}
-                                            </CommandItem>
-                                        ))}
-                                    </CommandGroup>
-                                </CommandList>
-                            </Command>
-                        </PopoverContent>
-                    </Popover>
+                    <div className="w-full md:w-[300px]">
+                        <Combobox value={selectedImsi} onValueChange={setSelectedImsi}>
+                            <ComboboxInput className="cursor-pointer h-10 w-full rounded-md border-input bg-background focus:bg-background" placeholder={t("selectDevice", { defaultValue: "Select Device" })} />
+                            <ComboboxContent searchPlaceholder={t("searchDevice", { defaultValue: "Search IMSI..." })}>
+                                <ComboboxEmpty>{t("noDeviceFound", { defaultValue: "No device found." })}</ComboboxEmpty>
+                                <ComboboxList>
+                                    {availableImsis.map((imsi) => (
+                                        <ComboboxItem key={imsi} value={imsi}>
+                                            {imsi}
+                                        </ComboboxItem>
+                                    ))}
+                                </ComboboxList>
+                            </ComboboxContent>
+                        </Combobox>
+                    </div>
                     <Button onClick={handleAddDevice} disabled={!selectedImsi || isAddingDevice} className="cursor-pointer w-full md:w-auto">
                         {isAddingDevice && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         <PlusSquare className="mr-2 h-4 w-4" />
@@ -301,8 +262,8 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
                         <Table className="relative w-full whitespace-nowrap md:whitespace-normal">
                             <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm">
                                 <TableRow>
-                                    <TableHead className="w-[200px]">{t("table.name")}</TableHead>
                                     <TableHead>{t("table.imsi")}</TableHead>
+                                    <TableHead className="w-[200px]">{t("table.name")}</TableHead>
                                     <TableHead className="w-[150px]">{t("table.gov")}</TableHead>
                                     <TableHead className="w-[120px]">{t("table.lat")}</TableHead>
                                     <TableHead className="w-[120px]">{t("table.lng")}</TableHead>
@@ -322,6 +283,7 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
                                 ) : paginatedData.length ? (
                                     paginatedData.map((item, index) => (
                                         <TableRow key={`${item.imsi}-${index}`}>
+                                            <TableCell>{item.imsi}</TableCell>
                                             <TableCell>
                                                 <Input
                                                     className="min-w-[120px]"
@@ -329,7 +291,6 @@ export function AddDeviceDialog({ open, onOpenChange, group }: AddDeviceDialogPr
                                                     onChange={(e) => handleInputChange(index, "street_light_name", e.target.value)}
                                                 />
                                             </TableCell>
-                                            <TableCell>{item.imsi}</TableCell>
                                             <TableCell>
                                                 <Input
                                                     className="min-w-[120px]"

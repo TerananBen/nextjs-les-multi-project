@@ -153,7 +153,7 @@ export function AddDeviceCsvDialog({ open, onOpenChange, group }: AddDeviceCsvDi
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="w-[95vw] sm:max-w-[500px] max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-lg">
+            <DialogContent className="sm:max-w-[500px] max-h-[70vh] overflow-y-auto p-3 sm:p-3 rounded-lg">
                 <DialogHeader>
                     <DialogTitle>{t("title")}</DialogTitle>
                     <DialogDescription>

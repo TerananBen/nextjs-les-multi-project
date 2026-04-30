@@ -283,27 +283,7 @@ export const useStreetLightColumns = () => {
     const t = useTranslations("StreetLight.table")
 
     const columns: ColumnDef<StreetLightDevice>[] = [
-        {
-            accessorKey: "streetLightName", // Name
-            header: ({ column }) => {
-                return (
-                    <Button
-                        variant="ghost"
-                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                    >
-                        {t("streetLightName")}
-                        <ArrowUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                )
-            },
-            cell: ({ row }) => {
-                return (
-                    <div className="flex flex-col">
-                        <span>{row.original.streetLightName || "-"}</span>
-                    </div>
-                )
-            },
-        },
+
         {
             accessorKey: "imeI_Name", // IMEI
             header: ({ column }) => {
@@ -311,30 +291,46 @@ export const useStreetLightColumns = () => {
                     <Button
                         variant="ghost"
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        className="hover:bg-transparent cursor-pointer"
                     >
                         {t("deviceNo")}
                         <ArrowUpDown className="ml-2 h-4 w-4" />
                     </Button>
                 )
             },
-            cell: ({ row }) => <div className="text-sm">{row.original.imeI_Name || "-"}</div>,
+            cell: ({ row }) => <div className="ml-4">{row.original.imeI_Name || "-"}</div>,
+        },
+        {
+            accessorKey: "streetLightName", // Name
+            header: ({ column }) => {
+                return (
+                    <Button
+                        variant="ghost"
+                        className="hover:bg-transparent cursor-pointer"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        {t("streetLightName")}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                )
+            },
+            cell: ({ row }) => <div className="ml-4">{row.original.streetLightName || "-"}</div>
         },
         {
             accessorKey: "streetLightSerial", // Gov / Asset ID
             header: ({ column }) => {
                 return (
-                    <div className="text-center">
-                        <Button
-                            variant="ghost"
-                            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                        >
-                            {t("gov")}
-                            <ArrowUpDown className="ml-2 h-4 w-4" />
-                        </Button>
-                    </div>
+                    <Button
+                        variant="ghost"
+                        className="hover:bg-transparent cursor-pointer"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        {t("gov")}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
                 )
             },
-            cell: ({ row }) => <div className="text-center">{row.original.streetLightSerial || "-"}</div>
+            cell: ({ row }) => <div className="ml-4">{row.original.streetLightSerial || "-"}</div>
         },
         {
             accessorKey: "streetLightGroups",
@@ -380,6 +376,7 @@ export const useStreetLightColumns = () => {
                 return (
                     <Button
                         variant="ghost"
+                        className="hover:bg-transparent cursor-pointer"
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                     >
                         {t("lastUpdate")}
@@ -395,6 +392,7 @@ export const useStreetLightColumns = () => {
                 return (
                     <Button
                         variant="ghost"
+                        className="hover:bg-transparent cursor-pointer"
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                     >
                         {t("lifeTime")}
@@ -410,6 +408,7 @@ export const useStreetLightColumns = () => {
                 return (
                     <Button
                         variant="ghost"
+                        className="hover:bg-transparent cursor-pointer"
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                     >
                         {t("lastPower")}

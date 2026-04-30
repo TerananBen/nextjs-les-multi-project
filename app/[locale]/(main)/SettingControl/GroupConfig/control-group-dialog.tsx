@@ -121,8 +121,8 @@ const DeviceRow = React.memo(({
                     onCheckedChange={(checked) => onSelect(item.imsi, !!checked)}
                 />
             </TableCell>
-            <TableCell className="font-medium max-w-[150px] sm:max-w-[250px] truncate" title={item.street_light_name}>{item.street_light_name}</TableCell>
             <TableCell className="max-w-[100px] sm:max-w-[100px] truncate" title={item.imsi}>{item.imsi}</TableCell>
+            <TableCell className="font-medium max-w-[150px] sm:max-w-[250px] truncate" title={item.street_light_name}>{item.street_light_name}</TableCell>
             <TableCell className="max-w-[120px] sm:max-w-[200px] truncate" title={item.gov_name}>{item.gov_name}</TableCell>
             <TableCell className="max-w-[100px] sm:max-w-[100px] truncate" title={String(item.lat)}>{item.lat}</TableCell>
             <TableCell className="max-w-[80px] sm:max-w-[100px] truncate" title={String(item.lng)}>{item.lng}</TableCell>
@@ -367,7 +367,7 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="w-[95vw] md:max-w-[85vw] lg:max-w-[80vw] xl:max-w-[75vw] h-[95vh] flex flex-col p-4 sm:p-6 gap-3 sm:gap-4 overflow-hidden">
+            <DialogContent className="md:max-w-[85vw] lg:max-w-[60vw] xl:max-w-[50vw] h-[80vh] flex flex-col p-4 sm:p-3 gap-3 sm:gap-4 overflow-hidden">
                 <DialogHeader>
                     <DialogTitle>{t("title")} - {group.group_name}</DialogTitle>
                     <DialogDescription>
@@ -376,16 +376,17 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                 </DialogHeader>
 
                 {/* Control Panel */}
-                <div className="flex flex-col lg:flex-row flex-wrap items-stretch lg:items-center gap-4 p-4 border rounded-md bg-muted/20">
-                    <div className="flex items-center gap-2 w-full lg:w-auto justify-between lg:justify-start">
-                        <span className="text-sm font-medium whitespace-nowrap">{t("brightness")}: {dimPercent}%</span>
-                        <div className="flex items-center gap-2 flex-1 sm:flex-none justify-end">
+                <div className="flex flex-col gap-4 p-4 border rounded-md bg-muted/20">
+                    {/* Top Row: Brightness & Main Actions */}
+                    <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 w-full">
+                        <div className="flex items-center gap-3 w-full xl:flex-1">
+                            <span className="text-sm font-medium whitespace-nowrap">{t("brightness")}: {dimPercent}%</span>
                             <Slider
                                 value={[dimPercent]}
                                 onValueChange={(vals) => setDimPercent(vals[0])}
                                 max={100}
                                 step={1}
-                                className="w-[100px] sm:w-[150px] cursor-pointer"
+                                className="flex-1 cursor-pointer"
                             />
                             <Input
                                 type="number"
@@ -396,66 +397,67 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                                     const val = parseInt(e.target.value)
                                     if (!isNaN(val) && val >= 0 && val <= 100) setDimPercent(val)
                                 }}
-                                className="w-[60px] sm:w-[70px] h-8"
+                                className="w-[70px] h-9 shrink-0"
+                            />
+                        </div>
+
+                        <div className="flex items-center gap-2 w-full xl:w-auto shrink-0 justify-end">
+                            <Button
+                                onClick={() => handleSendCommand("1")}
+                                disabled={isSending || selectedImsis.size === 0}
+                                className="flex-1 xl:flex-none cursor-pointer bg-green-600 hover:bg-green-700 text-white"
+                            >
+                                <Power className="w-4 h-4 mr-2" />
+                                {t("on")}
+                            </Button>
+                            <Button
+                                onClick={() => handleSendCommand("0")}
+                                disabled={isSending || selectedImsis.size === 0}
+                                variant="destructive"
+                                className="flex-1 xl:flex-none cursor-pointer"
+                            >
+                                <PowerOff className="w-4 h-4 mr-2" />
+                                {t("off")}
+                            </Button>
+                        </div>
+                    </div>
+
+                    {/* Bottom Row: Search & Advanced Actions */}
+                    <div className="flex flex-col md:flex-row md:items-center gap-4 w-full">
+                        {commandToken && (
+                            <div className="flex items-center gap-2 w-full md:flex-1">
+                                <Button
+                                    onClick={handleResend}
+                                    variant="outline"
+                                    className="flex-1 cursor-pointer"
+                                    title={t("resend")}
+                                >
+                                    <RotateCcw className="w-4 h-4 mr-2" />
+                                    {t("resend")}
+                                </Button>
+                                <Button
+                                    onClick={handleCheckStatus}
+                                    disabled={isChecking}
+                                    variant="outline"
+                                    className="flex-1 cursor-pointer"
+                                >
+                                    <RefreshCw className={cn("w-4 h-4 mr-2", isChecking && "animate-spin")} />
+                                    {t("checkStatus")}
+                                </Button>
+                            </div>
+                        )}
+
+                        <div className={cn("relative w-full", commandToken && "md:flex-1")}>
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder={t("searchPlaceholder")}
+                                className="pl-9 h-9 w-full"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
                     </div>
-
-                    <Button
-                        onClick={() => handleSendCommand("1")}
-                        disabled={isSending || selectedImsis.size === 0}
-                        className="cursor-pointer bg-green-600 hover:bg-green-700 text-white"
-                    >
-                        <Power className="w-4 h-4 mr-2" />
-                        {t("on")}
-                    </Button>
-                    <Button
-                        onClick={() => handleSendCommand("0")}
-                        disabled={isSending || selectedImsis.size === 0}
-                        variant="destructive"
-                        className="cursor-pointer"
-                    >
-                        <PowerOff className="w-4 h-4 mr-2" />
-                        {t("off")}
-                    </Button>
-
-                    {commandToken && (
-                        <div className="flex flex-row items-center gap-2 w-full lg:w-auto">
-                            <Button
-                                onClick={handleResend}
-                                variant="outline"
-                                className="cursor-pointer gap-2 flex-1 lg:flex-none"
-                                title={t("resend")}
-                            >
-                                <RotateCcw className="w-4 h-4" />
-                                {t("resend")}
-                            </Button>
-                            <Button
-                                onClick={handleCheckStatus}
-                                disabled={isChecking}
-                                variant="outline"
-                                className="cursor-pointer gap-2 flex-1 lg:flex-none"
-                            >
-                                <RefreshCw className={cn("w-4 h-4", isChecking && "animate-spin")} />
-                                {t("checkStatus")}
-                            </Button>
-                        </div>
-                    )}
-
-                    <div className="hidden lg:block flex-1" />
-
-                    <div className="relative w-full lg:w-[250px] mt-2 lg:mt-0">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input
-                            placeholder={t("searchPlaceholder")}
-                            className="pl-9 h-9 w-full"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
-                    {/* Refresh Button Removed */}
                 </div>
-
                 {/* Device Table */}
                 <div className="flex-1 overflow-hidden border rounded-md min-h-0 flex flex-col">
                     <div className="flex-1 overflow-auto">
@@ -469,8 +471,8 @@ export function ControlGroupDialog({ open, onOpenChange, group }: ControlGroupDi
                                             onCheckedChange={handleSelectAll}
                                         />
                                     </TableHead>
-                                    <TableHead>{t("table.name")}</TableHead>
                                     <TableHead>{t("table.imsi")}</TableHead>
+                                    <TableHead>{t("table.name")}</TableHead>
                                     <TableHead>{t("table.asset")}</TableHead>
                                     <TableHead className="w-[80px] sm:w-[100px]">{t("table.lat")}</TableHead>
                                     <TableHead className="w-[80px] sm:w-[100px]">{t("table.lng")}</TableHead>

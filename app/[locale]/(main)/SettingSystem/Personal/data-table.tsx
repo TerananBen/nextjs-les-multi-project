@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { cn } from "@/lib/utils"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -121,7 +122,10 @@ export function DataTable<TData, TValue>({
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                        <TableHead key={header.id}>
+                                        <TableHead key={header.id} className={cn("text-center",
+                                            header.column.id === "fullName" && "text-left",
+                                            header.column.id === "personal_username" && "text-left"
+                                        )}>
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
@@ -153,7 +157,10 @@ export function DataTable<TData, TValue>({
                                         className="hover:bg-muted/50"
                                     >
                                         {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id} className="py-3">
+                                            <TableCell key={cell.id} className={cn("text-center",
+                                                cell.column.id === "fullName" && "text-left",
+                                                cell.column.id === "personal_username" && "text-left"
+                                            )}>
                                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                             </TableCell>
                                         ))}

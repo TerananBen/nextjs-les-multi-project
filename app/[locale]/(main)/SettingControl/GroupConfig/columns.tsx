@@ -24,6 +24,7 @@ export const useGroupConfigColumns = (onDeleteSuccess?: () => void) => {
                     <Button
                         variant="ghost"
                         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        className="hover:bg-transparent cursor-pointer"
                     >
                         {t("groupName")}
                         <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -283,13 +284,13 @@ function EditDeviceCsvCell({ row }: { row: GroupConfigData }) {
         <div className="flex justify-center">
             <Button
                 variant="outline"
-                size="icon"
+                size="sm"
                 onClick={() => {
                     if (canManage) setOpen(true)
                     else toast.error(t("permissionDenied"))
                 }}
                 className={cn(
-                    "cursor-pointer h-8 w-8",
+                    "cursor-pointer h-8",
                     canManage
                         ? "text-orange-500 hover:text-orange-600 hover:bg-orange-100"
                         : "text-gray-400 bg-transparent cursor-not-allowed hover:bg-transparent"
@@ -297,7 +298,8 @@ function EditDeviceCsvCell({ row }: { row: GroupConfigData }) {
                 disabled={!canManage}
                 title={t("editDeviceCsv")}
             >
-                <PenSquare className="h-4 w-4" />
+                <PenSquare className="mr-2 h-4 w-4" />
+                {t("editDeviceCsv")}
             </Button>
             <EditDeviceCsvDialog open={open} onOpenChange={setOpen} group={row} />
         </div>

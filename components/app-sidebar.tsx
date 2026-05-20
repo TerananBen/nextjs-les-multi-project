@@ -90,6 +90,24 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 export function AppSidebar({ menuItems = [], user, sidebarLogo, ...props }: AppSidebarProps) {
   const pathname = usePathname()
   const t = useTranslations("Sidebar")
+  const [svgContent, setSvgContent] = React.useState<string>("")
+
+  React.useEffect(() => {
+    const logoUrl = sidebarLogo || "/logo-le-full.svg"
+    if (logoUrl.endsWith(".svg")) {
+      fetch(logoUrl)
+        .then((res) => res.text())
+        .then((text) => {
+          const processed = text
+            .replace('<svg width="550" height="80"', '<svg class="h-10 w-auto select-none text-sidebar-foreground transition-colors duration-500"')
+            .replace('stroke="#cccccc" stroke-width="2"', 'stroke="currentColor" stroke-width="2" stroke-opacity="0.3"')
+            .replace('fill="white" font-family="Arial, sans-serif" font-weight="bold"', 'fill="currentColor" font-family="Arial, sans-serif" font-weight="bold"')
+            .replace('fill="white" font-family="Arial, sans-serif" font-weight="normal"', 'fill="currentColor" font-family="Arial, sans-serif" font-weight="normal"')
+          setSvgContent(processed)
+        })
+        .catch((err) => console.error("Error loading sidebar logo:", err))
+    }
+  }, [sidebarLogo])
 
   // Create a map of readable menu items for easy lookup
   const readableItems = React.useMemo(() => {
@@ -106,12 +124,17 @@ export function AppSidebar({ menuItems = [], user, sidebarLogo, ...props }: AppS
     <Sidebar collapsible="offcanvas" {...props} className="border-r-0">
       <SidebarHeader className="flex items-center justify-center py-4 z-20">
         {/* Logo Area */}
-        <div className="flex flex-col items-center">
-          {sidebarLogo ? (
+        <div className="flex flex-col items-center w-full px-4">
+          {sidebarLogo && !sidebarLogo.endsWith(".svg") ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={sidebarLogo} alt="L&E" className="h-10 object-contain" />
+          ) : svgContent ? (
+            <div
+              className="flex flex-col items-center justify-center text-center"
+              dangerouslySetInnerHTML={{ __html: svgContent }}
+            />
           ) : (
-            <div className="bg-white/20 p-2 rounded text-lg font-bold border-2 border-white">L&E</div>
+            <div className="h-10 w-full max-w-[200px] animate-pulse bg-muted/20 rounded-md" />
           )}
         </div>
       </SidebarHeader>

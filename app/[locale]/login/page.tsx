@@ -21,7 +21,7 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
     const logoPath = path.join(process.cwd(), "public/logo-le-full.svg")
     let logoSvg = fs.readFileSync(logoPath, "utf-8")
     logoSvg = logoSvg
-        .replace('<svg width="550" height="80"', '<svg class="h-20 w-auto select-none text-slate-800 dark:text-slate-100 skyblue:text-sky-900 transition-colors duration-500"')
+        .replace('<svg width="550" height="80"', '<svg class="w-full h-auto select-none text-slate-800 dark:text-slate-100 skyblue:text-sky-900 transition-colors duration-500"')
         .replace('stroke="#cccccc" stroke-width="2"', 'stroke="currentColor" stroke-width="2" stroke-opacity="0.3"')
         .replace('fill="white" font-family="Arial, sans-serif" font-weight="bold"', 'fill="currentColor" font-family="Arial, sans-serif" font-weight="bold"')
         .replace('fill="white" font-family="Arial, sans-serif" font-weight="normal"', 'fill="currentColor" font-family="Arial, sans-serif" font-weight="normal"')
@@ -32,7 +32,7 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(99,102,241,0.15),transparent_50%)]" />
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_80%,rgba(14,165,233,0.1),transparent_50%)]" />
             <div className="absolute inset-0 opacity-[0.02] bg-[linear-gradient(to_right,#808080_1px,transparent_1px),linear-gradient(to_bottom,#808080_1px,transparent_1px)] bg-[size:32px_32px]" />
-            
+
             {/* Soft moving ambient glow */}
             <div className="absolute top-1/4 left-1/4 w-[450px] h-[450px] rounded-full bg-indigo-500/10 blur-[100px] pointer-events-none animate-float-blob" />
             <div className="absolute bottom-1/4 right-1/4 w-[450px] h-[450px] rounded-full bg-sky-500/8 blur-[100px] pointer-events-none animate-float-blob-reverse" />
@@ -46,7 +46,7 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
             {/* Login Form Core Centered */}
             <div className="w-full max-w-md mx-auto flex flex-col gap-6 relative z-10">
                 {/* Brand Logo Wrapper (Large & Premium) */}
-                <div 
+                <div
                     className="flex flex-col items-center justify-center gap-2 text-center py-4"
                     dangerouslySetInnerHTML={{ __html: logoSvg }}
                 />
@@ -62,4 +62,4 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
         </div>
     )
 }
-
+

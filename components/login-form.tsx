@@ -57,51 +57,49 @@ export function LoginForm({
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
-            <Card>
-                <CardHeader className="text-center">
-                    <CardTitle className="text-xl">{t("welcomeTitle")}</CardTitle>
-                    <CardDescription>
+            <Card className="border-none shadow-none bg-transparent sm:bg-card/30 sm:backdrop-blur-md sm:border sm:border-border/40 relative overflow-hidden rounded-2xl">
+                {/* Visual Accent Top Bar */}
+                <div className="absolute top-0 left-0 right-0 h-[3px] opacity-80" />
+
+                <CardHeader className="text-center pt-8 pb-4">
+                    <CardTitle className="text-2xl font-bold tracking-tight text-foreground">{t("welcomeTitle")}</CardTitle>
+                    <CardDescription className="text-muted-foreground text-sm">
                         {t("welcomeDescription")}
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="pb-8">
                     <form action={formAction}>
-                        <FieldGroup>
+                        <FieldGroup className="gap-5">
                             {state.isLocked && !state.success && (
-                                <Alert variant="destructive">
-                                    <ShieldAlert className="h-4 w-4" />
-                                    <AlertTitle>{t("accountLocked")}</AlertTitle>
+                                <Alert variant="destructive" className="rounded-xl border border-destructive/20 bg-destructive/10">
+                                    <ShieldAlert className="h-4 w-4 text-destructive" />
+                                    <AlertTitle className="text-sm font-semibold">{t("accountLocked")}</AlertTitle>
                                 </Alert>
                             )}
                             {(state.message || state.errorKey) && !state.success && !state.isLocked && (
-                                <div className="text-destructive text-sm font-medium text-center">
-                                    {state.errorKey ? t(state.errorKey) : state.message}
+                                <div className="p-3 rounded-xl border border-destructive/20 bg-destructive/10 text-destructive text-sm font-medium text-center flex flex-col gap-1">
+                                    <span>{state.errorKey ? t(state.errorKey) : state.message}</span>
                                     {state.failedAttempts && (
-                                        <div className="mt-1 text-xs text-muted-foreground">
+                                        <span className="text-xs text-destructive/80 font-normal">
                                             {t("failedAttempts", { count: state.failedAttempts })}
-                                        </div>
+                                        </span>
                                     )}
                                 </div>
                             )}
-                            <Field>
-                                <FieldLabel htmlFor="username">{t("usernameLabel")}</FieldLabel>
+                            <Field className="gap-1.5">
+                                <FieldLabel htmlFor="username" className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">{t("usernameLabel")}</FieldLabel>
                                 <Input
                                     id="username"
                                     name="username"
                                     type="text"
                                     placeholder={t("usernamePlaceholder")}
                                     required
+                                    className="h-11 rounded-xl bg-muted/20 border-border/40 hover:bg-muted/30 focus:bg-background focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm shadow-sm"
                                 />
                             </Field>
-                            <Field>
-                                <div className="flex items-center">
-                                    <FieldLabel htmlFor="password">{t("passwordLabel")}</FieldLabel>
-                                    {/* <a
-                                        href="#"
-                                        className="ml-auto text-sm underline-offset-4 hover:underline"
-                                    >
-                                        {t("forgotPassword")}
-                                    </a> */}
+                            <Field className="gap-1.5">
+                                <div className="flex items-center justify-between">
+                                    <FieldLabel htmlFor="password" className="text-xs uppercase tracking-wider font-semibold text-muted-foreground">{t("passwordLabel")}</FieldLabel>
                                 </div>
                                 <div className="relative">
                                     <Input
@@ -109,12 +107,12 @@ export function LoginForm({
                                         name="password"
                                         type={showPassword ? "text" : "password"}
                                         required
-                                        className="pr-10"
+                                        className="pr-10 h-11 rounded-xl bg-muted/20 border-border/40 hover:bg-muted/30 focus:bg-background focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm shadow-sm"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                                        className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
                                     >
                                         {showPassword ? (
                                             <EyeOff className="h-4 w-4" />
@@ -127,16 +125,20 @@ export function LoginForm({
                                     </button>
                                 </div>
                             </Field>
-                            <Field>
-                                <Button className="cursor-pointer" type="submit" disabled={isPending || state.isLocked}>
-                                    {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                    {t("loginButton")}
+                            <Field className="mt-2">
+                                <Button
+                                    className="cursor-pointer w-full bg-gradient-to-r from-indigo-600 to-sky-600 hover:from-indigo-500 hover:to-sky-500 text-white font-semibold h-11 rounded-xl transition-all shadow-[0_4px_16px_rgba(99,102,241,0.25)] hover:shadow-[0_6px_20px_rgba(99,102,241,0.35)] active:scale-[0.98] flex items-center justify-center gap-2 border-none"
+                                    type="submit"
+                                    disabled={isPending || state.isLocked}
+                                >
+                                    {isPending ? (
+                                        <Loader2 className="h-4 w-4 animate-spin text-white" />
+                                    ) : (
+                                        t("loginButton")
+                                    )}
                                 </Button>
-                                {/* <FieldDescription className="text-center">
-                                    {t("noAccount")} <a href="#">{t("signUp")}</a>
-                                </FieldDescription> */}
 
-                                <FieldDescription className="text-center">
+                                <FieldDescription className="text-center text-xs text-muted-foreground/80 mt-4">
                                     {"© 2026 Lighting and Equipment PCL"}
                                 </FieldDescription>
                             </Field>
@@ -144,13 +146,14 @@ export function LoginForm({
                     </form>
                 </CardContent>
             </Card>
-            <FieldDescription className="px-6 text-center">
+
+            <FieldDescription className="px-6 text-center text-xs text-muted-foreground/90">
                 {t("termsText")}{" "}
-                <button type="button" onClick={() => setTermsOpen(true)} className="cursor-pointer underline underline-offset-4 hover:text-primary">
+                <button type="button" onClick={() => setTermsOpen(true)} className="cursor-pointer underline underline-offset-4 font-semibold text-foreground hover:text-primary transition-colors">
                     {t("termsLink")}
                 </button>{" "}
                 {t("and")}{" "}
-                <button type="button" onClick={() => setPrivacyOpen(true)} className="cursor-pointer underline underline-offset-4 hover:text-primary">
+                <button type="button" onClick={() => setPrivacyOpen(true)} className="cursor-pointer underline underline-offset-4 font-semibold text-foreground hover:text-primary transition-colors">
                     {t("privacyLink")}
                 </button>.
             </FieldDescription>

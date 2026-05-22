@@ -42,7 +42,7 @@ export async function getPersonalList(): Promise<PersonalListResponse | null> {
     const cookieStore = await cookies()
     const token = cookieStore.get("jwt")?.value
 
-    if (!API_URL) return null
+    if (!token || !API_URL) return null
 
     try {
         //console.log("Fetching personal list from:", `${API_URL}/StreetLight/getDataListPersonal`)
@@ -74,6 +74,8 @@ export async function getPersonalDetail(personal_id: string): Promise<PersonalDe
 
     const cookieStore = await cookies()
     const token = cookieStore.get("jwt")?.value
+
+    if (!token) return null
 
     try {
         const response = await fetch(`${API_URL}/StreetLight/getDataPersonal`, {
@@ -109,6 +111,8 @@ export async function savePersonal(data: SavePersonalParams) {
     const cookieStore = await cookies()
     const token = cookieStore.get("jwt")?.value
 
+    if (!token) return { result: false, message: "Unauthorized" }
+
     try {
         const response = await fetch(`${API_URL}/StreetLight/saveDataPersonal`, {
             method: "POST",
@@ -131,6 +135,8 @@ export async function setPersonalUsable(personal_id: string, status: "Y" | "N") 
 
     const cookieStore = await cookies()
     const token = cookieStore.get("jwt")?.value
+
+    if (!token) return { result: false, message: "Unauthorized" }
 
     try {
         const response = await fetch(`${API_URL}/StreetLight/setUsablePersonal`, {
@@ -155,6 +161,8 @@ export async function deletePersonal(personal_id: string) {
     const cookieStore = await cookies()
     const token = cookieStore.get("jwt")?.value
 
+    if (!token) return { result: false, message: "Unauthorized" }
+
     try {
         const response = await fetch(`${API_URL}/StreetLight/removeDataPersonal`, {
             method: "POST",
@@ -177,6 +185,8 @@ export async function checkPersonalUsername(personal_username: string) {
 
     const cookieStore = await cookies()
     const token = cookieStore.get("jwt")?.value
+
+    if (!token) return { result: false, message: "Unauthorized" }
 
     try {
         const response = await fetch(`${API_URL}/StreetLight/checkDataPersonal`, {
@@ -215,6 +225,8 @@ export async function updatePersonalProfile(data: UpdatePersonalProfileParams): 
 
     const cookieStore = await cookies()
     const token = cookieStore.get("jwt")?.value
+
+    if (!token) return { result: false, message: "Unauthorized" }
 
     try {
         const response = await fetch(`${API_URL}/StreetLight/editPersonal`, {

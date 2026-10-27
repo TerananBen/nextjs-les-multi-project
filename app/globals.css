@@ -44,7 +44,8 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
-:root {
+:root,
+.light {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -114,40 +115,39 @@
 }
 
 .skyblue {
-  /* Using Hex/HSL for specific blue requested: #1e88e5 (Material Blue 600) or similar vibrant blue */
-  --background: oklch(0.95 0.02 240);
-  --foreground: oklch(0.25 0.05 240);
-  --card: oklch(0.97 0.01 240);
-  --card-foreground: oklch(0.25 0.05 240);
-  --popover: oklch(0.97 0.01 240);
-  --popover-foreground: oklch(0.25 0.05 240);
-  --primary: oklch(0.65 0.15 240);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: var(--project-primary, var(--tenant-primary, oklch(0.65 0.12 245)));
   --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.92 0.03 240);
-  --secondary-foreground: oklch(0.3 0.05 240);
-  --muted: oklch(0.92 0.03 240);
+  --secondary: oklch(0.96 0.01 240);
+  --secondary-foreground: oklch(0.25 0.05 240);
+  --muted: oklch(0.96 0.01 240);
   --muted-foreground: oklch(0.5 0.05 240);
-  --accent: oklch(0.92 0.03 240);
-  --accent-foreground: oklch(0.3 0.05 240);
+  --accent: oklch(0.96 0.01 240);
+  --accent-foreground: oklch(0.25 0.05 240);
   --destructive: oklch(0.6 0.15 20);
-  --border: oklch(0.85 0.02 240);
-  --input: oklch(0.85 0.02 240);
-  --ring: oklch(0.65 0.15 240);
-  --chart-1: oklch(0.65 0.15 240);
+  --border: oklch(0.90 0.01 240);
+  --input: oklch(0.90 0.01 240);
+  --ring: var(--project-primary, var(--tenant-primary, oklch(0.65 0.12 245)));
+  --chart-1: var(--project-primary, var(--tenant-primary, oklch(0.65 0.12 245)));
   --chart-2: oklch(0.75 0.12 220);
   --chart-3: oklch(0.85 0.1 200);
   --chart-4: oklch(0.6 0.15 260);
   --chart-5: oklch(0.7 0.12 280);
   
-  /* Sidebar Specifics */
-  --sidebar: #1e88e5;
-  --sidebar-foreground: #ffffff;
-  --sidebar-primary: #ffffff;
-  --sidebar-primary-foreground: #1e88e5;
-  --sidebar-accent: #1565c0; /* Darker blue */
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #1e88e5; /* Hide border */
-  --sidebar-ring: oklch(0.65 0.15 240);
+  /* Sidebar — project-aware (Brand Theme) */
+  --sidebar: var(--project-sidebar, var(--tenant-sidebar, #0284c7));
+  --sidebar-foreground: var(--project-sidebar-foreground, var(--tenant-sidebar-foreground, #ffffff));
+  --sidebar-primary: var(--project-sidebar-foreground, var(--tenant-sidebar-foreground, #ffffff));
+  --sidebar-primary-foreground: var(--project-sidebar, var(--tenant-sidebar, #0284c7));
+  --sidebar-accent: var(--project-sidebar-accent, var(--tenant-sidebar-accent, #0369a1));
+  --sidebar-accent-foreground: var(--project-sidebar-foreground, var(--tenant-sidebar-foreground, #ffffff));
+  --sidebar-border: var(--project-sidebar, var(--tenant-sidebar, #0284c7));
+  --sidebar-ring: var(--project-primary, var(--tenant-primary, oklch(0.65 0.12 245)));
 }
 
 @layer base {
@@ -168,4 +168,31 @@
 .no-scrollbar {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+}
+
+/* Leaflet Popup Theme Integration */
+.leaflet-popup-content-wrapper {
+  background-color: var(--card) !important;
+  color: var(--card-foreground) !important;
+  border-radius: var(--radius-lg, 0.75rem) !important;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+  border: 1px solid var(--border) !important;
+  padding: 0 !important;
+}
+.leaflet-popup-tip {
+  background-color: var(--card) !important;
+}
+.leaflet-popup-content p {
+  margin: 0 !important;
+}
+.leaflet-popup-content {
+  margin: 0.875rem !important;
+  line-height: 1.5 !important;
+}
+.leaflet-container a.leaflet-popup-close-button {
+  color: var(--muted-foreground) !important;
+  padding: 8px 8px 0 0 !important;
+}
+.leaflet-container a.leaflet-popup-close-button:hover {
+  color: var(--foreground) !important;
 }

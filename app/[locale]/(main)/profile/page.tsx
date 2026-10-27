@@ -1,5 +1,5 @@
 import { getCurrentUser } from "@/app/actions/auth"
-import { ProfileForm } from "@/components/profile-form"
+import { ProfileForm } from "@/components/cores/profile/profile-form"
 import { redirect } from "@/i18n/routing"
 import { getTranslations } from "next-intl/server"
 

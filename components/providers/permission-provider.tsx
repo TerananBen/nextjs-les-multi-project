@@ -8,19 +8,22 @@ interface PermissionContextType {
     isLoading: boolean;
     getPermission: (menuName: string) => {
         readable: boolean;
-        writable: boolean; // Note: auth.ts uses 'writable', check if API returns 'writeable'
+        writable: boolean;
         control: boolean;
     };
+    getApiVersion: (menuName: string) => number;
 }
 
 const PermissionContext = createContext<PermissionContextType | undefined>(undefined);
 
 export function PermissionProvider({
     children,
-    initialPermissions = []
+    initialPermissions = [],
+    isSuperAdmin = false,
 }: {
     children: ReactNode;
     initialPermissions?: MenuItem[];
+    isSuperAdmin?: boolean;
 }) {
     const [permissions, setPermissions] = useState<MenuItem[]>(initialPermissions);
     const [isLoading, setIsLoading] = useState(false);
@@ -45,36 +48,83 @@ export function PermissionProvider({
         }
     }, [initialPermissions]);
 
-    const getPermission = (menuName: string) => {
-        // Find permission item for the given menuName (e.g. "V_StreetLight")
-        // The menu_name in API might be the key?
-        // Wait, the API returns `menu_name` like "V_StreetLight"? Or is `menu_name` the label?
-        // Looking at `messages/th.json` keys: `txt_list_name_V_StreetLight`.
-        // Usually systems map by ID or a unique Code.
-        // Let's assume `menu_name` or `menu_id` corresponds to the view ID.
-        // Based on `menu-settings.ts` earlier, `menu_name` was used as accessor.
+const MENU_ALIASES: Record<string, string> = {
+    "V_GroupDashboard": "dashboard_group",
+    "V_Dashboard": "dashboard_overview",
+    "V_StreetLight": "control_streetlight",
+    "V_GroupConfig": "control_group",
+    "V_SettingSchedule": "control_schedule",
+    "V_MapGlobal": "map_global",
+    "V_MapDisconnect": "map_disconnect",
+    "V_MapChangeLamp": "map_changelamp",
+    "V_MaintenanceDashboard": "maintenance_dashboard",
+    "V_MaintenanceConfig": "maintenance_request",
+    "V_MaintenanceDetail": "maintenance_list",
+    "V_ProjectSetting": "system_project",
+    "V_Personal": "system_personal",
+    "V_AlertStreetLight": "system_alert",
+    "V_SettingMenu": "system_menu_permission",
+    "V_SettingApi": "system_api_setting",
+    "V_SettingDevice": "system_device",
+    "dashboard_group": "V_GroupDashboard",
+    "dashboard_overview": "V_Dashboard",
+    "control_streetlight": "V_StreetLight",
+    "control_group": "V_GroupConfig",
+    "control_schedule": "V_SettingSchedule",
+    "map_global": "V_MapGlobal",
+    "map_disconnect": "V_MapDisconnect",
+    "map_changelamp": "V_MapChangeLamp",
+    "maintenance_dashboard": "V_MaintenanceDashboard",
+    "maintenance_request": "V_MaintenanceConfig",
+    "maintenance_list": "V_MaintenanceDetail",
+    "system_project": "V_ProjectSetting",
+    "system_personal": "V_Personal",
+    "system_alert": "V_AlertStreetLight",
+    "system_menu_permission": "V_SettingMenu",
+    "system_api_setting": "V_SettingApi",
+    "system_device": "V_SettingDevice",
+};
 
-        // Safety check for empty permissions
+    const getPermission = (menuName: string) => {
+        if (isSuperAdmin) {
+            return { readable: true, writable: true, control: true };
+        }
+
         if (!permissions.length) {
             return { readable: false, writable: false, control: false };
         }
 
-        const item = permissions.find(p => p.menu_name === menuName);
+        const alias = MENU_ALIASES[menuName];
+        const item = permissions.find(p => p.menu_name === menuName || (alias && p.menu_name === alias));
 
         if (!item) {
-            // If not found, default to false or handle as needed
             return { readable: false, writable: false, control: false };
         }
 
+        const isReadable = item.readable === "1" || String(item.readable) === "1";
+        const isWritable = item.writable === "1" || String(item.writable) === "1";
+        const isControl = item.control === "1" || String(item.control) === "1";
+
         return {
-            readable: item.readable === "1",
-            writable: item.writable === "1", // auth.ts defines it as 'writable'
-            control: item.control === "1"
+            readable: isReadable,
+            writable: isWritable,
+            control: isControl
         };
     };
 
+    const getApiVersion = (menuName: string): number => {
+        if (!permissions.length) {
+            return 1;
+        }
+
+        const alias = MENU_ALIASES[menuName];
+        const item = permissions.find(p => p.menu_name === menuName || (alias && p.menu_name === alias));
+
+        return item?.api_version ?? 1;
+    };
+
     return (
-        <PermissionContext.Provider value={{ permissions, isLoading, getPermission }}>
+        <PermissionContext.Provider value={{ permissions, isLoading, getPermission, getApiVersion }}>
             {children}
         </PermissionContext.Provider>
     );

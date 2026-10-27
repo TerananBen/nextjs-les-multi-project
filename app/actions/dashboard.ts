@@ -1,9 +1,5 @@
 "use server"
 
-import { cookies } from "next/headers"
-
-const API_URL = process.env.API_URL
-
 export interface GroupItem {
     group_name: string
     group_code: string
@@ -57,27 +53,40 @@ export interface DashboardData {
     projectGroupCode: string
 }
 
+import { fetchLesApi } from "@/lib/les-api"
+import { getProjectId } from "@/lib/project"
+import { resolveProjectSlug } from "@/config/projects"
+import { getDashboardApiVersion } from "@/app/actions/api-settings"
+
 export async function getListDataGroupAll(): Promise<GroupItem[]> {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
-
-    if (!API_URL || !token) return []
-
     try {
-        const response = await fetch(`${API_URL}/StreetLight/getListDataGroupAll`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({}),
-        })
+        const version = await getDashboardApiVersion()
 
-        if (!response.ok) return []
+        const data = await fetchLesApi<GroupItem[] | { result?: boolean; dataReturn?: GroupItem[] }>(
+            `/api/v${version}/streetlights/groups/all`,
+            {
+                method: "GET",
+                skipProject: true,
+            }
+        )
 
-        const data = await response.json()
-        if (data.result) {
-            return data.dataReturn
+        let rawList: unknown[] = []
+        if (Array.isArray(data)) {
+            rawList = data
+        } else if (data && "dataReturn" in data && Array.isArray(data.dataReturn)) {
+            rawList = data.dataReturn
+        }
+
+        if (rawList.length > 0) {
+            return rawList.map((item) => {
+                const g = item as Record<string, unknown>
+                return {
+                    group_code: String(g.group_code ?? g.GroupCode ?? ""),
+                    group_name: String(g.group_name ?? g.GroupName ?? ""),
+                    sub_district: String(g.sub_district ?? g.SubDistrict ?? "-"),
+                    total_rtu: String(g.total_rtu ?? g.TotalRtu ?? "0"),
+                }
+            })
         }
         return []
     } catch (error) {
@@ -87,26 +96,35 @@ export async function getListDataGroupAll(): Promise<GroupItem[]> {
 }
 
 export async function getDataDashBoard(params: DashboardParams): Promise<DashboardData | null> {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
-
-    if (!API_URL || !token) return null
-
     try {
-        const response = await fetch(`${API_URL}/StreetLight/getDataDashBoard`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(params),
-        })
+        const rawProjectId = await getProjectId()
+        const projectSlug = resolveProjectSlug(rawProjectId)
+        const version = await getDashboardApiVersion()
 
-        if (!response.ok) return null
+        const payload = {
+            project_name: projectSlug,
+            projectName: projectSlug,
+            group_code: params.group_code,
+            select_type: params.select_type,
+            select_date: params.select_date,
+        }
 
-        const data = await response.json()
-        if (data.result) {
-            return data.dataReturn
+        const data = await fetchLesApi<DashboardData | { result?: boolean; dataReturn?: DashboardData }>(
+            `/api/v${version}/streetlights/dashboard`,
+            {
+                method: "POST",
+                body: JSON.stringify(payload),
+                skipProject: true,
+            }
+        )
+
+        if (data) {
+            if ("result" in data && data.result && data.dataReturn) {
+                return data.dataReturn
+            }
+            if ("groupName" in data || "totalLostImei" in data || "listAvgWatt" in data) {
+                return data as DashboardData
+            }
         }
         return null
     } catch (error) {

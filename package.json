@@ -3,7 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "codegen": "node scripts/codegen-registry.mjs",
+    "predev": "npm run codegen",
+    "dev": "next dev -p 3008",
+    "prebuild": "npm run codegen",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -38,6 +41,7 @@
     "@tabler/icons-react": "^3.35.0",
     "@tanstack/react-table": "^8.21.3",
     "@types/leaflet": "1.9.21",
+    "@types/pg": "^8.23.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -48,6 +52,8 @@
     "next": "^16.2.4",
     "next-intl": "^4.9.1",
     "next-themes": "^0.4.6",
+    "nodemailer": "^10.0.12",
+    "pg": "^8.23.0",
     "radix-ui": "^1.4.3",
     "react": "19.2.5",
     "react-day-picker": "^9.13.2",
@@ -63,6 +69,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/nodemailer": "^8.0.2",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "baseline-browser-mapping": "^2.9.19",

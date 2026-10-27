@@ -1,8 +1,9 @@
 "use server"
 
-import { cookies } from "next/headers"
-
-const API_URL = process.env.API_URL
+import { getProjectId } from "@/lib/project"
+import { resolveProjectSlug } from "@/config/projects"
+import { fetchLesApi } from "@/lib/les-api"
+import { getMapApiVersion } from "@/app/actions/api-settings"
 
 export interface GetListDataGroupResponse {
     result: boolean
@@ -15,31 +16,34 @@ export interface GetListDataGroupResponse {
 }
 
 export async function getListDataGroupAction(): Promise<{ groupCode: string; groupName: string }[]> {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
-
-    if (!API_URL || !token) {
-        return []
-    }
-
     try {
-        const response = await fetch(`${API_URL}/StreetLight/getListDataGroup`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({})
-        })
+        const version = await getMapApiVersion()
 
-        if (!response.ok) {
-            console.error(`API error: ${response.status}`)
-            return []
+        const data = await fetchLesApi<
+            { groupCode?: string; groupName?: string; group_code?: string; group_name?: string }[] |
+            { result?: boolean; dataReturn?: { groupCode?: string; groupName?: string; group_code?: string; group_name?: string }[] }
+        >(
+            `/api/v${version}/streetlights/groups`,
+            {
+                method: "GET",
+            }
+        )
+
+        let rawList: unknown[] = []
+        if (Array.isArray(data)) {
+            rawList = data
+        } else if (data && "dataReturn" in data && Array.isArray(data.dataReturn)) {
+            rawList = data.dataReturn
         }
 
-        const data: GetListDataGroupResponse = await response.json()
-        if (data.result && Array.isArray(data.dataReturn)) {
-            return data.dataReturn
+        if (rawList.length > 0) {
+            return rawList.map((item) => {
+                const g = item as Record<string, unknown>
+                return {
+                    groupCode: String(g.groupCode ?? g.group_code ?? ""),
+                    groupName: String(g.groupName ?? g.group_name ?? ""),
+                }
+            }).filter(g => Boolean(g.groupName))
         }
         return []
     } catch (error) {
@@ -56,33 +60,12 @@ export interface GetListDataIMSIResponse {
 }
 
 export async function getListDataIMSIAction(): Promise<string[]> {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
-
-    if (!API_URL || !token) {
-        return []
-    }
-
     try {
-        const response = await fetch(`${API_URL}/StreetLight/getListDataIMSI`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({})
-        })
-
-        if (!response.ok) {
-            console.error(`API error: ${response.status}`)
-            return []
-        }
-
-        const data: GetListDataIMSIResponse = await response.json()
-        if (data.result && Array.isArray(data.dataReturn)) {
-            return data.dataReturn
-        }
-        return []
+        const devices = await getDataLatLongSearchAction("group", ["ALL"])
+        const imsis = devices
+            .map((d) => d.imsi?.trim())
+            .filter((imsi): imsi is string => Boolean(imsi))
+        return Array.from(new Set(imsis))
     } catch (error) {
         console.error("Error fetching IMSI data:", error)
         return []
@@ -97,40 +80,21 @@ export interface GetListDataStreetLightNameResponse {
 }
 
 export async function getListDataStreetLightNameAction(): Promise<string[]> {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
-
-    if (!API_URL || !token) {
-        return []
-    }
-
     try {
-        const response = await fetch(`${API_URL}/StreetLight/getListDataStreetLightName`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({})
-        })
-
-        if (!response.ok) {
-            console.error(`API error: ${response.status}`)
-            return []
-        }
-
-        const data: GetListDataStreetLightNameResponse = await response.json()
-        if (data.result && Array.isArray(data.dataReturn)) {
-            return data.dataReturn
-        }
-        return []
+        const devices = await getDataLatLongSearchAction("group", ["ALL"])
+        const names = devices
+            .map((d) => (d.street_light_name || d.name_pole || "").trim())
+            .filter((name): name is string => Boolean(name))
+        return Array.from(new Set(names))
     } catch (error) {
         console.error("Error fetching Street Light Name data:", error)
         return []
     }
 }
 
+
 export interface LatLongData {
+    SN?: string
     id: string
     imsi: string
     lat: string
@@ -155,45 +119,75 @@ export interface GetDataLatLongResponse {
 
 export async function getDataLatLongSearchAction(
     typeSearch: "group" | "imsi" | "street_light_name",
-    listValue: string[], // Will be stringified
-    statusLamp: string = "all", // "all", "3" (yellow), "4" (fail), "5" (comm error)
-    typeGps: string = "rtu" // "rtu", "pole", "mobile"
+    listValue: string[],
+    statusLamp: string = "all",
+    typeGps: string = "rtu"
 ): Promise<LatLongData[]> {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
-
-    // Use environment variable for default GPS type if not provided or if we want to enforce it from env?
-    // User request: "อันนี้จะต้องดึงตั้งค่ามาจาก .env" for type_gps default.
-    // However, the action allows overriding. Let's stick to the argument or env.
-    const finalTypeGps = typeGps || process.env.MAP_GPS_TYPE || "rtu"
-
-    if (!API_URL || !token) {
-        return []
-    }
-
     try {
-        const response = await fetch(`${API_URL}/StreetLight/getDataLatLong`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                type_search: typeSearch,
-                list_value: JSON.stringify(listValue),
-                status_lamp: statusLamp,
-                type_gps: finalTypeGps
-            })
-        })
+        const version = await getMapApiVersion()
+        const finalTypeGps = typeGps || process.env.MAP_GPS_TYPE || "rtu"
 
-        if (!response.ok) {
-            console.error(`API error: ${response.status}`)
-            return []
+        let resolvedListValue = listValue
+        if (typeSearch === "group" && listValue.length > 0 && !listValue.some(v => v.toUpperCase() === "ALL")) {
+            try {
+                const groups = await getListDataGroupAction()
+                const expanded = new Set<string>()
+                for (const val of listValue) {
+                    expanded.add(val)
+                    const found = groups.find(g => g.groupName === val || g.groupCode === val)
+                    if (found) {
+                        if (found.groupCode) expanded.add(found.groupCode)
+                        if (found.groupName) expanded.add(found.groupName)
+                    }
+                }
+                resolvedListValue = Array.from(expanded)
+            } catch {
+                // Keep original listValue if group resolution encounters an issue
+            }
         }
 
-        const data: GetDataLatLongResponse = await response.json()
-        if (data.result && Array.isArray(data.dataReturn)) {
-            return data.dataReturn
+        const payload = {
+            type_search: typeSearch,
+            type_gps: finalTypeGps,
+            status_lamp: statusLamp,
+            list_value: resolvedListValue,
+        }
+
+        const data = await fetchLesApi<GetDataLatLongResponse | LatLongData[]>(
+            `/api/v${version}/streetlights/getDataLatLong`,
+            {
+                method: "POST",
+                body: JSON.stringify(payload),
+            }
+        )
+
+        let rawList: unknown[] = []
+        if (Array.isArray(data)) {
+            rawList = data
+        } else if (data && "dataReturn" in data && Array.isArray(data.dataReturn)) {
+            rawList = data.dataReturn
+        }
+
+        if (rawList.length > 0) {
+            return rawList.map((item) => {
+                const d = item as Record<string, unknown>
+                const sn = String(d.imsi ?? d.SN ?? d.id ?? "")
+                return {
+                    id: String(d.id ?? sn),
+                    imsi: sn,
+                    lat: String(d.lat ?? ""),
+                    lng: String(d.lng ?? ""),
+                    using_sensor: String(d.using_sensor ?? "false"),
+                    last_power: String(d.last_power ?? "0"),
+                    type_schedule: String(d.type_schedule ?? "manual"),
+                    gateway_id: d.gateway_id ? String(d.gateway_id) : null,
+                    status: String(d.status ?? ""),
+                    name_pole: String(d.name_pole ?? ""),
+                    name_gov: String(d.name_gov ?? ""),
+                    street_light_name: d.street_light_name ? String(d.street_light_name) : undefined,
+                    group_name: d.group_name ? String(d.group_name) : undefined,
+                }
+            })
         }
         return []
     } catch (error) {
@@ -221,31 +215,39 @@ export interface GetDataDetailIMSIResponse {
 }
 
 export async function getDataDetailIMSIAction(imsi: string): Promise<ImsiDetail | null> {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
-
-    if (!API_URL || !token) {
-        return null
-    }
-
     try {
-        const response = await fetch(`${API_URL}/StreetLight/getDataDetailIMSI`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({ imsi })
-        })
+        const version = await getMapApiVersion()
 
-        if (!response.ok) {
-            console.error(`API error: ${response.status}`)
-            return null
+        const data = await fetchLesApi<
+            ImsiDetail |
+            { result?: boolean; dataReturn?: ImsiDetail }
+        >(
+            `/api/v${version}/streetlights/devices/detail?imsi=${encodeURIComponent(imsi)}`,
+            {
+                method: "GET",
+            }
+        )
+
+        let detail: Record<string, unknown> | null = null
+        if (data) {
+            if ("dataReturn" in data && data.dataReturn && typeof data.dataReturn === "object") {
+                detail = data.dataReturn as unknown as Record<string, unknown>
+            } else if (typeof data === "object") {
+                detail = data as unknown as Record<string, unknown>
+            }
         }
 
-        const data: GetDataDetailIMSIResponse = await response.json()
-        if (data.result && data.dataReturn) {
-            return data.dataReturn
+        if (detail) {
+            return {
+                imsi: String(detail.imsi ?? detail.Imsi ?? imsi),
+                group_name: String(detail.groupName ?? detail.group_name ?? detail.GroupName ?? ""),
+                last_update: String(detail.lastUpdate ?? detail.last_update ?? detail.LastUpdate ?? ""),
+                last_command: String(detail.lastCommand ?? detail.last_command ?? detail.LastCommand ?? ""),
+                last_status: String(detail.lastStatus ?? detail.last_status ?? detail.LastStatus ?? ""),
+                number_gov: String(detail.numberGov ?? detail.number_gov ?? detail.NumberGov ?? ""),
+                street_light_name: String(detail.streetLightName ?? detail.street_light_name ?? detail.StreetLightName ?? ""),
+                gateway_id: String(detail.gatewayId ?? detail.gateway_id ?? detail.GatewayId ?? ""),
+            }
         }
         return null
     } catch (error) {
@@ -254,68 +256,44 @@ export async function getDataDetailIMSIAction(imsi: string): Promise<ImsiDetail 
     }
 }
 
+
+
 export interface SendCommandMqttResponse {
     result: boolean
     apiName: string
     dateTime: string
-    dataReturn: string // JSON string that needs parsing or empty string on failure
+    dataReturn: string
 }
 
-export async function sendCommandMqttAction(imsi: string, commandType: "0" | "1", dimPercent: string): Promise<{ success: boolean, message?: string }> {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
-    const projectName = process.env.PROJECT_NAME
-    const waitTime = process.env.WAIT_TIME || "20"
-
-    if (!API_URL || !token || !projectName) {
-        console.error("Missing configuration for sendCommandMqttAction")
-        return { success: false, message: "Configuration error" }
-    }
-
+export async function sendCommandMqttAction(
+    imsi: string,
+    commandType: "0" | "1",
+    dimPercent: string
+): Promise<{ success: boolean; message?: string }> {
     try {
+        const version = await getMapApiVersion()
+        const waitTime = process.env.WAIT_TIME || "30"
+
         const body = {
             type_open: "imsi",
             imsi: imsi,
-            subscribe: `${projectName}/RESPONSE/${imsi}`,
             wait_time: waitTime,
             command_type: commandType,
-            dim_percent: dimPercent
+            dim_percent: dimPercent,
         }
 
-        const response = await fetch(`${API_URL}/StreetLight/sendCommandMqtt`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
-        })
-
-        if (!response.ok) {
-            console.error(`API error: ${response.status}`)
-            return { success: false, message: `API Error: ${response.status}` }
-        }
-
-        const data: SendCommandMqttResponse = await response.json()
-
-        // Check result
-        if (data.result && data.dataReturn) {
-            // Data return is a JSON string, ensuring it's not empty means success usually?
-            // "{\"Type\":\"Response\",\"SN\":\"IMEI000010\",\"TOKEN\":\"g65C6MepSknqMIvkjCRw\"}"
-            try {
-                // If it parses JSON successfully, it's likely a success response as per user example
-                const parsed = JSON.parse(data.dataReturn);
-                if (parsed && (parsed.Type === "Response" || parsed.result === "true")) {
-                    return { success: true }
-                }
-                return { success: true } // Assuming any non-empty return is success based on user input
-            } catch {
-                return { success: true } // Even purely string return might indicate success if not empty
+        const data = await fetchLesApi<{ result?: boolean; dataReturn?: string; success?: boolean }>(
+            `/api/v${version}/streetlights/commands/control-rtu`,
+            {
+                method: "POST",
+                body: JSON.stringify(body),
             }
-        } else {
-            // If dataReturn is empty, it failed (timeout)
-            return { success: false, message: "Timeout or No Response" }
+        )
+
+        if (data && (data.result === true || data.dataReturn === "true" || data.success === true)) {
+            return { success: true }
         }
+        return { success: false, message: "Command Failed" }
     } catch (error) {
         console.error("Error sending MQTT command:", error)
         return { success: false, message: "Network Error" }
@@ -329,52 +307,41 @@ export interface ReadDataMqttResponse {
     dataReturn: string
 }
 
-export async function readDataMqttAction(gatewayId: string, imsi: string): Promise<{ success: boolean, message?: string }> {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
-    const projectName = process.env.PROJECT_NAME
-    const waitTime = process.env.WAIT_TIME || "20"
-
-    if (!API_URL || !token || !projectName) {
-        return { success: false, message: "Configuration error" }
-    }
-
+export async function readDataMqttAction(
+    gatewayId: string,
+    imsi: string
+): Promise<{ success: boolean; message?: string }> {
     try {
-        //console.log(`[readDataMqttAction] Calling ${API_URL}/StreetLight/readDataMqtt for IMSI: ${imsi} Gateway: ${gatewayId}`);
-        const randomToken = Math.random().toString(36).substring(2, 12); // ~10 chars
-        const msg = JSON.stringify({ Type: "GetPower", TOKEN: randomToken });
+        const rawProjectId = await getProjectId()
+        const projectSlug = resolveProjectSlug(rawProjectId)
+        const version = await getMapApiVersion()
+        const waitTime = process.env.WAIT_TIME || "30"
+
+        const randomToken = Math.random().toString(36).substring(2, 12)
+        const msg = JSON.stringify({ Type: "GetPower", TOKEN: randomToken })
 
         const body = {
-            topic: `${gatewayId}/${imsi}`, // According to user: "${gateway_id}/${imsi}" - wait, user said "${gateway_id}/IMEI..." but logic suggests dynamic IMSI. 
-            // User example: "topic": "${gateway_id}/IMEI000010" for a device with IMSI IMEI000010. So it is `${gatewayId}/${imsi}`.
+            topic: `${gatewayId}/${imsi}`,
             message: msg,
-            subscribe: `${projectName}/${imsi}`,
-            wait_time: waitTime
+            subscribe: `${projectSlug}/${imsi}`,
+            wait_time: waitTime,
         }
 
-        const response = await fetch(`${API_URL}/StreetLight/readDataMqtt`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(body)
-        })
+        const data = await fetchLesApi<ReadDataMqttResponse | { result?: boolean; dataReturn?: string }>(
+            `/api/v${version}/streetlights/commands/read-data-mqtt`,
+            {
+                method: "POST",
+                body: JSON.stringify(body),
+            }
+        )
 
-        if (!response.ok) {
-            return { success: false, message: `API Error: ${response.status}` }
-        }
-
-        const data: ReadDataMqttResponse = await response.json()
-
-        if (data.result && data.dataReturn) {
-            // "{\"GW\":\"...\",\"SN\":\"...\",\"W\":\"...\"}"
+        if (data && (data.result === true || Boolean(data.dataReturn))) {
             return { success: true }
-        } else {
-            return { success: false, message: "Read Timeout" }
         }
+        return { success: false, message: "Read Timeout" }
     } catch (error) {
         console.error("Error reading MQTT data:", error)
         return { success: false, message: "Network Error" }
     }
 }
+

@@ -124,7 +124,17 @@ export function ComboboxEmpty({ children }: { children: React.ReactNode }) {
     return <CommandEmpty>{children}</CommandEmpty>
 }
 
-export function ComboboxItem({ value, children, onSelect }: { value: string, children: React.ReactNode, onSelect?: (val: string) => void }) {
+export function ComboboxItem({
+    value,
+    children,
+    onSelect,
+    showCheck = true,
+}: {
+    value: string
+    children: React.ReactNode
+    onSelect?: (val: string) => void
+    showCheck?: boolean
+}) {
     const context = React.useContext(ComboboxContext)
 
     return (
@@ -137,12 +147,14 @@ export function ComboboxItem({ value, children, onSelect }: { value: string, chi
                 if (onSelect) onSelect(value)
             }}
         >
-            <Check
-                className={cn(
-                    "mr-2 h-4 w-4",
-                    context?.value === value ? "opacity-100" : "opacity-0"
-                )}
-            />
+            {showCheck && (
+                <Check
+                    className={cn(
+                        "mr-2 h-4 w-4 shrink-0",
+                        context?.value === value ? "opacity-100" : "opacity-0"
+                    )}
+                />
+            )}
             {children}
         </CommandItem>
     )

@@ -16,6 +16,11 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { refreshStreetLightPowerAction, sendStreetLightCommandAction } from "@/app/actions/street-light"
 import * as React from "react"
 import { toast } from "sonner"
@@ -397,23 +402,59 @@ export const useStreetLightColumns = (onCommandSuccess?: (imei: string, command:
                 if (groups.length === 1) {
                     return (
                         <div className="flex justify-center">
-                            <Badge variant="outline" className="text-xs font-normal max-w-[140px] truncate bg-muted/40 text-foreground">
-                                {groups[0]}
-                            </Badge>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <Badge
+                                        variant="outline"
+                                        className="text-xs font-normal max-w-[200px] truncate bg-muted/40 text-foreground cursor-default hover:bg-muted/70 transition-colors"
+                                    >
+                                        {groups[0]}
+                                    </Badge>
+                                </TooltipTrigger>
+                                <TooltipContent side="top" className="max-w-xs text-xs">
+                                    <p>{groups[0]}</p>
+                                </TooltipContent>
+                            </Tooltip>
                         </div>
                     )
                 }
                 return (
-                    <div className="flex items-center justify-center gap-1">
-                        <Badge variant="outline" className="text-xs font-normal max-w-[110px] truncate bg-muted/40 text-foreground">
-                            {groups[0]}
-                        </Badge>
+                    <div className="flex items-center justify-center gap-1.5">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Badge
+                                    variant="outline"
+                                    className="text-xs font-normal max-w-[150px] truncate bg-muted/40 text-foreground cursor-default hover:bg-muted/70 transition-colors"
+                                >
+                                    {groups[0]}
+                                </Badge>
+                            </TooltipTrigger>
+                            <TooltipContent side="top" className="max-w-xs text-xs">
+                                <p>{groups[0]}</p>
+                            </TooltipContent>
+                        </Tooltip>
                         <Popover>
-                            <PopoverTrigger asChild>
-                                <Button variant="secondary" size="sm" className="h-5 px-1.5 text-xs font-medium rounded-full cursor-pointer">
-                                    +{groups.length - 1}
-                                </Button>
-                            </PopoverTrigger>
+                            <Tooltip>
+                                <PopoverTrigger asChild>
+                                    <TooltipTrigger asChild>
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            className="h-5 px-1.5 text-xs font-medium rounded-full cursor-pointer hover:bg-secondary/80"
+                                        >
+                                            +{groups.length - 1}
+                                        </Button>
+                                    </TooltipTrigger>
+                                </PopoverTrigger>
+                                <TooltipContent side="top" className="max-w-xs text-xs">
+                                    <p className="font-semibold mb-1">{t("groupName")} ({groups.length}):</p>
+                                    <div className="space-y-0.5">
+                                        {groups.slice(1).map((g, idx) => (
+                                            <div key={idx} className="truncate">• {g}</div>
+                                        ))}
+                                    </div>
+                                </TooltipContent>
+                            </Tooltip>
                             <PopoverContent className="w-56 p-3 text-sm">
                                 <div className="font-semibold mb-2 border-b pb-1">
                                     {t("groupName")} ({groups.length})

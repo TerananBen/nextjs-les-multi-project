@@ -3,6 +3,8 @@ export interface GroupConfigData {
     group_code: string;
     sub_district: string;
     total_rtu: string;
+    online_rtu?: string | number;
+    offline_rtu?: string | number;
 }
 
 export interface GetListDataGroupAllResponse {

@@ -14,7 +14,9 @@ interface SummaryCardsProps {
 export function SummaryCards({ data, loading }: SummaryCardsProps) {
     const t = useTranslations("GroupDashboard.summary")
 
-    const totalLamp = data ? (parseInt(data.projectTotalLamp, 10) || 0) : 0
+    const parsedProjectLamp = data ? parseInt(data.projectTotalLamp, 10) : 0
+    const parsedTotalImei = data ? parseInt(data.toTalImei, 10) : 0
+    const totalLamp = parsedProjectLamp > 0 ? parsedProjectLamp : (parsedTotalImei > 0 ? parsedTotalImei : 0)
     const totalLampLose = data ? (parseInt(data.totalRTULose, 10) || 0) : 0
     const onlineLamp = Math.max(0, totalLamp - totalLampLose)
 

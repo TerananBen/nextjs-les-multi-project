@@ -1,21 +1,26 @@
+"use client"
+
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { ThemeSwitcher } from "@/components/common/theme-switcher"
 import { LanguageSwitcher } from "@/components/common/language-switcher"
 import { ProjectSwitcher, type ProjectOption } from "@/components/common/project-switcher"
 import { HeaderProjectTitle } from "@/components/layout/header-project-title"
+import { NavUser, type NavUserProps } from "@/components/layout/nav-user"
 
 interface SiteHeaderProps {
   currentProjectId?: string
   projects?: ProjectOption[]
+  user?: NavUserProps["user"]
 }
 
 export function SiteHeader({
   currentProjectId = "",
   projects = [],
+  user,
 }: SiteHeaderProps) {
   return (
-    <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
+    <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b bg-background transition-[width,height] ease-linear md:rounded-t-xl group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
         <SidebarTrigger className="cursor-pointer -ml-1" />
         <Separator
@@ -32,6 +37,15 @@ export function SiteHeader({
           )}
           <ThemeSwitcher />
           <LanguageSwitcher />
+          {user && (
+            <>
+              <Separator
+                orientation="vertical"
+                className="mx-1 data-[orientation=vertical]:h-4"
+              />
+              <NavUser user={user} />
+            </>
+          )}
         </div>
       </div>
     </header>

@@ -1,10 +1,11 @@
 "use client"
 
+import * as React from "react"
 import {
-  IconDotsVertical,
   IconLogout,
   IconUserCircle,
 } from "@tabler/icons-react"
+import { ChevronDown } from "lucide-react"
 
 import {
   Avatar,
@@ -20,30 +21,24 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar"
-import { useRouter, Link } from "@/i18n/routing"
+import { Button } from "@/components/ui/button"
+import { Link } from "@/i18n/routing"
 import { toast } from "sonner"
-
 import { useTranslations } from "next-intl"
 
-export function NavUser({
-  user,
-}: {
-  user: {
+export interface NavUserProps {
+  user?: {
     name: string
     email?: string
     avatar?: string
     role?: string
   }
-}) {
-  const { isMobile } = useSidebar()
-  const router = useRouter()
-  const t = useTranslations('UserMenu')
+}
+
+export function NavUser({ user }: NavUserProps) {
+  const t = useTranslations("UserMenu")
+
+  if (!user) return null
 
   const getInitials = (name: string) => {
     const parts = name.trim().split(/\s+/)
@@ -54,70 +49,71 @@ export function NavUser({
   }
 
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <Avatar className="cursor-pointer h-8 w-8 rounded-lg grayscale">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">{getInitials(user.name)}</AvatarFallback>
-              </Avatar>
-              <div className="cursor-pointer grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
-                <span className="text-muted-foreground skyblue:text-sidebar-foreground truncate text-xs">
-                  {user.role || user.email}
-                </span>
-              </div>
-              <IconDotsVertical className="cursor-pointer ml-auto size-4" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
-            align="end"
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">{getInitials(user.name)}</AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
-                  <span className="text-muted-foreground truncate text-xs">
-                    {user.email}
-                  </span>
-                </div>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Link href="/profile" className="flex items-center gap-2 w-full">
-                  <IconUserCircle />
-                  {t('account')}
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="cursor-pointer"
-              onClick={() => {
-                toast.dismiss()
-                window.location.href = "/api/auth/logout"
-              }}
-            >
-              <IconLogout />
-              {t('logout')}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="cursor-pointer flex items-center gap-2 h-9 px-2.5 rounded-md hover:bg-accent data-[state=open]:bg-accent"
+        >
+          <Avatar className="h-7 w-7 rounded-md">
+            <AvatarImage src={user.avatar} alt={user.name} />
+            <AvatarFallback className="rounded-md text-xs font-semibold">
+              {getInitials(user.name)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="hidden md:flex flex-col text-left leading-none">
+            <span className="text-xs font-semibold truncate max-w-[120px]">{user.name}</span>
+            {user.role && (
+              <span className="text-[10px] text-muted-foreground truncate max-w-[120px]">
+                {user.role}
+              </span>
+            )}
+          </div>
+          <ChevronDown className="hidden md:block h-3.5 w-3.5 text-muted-foreground shrink-0" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        className="w-56 rounded-lg"
+        align="end"
+        sideOffset={8}
+      >
+        <DropdownMenuLabel className="p-0 font-normal">
+          <div className="flex items-center gap-2.5 px-2 py-2 text-left text-sm">
+            <Avatar className="h-8 w-8 rounded-md">
+              <AvatarImage src={user.avatar} alt={user.name} />
+              <AvatarFallback className="rounded-md font-semibold">
+                {getInitials(user.name)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              <span className="truncate font-semibold text-foreground">{user.name}</span>
+              <span className="text-muted-foreground truncate text-xs">
+                {user.role || user.email}
+              </span>
+            </div>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuGroup>
+          <DropdownMenuItem asChild>
+            <Link href="/profile" className="cursor-pointer flex items-center gap-2 w-full">
+              <IconUserCircle className="size-4" />
+              <span>{t("account")}</span>
+            </Link>
+          </DropdownMenuItem>
+        </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="cursor-pointer text-destructive focus:text-destructive flex items-center gap-2"
+          onClick={() => {
+            toast.dismiss()
+            window.location.href = "/api/auth/logout"
+          }}
+        >
+          <IconLogout className="size-4" />
+          <span>{t("logout")}</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

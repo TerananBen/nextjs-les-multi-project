@@ -4,8 +4,8 @@ import { ColumnDef } from "@tanstack/react-table"
 import { MaintenanceDetailListRecord } from "@/app/actions/maintenance"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
-import { Info } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
+import { Eye, ArrowUpDown, CheckCircle2, Clock } from "lucide-react"
 
 export const useMaintenanceDetailColumns = (onOpenDialog: (id: string) => void) => {
     const t = useTranslations("MaintenanceDetail.table")
@@ -13,104 +13,154 @@ export const useMaintenanceDetailColumns = (onOpenDialog: (id: string) => void) 
     const columns: ColumnDef<MaintenanceDetailListRecord>[] = [
         {
             id: "index",
-            header: () => {
-                return (
-                    <div className="ml-4">
-                        {t("index")}
-                    </div>
-                )
-            },
-            cell: ({ row }) => <div className="ml-4">{row.index + 1}</div>,
+            header: () => <div className="text-center w-12 font-semibold text-muted-foreground">{t("index")}</div>,
+            cell: ({ row }) => <div className="text-center font-medium text-muted-foreground">{row.index + 1}</div>,
         },
         {
             accessorKey: "list_name",
-            header: () => {
-                return (
-                    <div>
-                        {t("listName")}
-                    </div>
-                )
-            },
-            cell: ({ row }) => <div>{row.original.list_name}</div>,
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    className="-ml-3 h-8 text-sm font-semibold hover:bg-muted/50"
+                >
+                    {t("listName")}
+                    <ArrowUpDown className="ml-1 h-3.5 w-3.5" />
+                </Button>
+            ),
+            cell: ({ row }) => <div className="font-medium text-foreground">{row.original.list_name}</div>,
         },
         {
             accessorKey: "name_operator",
-            header: () => {
-                return (
-                    <div>
-                        {t("operatorName")}
-                    </div>
-                )
-            },
-            cell: ({ row }) => <div>{row.original.name_operator}</div>,
+            header: ({ column }) => (
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    className="-ml-3 h-8 text-sm font-semibold hover:bg-muted/50"
+                >
+                    {t("operatorName")}
+                    <ArrowUpDown className="ml-1 h-3.5 w-3.5" />
+                </Button>
+            ),
+            cell: ({ row }) => <div className="text-muted-foreground">{row.original.name_operator || "-"}</div>,
         },
         {
             accessorKey: "repair_all",
-            header: () => {
-                return (
-                    <div>
+            header: ({ column }) => (
+                <div className="flex justify-center">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        className="h-8 text-sm font-semibold hover:bg-muted/50"
+                    >
                         {t("repaired")}
-                    </div>
-                )
-            },
-            cell: ({ row }) => <div>{row.original.repair_all}</div>,
+                        <ArrowUpDown className="ml-1 h-3.5 w-3.5" />
+                    </Button>
+                </div>
+            ),
+            cell: ({ row }) => (
+                <div className="text-center font-semibold text-emerald-600 dark:text-emerald-400">
+                    {row.getValue("repair_all")}
+                </div>
+            ),
         },
         {
             accessorKey: "wait_repair",
-            header: () => {
-                return (
-                    <div>
+            header: ({ column }) => (
+                <div className="flex justify-center">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        className="h-8 text-sm font-semibold hover:bg-muted/50"
+                    >
                         {t("waitingRepair")}
-                    </div>
-                )
-            },
-            cell: ({ row }) => <div>{row.original.wait_repair}</div>,
+                        <ArrowUpDown className="ml-1 h-3.5 w-3.5" />
+                    </Button>
+                </div>
+            ),
+            cell: ({ row }) => (
+                <div className="text-center font-semibold text-amber-600 dark:text-amber-400">
+                    {row.getValue("wait_repair")}
+                </div>
+            ),
         },
         {
             accessorKey: "count_lamp_all",
-            header: () => {
-                return (
-                    <div className="text-center">
+            header: ({ column }) => (
+                <div className="flex justify-center">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                        className="h-8 text-sm font-semibold hover:bg-muted/50"
+                    >
                         {t("total")}
-                    </div>
-                )
-            },
-            cell: ({ row }) => <div>{row.original.count_lamp_all}</div>,
+                        <ArrowUpDown className="ml-1 h-3.5 w-3.5" />
+                    </Button>
+                </div>
+            ),
+            cell: ({ row }) => (
+                <div className="text-center font-semibold text-foreground">
+                    {row.getValue("count_lamp_all")}
+                </div>
+            ),
         },
         {
             id: "details",
-            header: () => <div className="text-center">{t("details")}</div>,
+            header: () => <div className="text-center font-semibold text-muted-foreground">{t("details")}</div>,
             cell: ({ row }) => {
                 return (
                     <div className="flex justify-center">
                         <Button
-                            variant="default"
-                            size="icon"
-                            className="cursor-pointer h-8 w-8 bg-blue-500 hover:bg-blue-600 rounded-lg"
+                            variant="outline"
+                            size="sm"
+                            className="h-8 w-8 p-0 cursor-pointer hover:bg-muted/80 shadow-2xs"
                             onClick={() => onOpenDialog(row.original.detail)}
+                            title={t("details")}
+                            aria-label={t("details")}
                         >
-                            <Info className="h-4 w-4 text-white" />
+                            <Eye className="h-4 w-4" />
                         </Button>
                     </div>
                 )
             },
+            enableSorting: false,
         },
         {
             accessorKey: "confrime",
-            header: () => <div className="text-center">{t("confirmStatus")}</div>,
+            header: () => <div className="text-center font-semibold text-muted-foreground">{t("confirmStatus")}</div>,
             cell: ({ row }) => {
-                const isConfirmed = row.original.confrime === "T" || row.original.confrime === "true"
+                const isConfirmed = row.original.confrime === "T" || row.original.confrime === "1" || row.original.confrime?.toLowerCase() === "true"
                 return (
                     <div className="flex justify-center">
-                        <span className={cn(
-                            "px-3 py-1 text-xs font-semibold rounded-full",
-                            isConfirmed ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" : "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400"
-                        )}>
-                            {isConfirmed ? t("confirmed") : t("pending")}
-                        </span>
+                        <Badge
+                            variant="outline"
+                            className={`gap-1.5 py-1 px-3 font-medium transition-colors ${
+                                isConfirmed
+                                    ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                                    : "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                            }`}
+                        >
+                            {isConfirmed ? (
+                                <>
+                                    <CheckCircle2 className="h-3.5 w-3.5" />
+                                    {t("confirmed")}
+                                </>
+                            ) : (
+                                <>
+                                    <Clock className="h-3.5 w-3.5" />
+                                    {t("pending")}
+                                </>
+                            )}
+                        </Badge>
                     </div>
                 )
             },
+            enableSorting: false,
         },
     ]
 

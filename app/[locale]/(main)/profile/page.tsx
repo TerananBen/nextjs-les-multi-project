@@ -11,9 +11,9 @@ interface ProfilePageProps {
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params
-    const t = await getTranslations({ locale, namespace: "Sidebar" })
+    const t = await getTranslations({ locale, namespace: "Personal" })
     return {
-        title: t("menu.personal"),
+        title: t("form.profileHeader"),
     }
 }
 
@@ -27,7 +27,7 @@ export default async function ProfilePage({ params }: ProfilePageProps) {
     }
 
     return (
-        <div className="flex flex-col gap-6 p-4 pt-4">
+        <div className="flex flex-1 flex-col gap-2.5 p-2.5 sm:p-3">
             <ProfileForm initialData={user} />
         </div>
     )

@@ -354,6 +354,12 @@ export const decodeJwtPayload = <T = KeycloakJwtPayload>(token: string): T | nul
   }
 };
 
+export const isKeycloakTokenValid = (token?: string | null): boolean => {
+  if (!token) return false;
+  const payload = decodeJwtPayload(token);
+  return Boolean(payload?.exp && payload.exp * 1000 > Date.now());
+};
+
 export const loginKeycloakDirectGrant = async (
   username: string,
   password: string
@@ -520,6 +526,7 @@ export const refreshKeycloakToken = async (
   const params = new URLSearchParams();
   params.append("grant_type", "refresh_token");
   params.append("client_id", clientId);
+  params.append("scope", "openid profile email");
   if (clientSecret && (clientId === defaultClientId || clientId === tokenAzp)) {
     params.append("client_secret", clientSecret);
   }

@@ -180,7 +180,7 @@ export default async function proxy(request: NextRequest) {
   const apiUrl = process.env.API_URL;
   const keycloakUrl = (process.env.KEYCLOAK_BASE_URL || "").replace(/\/+$/, "");
   const keycloakRealm = process.env.KEYCLOAK_REALM;
-  let refreshedTokens: { access_token: string; refresh_token?: string } | null = null;
+  let refreshedTokens: { access_token: string; refresh_token?: string; id_token?: string } | null = null;
 
   // If access token is missing but refresh token exists, attempt immediate refresh
   let clientForRefresh = "project-a";
@@ -197,10 +197,14 @@ export default async function proxy(request: NextRequest) {
       refreshedTokens = {
         access_token: newTokens.access_token,
         refresh_token: newTokens.refresh_token,
+        id_token: newTokens.id_token,
       };
       request.cookies.set("jwt", token);
       if (newTokens.refresh_token) {
         request.cookies.set("refresh_token", newTokens.refresh_token);
+      }
+      if (newTokens.id_token) {
+        request.cookies.set("id_token", newTokens.id_token);
       }
     }
   }
@@ -265,10 +269,14 @@ export default async function proxy(request: NextRequest) {
         refreshedTokens = {
           access_token: newTokens.access_token,
           refresh_token: newTokens.refresh_token,
+          id_token: newTokens.id_token,
         };
         request.cookies.set("jwt", token);
         if (newTokens.refresh_token) {
           request.cookies.set("refresh_token", newTokens.refresh_token);
+        }
+        if (newTokens.id_token) {
+          request.cookies.set("id_token", newTokens.id_token);
         }
       } else if (payload.exp && payload.exp * 1000 < Date.now()) {
         const redirectResponse = makeLoginRedirect();
@@ -304,10 +312,14 @@ export default async function proxy(request: NextRequest) {
             refreshedTokens = {
               access_token: newTokens.access_token,
               refresh_token: newTokens.refresh_token,
+              id_token: newTokens.id_token,
             };
             request.cookies.set("jwt", token);
             if (newTokens.refresh_token) {
               request.cookies.set("refresh_token", newTokens.refresh_token);
+            }
+            if (newTokens.id_token) {
+              request.cookies.set("id_token", newTokens.id_token);
             }
             keycloakRes = await fetch(userInfoUrl, {
               headers: {
@@ -370,6 +382,9 @@ export default async function proxy(request: NextRequest) {
     response.cookies.set("jwt", refreshedTokens.access_token, refreshCookieOptions);
     if (refreshedTokens.refresh_token) {
       response.cookies.set("refresh_token", refreshedTokens.refresh_token, refreshCookieOptions);
+    }
+    if (refreshedTokens.id_token) {
+      response.cookies.set("id_token", refreshedTokens.id_token, refreshCookieOptions);
     }
   }
   return response;

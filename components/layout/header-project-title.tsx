@@ -11,7 +11,7 @@ export function HeaderProjectTitle({ className }: { className?: string }) {
 
     return (
         <h1
-            className={cn("text-base font-medium truncate max-w-[300px] md:max-w-[400px]", className)}
+            className={cn("text-base font-semibold text-project-primary truncate max-w-[300px] md:max-w-[400px]", className)}
             title={title}
         >
             {title}

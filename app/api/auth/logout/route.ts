@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getKeycloakConfig, getKeycloakLogoutUrl, logoutKeycloak } from "@/lib/keycloak";
+import { getKeycloakLogoutUrl, logoutKeycloak, isKeycloakTokenValid } from "@/lib/keycloak";
 import { resolveProjectSlug, isIpAddress } from "@/config/projects";
 
 export async function GET(request: NextRequest) {
@@ -32,21 +32,23 @@ export async function GET(request: NextRequest) {
 
   const loginUrl = `${appUrl}/api/auth/login?prompt=login`;
 
-  // Always invoke backchannel logout if refresh token is available to kill session in Keycloak
-  if (refreshToken) {
+  let targetUrl: string = loginUrl;
+  const hasValidIdToken = isKeycloakTokenValid(idToken);
+
+  if (hasValidIdToken && idToken) {
+    // If idToken is valid, frontchannel logout with id_token_hint clears Keycloak session & browser cookies and redirects to post_logout_redirect_uri.
+    // Do NOT invoke backchannel logout first, as it would destroy the session and cause Keycloak to reject id_token_hint as expired/invalid.
+    const keycloakLogoutUrl = getKeycloakLogoutUrl(loginUrl, idToken, resolvedClientId);
+    if (keycloakLogoutUrl) {
+      targetUrl = keycloakLogoutUrl;
+    }
+  } else if (refreshToken) {
+    // If idToken is expired or absent, do NOT send expired id_token_hint to Keycloak (which causes EXPIRED_ACTION error).
+    // Instead, terminate session via backchannel logout and redirect directly to login with prompt=login.
     try {
       await logoutKeycloak(refreshToken, resolvedClientId);
     } catch (e) {
       console.warn("[Logout] Backchannel logout failed:", e);
-    }
-  }
-
-  let targetUrl: string = loginUrl;
-  // If idToken is present, frontchannel logout with id_token_hint clears Keycloak session cookies without confirmation prompt
-  if (idToken) {
-    const keycloakLogoutUrl = getKeycloakLogoutUrl(loginUrl, idToken, resolvedClientId);
-    if (keycloakLogoutUrl) {
-      targetUrl = keycloakLogoutUrl;
     }
   }
 
@@ -59,6 +61,7 @@ export async function GET(request: NextRequest) {
   response.cookies.set("menuRole", "", { path: "/", maxAge: 0 });
   response.cookies.set("current_project", "", { path: "/", maxAge: 0 });
   response.cookies.set("remember_me", "", { path: "/", maxAge: 0 });
+  response.cookies.set("pkce_verifier", "", { path: "/", maxAge: 0 });
   response.cookies.delete("jwt");
   response.cookies.delete("refresh_token");
   response.cookies.delete("id_token");
@@ -66,6 +69,7 @@ export async function GET(request: NextRequest) {
   response.cookies.delete("current_project");
   response.cookies.delete("current_tenant");
   response.cookies.delete("remember_me");
+  response.cookies.delete("pkce_verifier");
 
   return response;
 }

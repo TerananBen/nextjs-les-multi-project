@@ -79,8 +79,8 @@ export default async function MainLayout({
             <TokenRefresher />
             <AppSidebar variant="inset" menuItems={menuItems} user={sidebarUser} sidebarLogo={projectConfig.logo} />
             <PermissionProvider initialPermissions={menuItems} isSuperAdmin={isSuperAdmin}>
-                <SidebarInset>
-                    <SiteHeader currentProjectId={projectConfig.code || projectConfig.id} projects={projectList} />
+                <SidebarInset className="overflow-hidden">
+                    <SiteHeader currentProjectId={projectConfig.code || projectConfig.id} projects={projectList} user={sidebarUser} />
                     <div className="flex flex-1 flex-col">
                         <div className="@container/main flex flex-1 flex-col gap-2">
                             {children}

@@ -353,7 +353,7 @@ export function PersonalClient({
     return (
         <div className="flex flex-1 flex-col gap-3 w-full h-full">
             {/* Header Toolbar: 2-Row Compact Container */}
-            <div className="rounded-lg border bg-card p-3 shadow-2xs space-y-2.5">
+            <div className="rounded-lg border bg-card text-card-foreground p-2 shadow-2xs space-y-2">
                 {/* Row 1: Filters (Project for SuperAdmin, Role, Status, Last Login) */}
                 <div className={cn(
                     "grid grid-cols-1 gap-2.5 w-full",

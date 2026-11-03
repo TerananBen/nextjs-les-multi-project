@@ -10,8 +10,9 @@ import { getListDataGroupAction } from "@/app/actions/street-light"
 import { DeviceGroup } from "@/types/street-light"
 import { EditScheduleDialog } from "./edit-dialog"
 import { ResponseDialog } from "./response-dialog"
-import { Loader2, Search, X, Plus } from "lucide-react"
+import { Loader2, Search, X, Plus, Calendar, Clock, SunMedium, Sliders } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { cn } from "@/lib/utils"
 import { deleteScheduleAction } from "@/app/actions/schedule-settings"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
@@ -78,6 +79,27 @@ export function ScheduleSettingsClient({ versionLightSensor }: ScheduleSettingsC
         }
     })
 
+    const fetchData = React.useCallback(async () => {
+        setLoading(true)
+        try {
+            const [scheduleResult, groupsResult] = await Promise.all([
+                getDataScheduleAction(),
+                getListDataGroupAction()
+            ])
+            setData(scheduleResult || [])
+            setGroups(groupsResult || [])
+        } catch (error) {
+            console.error("Failed to fetch data", error)
+            toast.error(t("failedToLoadData"))
+        } finally {
+            setLoading(false)
+        }
+    }, [t])
+
+    React.useEffect(() => {
+        fetchData()
+    }, [fetchData])
+
     const handleAdd = () => {
         setSelectedSchedule(null) // Ensure we are in "Add" mode
         setOpenDialog(true)
@@ -92,8 +114,7 @@ export function ScheduleSettingsClient({ versionLightSensor }: ScheduleSettingsC
             if (result.success) {
                 toast.success(t("deleteDialog.success"))
                 setOpenDeleteDialog(false)
-                // Refresh data
-                window.location.reload()
+                await fetchData()
             } else {
                 toast.error(t("deleteDialog.error") + (result.message ? `: ${result.message}` : ""))
             }
@@ -106,25 +127,14 @@ export function ScheduleSettingsClient({ versionLightSensor }: ScheduleSettingsC
         }
     }
 
-    React.useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [scheduleResult, groupsResult] = await Promise.all([
-                    getDataScheduleAction(),
-                    getListDataGroupAction()
-                ])
-                setData(scheduleResult)
-                setGroups(groupsResult)
-            } catch (error) {
-                console.error("Failed to fetch data", error)
-                toast.error(t("failedToLoadData"))
-            } finally {
-                setLoading(false)
-            }
-        }
-
-        fetchData()
-    }, [t])
+    // KPI Summary Calculation
+    const kpiSummary = React.useMemo(() => {
+        const total = data.length
+        const timeCount = data.filter(s => s.typeSchedule === "time").length
+        const lightCount = data.filter(s => s.typeSchedule === "light").length
+        const manualCount = data.filter(s => s.typeSchedule === "manual").length
+        return { total, timeCount, lightCount, manualCount }
+    }, [data])
 
     // Filtering
     const filteredData = React.useMemo(() => {
@@ -205,6 +215,101 @@ export function ScheduleSettingsClient({ versionLightSensor }: ScheduleSettingsC
                 </div>
             </div>
 
+            {/* KPI Summary Cards */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 w-full">
+                {/* Card 1: Total Schedules */}
+                <button
+                    type="button"
+                    onClick={() => setTypeFilter("ALL")}
+                    className={cn(
+                        "flex items-center gap-3.5 p-3.5 rounded-xl border transition-all text-left cursor-pointer shadow-2xs",
+                        typeFilter === "ALL" && (searchQuery !== "" || typeFilter !== "ALL")
+                            ? "border-primary/50 bg-primary/10 ring-1 ring-primary/30"
+                            : "border-border/80 bg-muted/40 hover:bg-muted/70"
+                    )}
+                >
+                    <div className="p-2.5 rounded-lg bg-primary/10 text-primary shrink-0">
+                        <Calendar className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                        <p className="text-xs text-muted-foreground font-medium truncate">{t("kpi.totalSchedules")}</p>
+                        <div className="flex items-baseline gap-1.5">
+                            <p className="text-xl font-bold tracking-tight text-foreground">{kpiSummary.total}</p>
+                            <span className="text-xs text-muted-foreground">{t("kpi.schedulesUnit")}</span>
+                        </div>
+                    </div>
+                </button>
+
+                {/* Card 2: Time-based Schedules */}
+                <button
+                    type="button"
+                    onClick={() => setTypeFilter(prev => prev === "time" ? "ALL" : "time")}
+                    className={cn(
+                        "flex items-center gap-3.5 p-3.5 rounded-xl border transition-all text-left cursor-pointer shadow-2xs",
+                        typeFilter === "time"
+                            ? "border-sky-500/50 bg-sky-500/10 ring-1 ring-sky-500/30"
+                            : "border-border/80 bg-muted/40 hover:bg-muted/70"
+                    )}
+                >
+                    <div className="p-2.5 rounded-lg bg-sky-500/10 text-sky-600 dark:text-sky-400 shrink-0">
+                        <Clock className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                        <p className="text-xs text-muted-foreground font-medium truncate">{t("kpi.timeSchedules")}</p>
+                        <div className="flex items-baseline gap-1.5">
+                            <p className="text-xl font-bold tracking-tight text-foreground">{kpiSummary.timeCount}</p>
+                            <span className="text-xs text-muted-foreground">{t("kpi.schedulesUnit")}</span>
+                        </div>
+                    </div>
+                </button>
+
+                {/* Card 3: Light Sensor Schedules */}
+                <button
+                    type="button"
+                    onClick={() => setTypeFilter(prev => prev === "light" ? "ALL" : "light")}
+                    className={cn(
+                        "flex items-center gap-3.5 p-3.5 rounded-xl border transition-all text-left cursor-pointer shadow-2xs",
+                        typeFilter === "light"
+                            ? "border-amber-500/50 bg-amber-500/10 ring-1 ring-amber-500/30"
+                            : "border-border/80 bg-muted/40 hover:bg-muted/70"
+                    )}
+                >
+                    <div className="p-2.5 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 shrink-0">
+                        <SunMedium className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                        <p className="text-xs text-muted-foreground font-medium truncate">{t("kpi.lightSchedules")}</p>
+                        <div className="flex items-baseline gap-1.5">
+                            <p className="text-xl font-bold tracking-tight text-foreground">{kpiSummary.lightCount}</p>
+                            <span className="text-xs text-muted-foreground">{t("kpi.schedulesUnit")}</span>
+                        </div>
+                    </div>
+                </button>
+
+                {/* Card 4: Manual Schedules */}
+                <button
+                    type="button"
+                    onClick={() => setTypeFilter(prev => prev === "manual" ? "ALL" : "manual")}
+                    className={cn(
+                        "flex items-center gap-3.5 p-3.5 rounded-xl border transition-all text-left cursor-pointer shadow-2xs",
+                        typeFilter === "manual"
+                            ? "border-emerald-500/50 bg-emerald-500/10 ring-1 ring-emerald-500/30"
+                            : "border-border/80 bg-muted/40 hover:bg-muted/70"
+                    )}
+                >
+                    <div className="p-2.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0">
+                        <Sliders className="h-5 w-5" />
+                    </div>
+                    <div className="min-w-0">
+                        <p className="text-xs text-muted-foreground font-medium truncate">{t("kpi.manualSchedules")}</p>
+                        <div className="flex items-baseline gap-1.5">
+                            <p className="text-xl font-bold tracking-tight text-foreground">{kpiSummary.manualCount}</p>
+                            <span className="text-xs text-muted-foreground">{t("kpi.schedulesUnit")}</span>
+                        </div>
+                    </div>
+                </button>
+            </div>
+
             {/* Middle & Bottom Table Section */}
             <div className="flex-1 flex flex-col min-h-0">
                 <DataTable columns={columns} data={filteredData} loading={loading} />
@@ -216,6 +321,7 @@ export function ScheduleSettingsClient({ versionLightSensor }: ScheduleSettingsC
                 onOpenChange={setOpenDialog}
                 schedule={selectedSchedule}
                 groups={groups}
+                onSuccess={fetchData}
             />
 
             <ResponseDialog

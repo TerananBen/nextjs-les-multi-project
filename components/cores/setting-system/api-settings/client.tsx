@@ -120,8 +120,8 @@ export function ApiSettingsClient({ initialData = [] }: ApiSettingsClientProps) 
     return (
         <div className="flex flex-1 flex-col gap-3 w-full h-full">
             {/* Header Toolbar: Standard Compact Container */}
-            <div className="rounded-lg border bg-card p-3 shadow-2xs">
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 w-full">
+            <div className="rounded-lg border bg-card text-card-foreground p-2 shadow-2xs">
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 w-full">
                     {/* Search Input (Expands to fill available space) */}
                     <div className="relative flex-1 min-w-[200px]">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />

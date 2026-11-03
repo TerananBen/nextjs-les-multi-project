@@ -3,7 +3,9 @@
 import { useTranslations } from "next-intl"
 import { ColumnDef } from "@tanstack/react-table"
 import { MaintenanceDetailRecord } from "@/app/actions/maintenance"
+import { Badge } from "@/components/ui/badge"
 import { getLeafletIconUrl, MarkerBadge } from "@/lib/map-icons"
+import { cn } from "@/lib/utils"
 
 export const useMaintenanceDetailColumns = (): ColumnDef<MaintenanceDetailRecord>[] => {
     const t = useTranslations("MaintenanceDashboard")
@@ -33,7 +35,7 @@ export const useMaintenanceDetailColumns = (): ColumnDef<MaintenanceDetailRecord
 
         return (
             /* eslint-disable-next-line @next/next/no-img-element */
-            <img src={getLeafletIconUrl(color, badge as MarkerBadge)} className="w-6 h-6 object-contain" alt="Report Cause" />
+            <img src={getLeafletIconUrl(color, badge as MarkerBadge)} className="w-5 h-5 object-contain shrink-0" alt="Report Cause" />
         )
     }
 
@@ -54,17 +56,17 @@ export const useMaintenanceDetailColumns = (): ColumnDef<MaintenanceDetailRecord
         {
             accessorKey: "street_light_name",
             header: t("detail.table.poleNumber"),
-            cell: ({ row }) => <div className="text-gray-500">{row.getValue("street_light_name") || "-"}</div>,
+            cell: ({ row }) => <span className="font-medium text-foreground">{row.getValue("street_light_name") || "-"}</span>,
         },
         {
             accessorKey: "imsi_befor",
             header: t("detail.table.oldDeviceId"),
-            cell: ({ row }) => <div className="text-gray-500">{row.getValue("imsi_befor") || "-"}</div>,
+            cell: ({ row }) => <span className="font-mono text-xs text-muted-foreground">{row.getValue("imsi_befor") || "-"}</span>,
         },
         {
             accessorKey: "imsi_after",
             header: t("detail.table.newDeviceId"),
-            cell: ({ row }) => <div className="text-gray-500">{row.getValue("imsi_after") || "-"}</div>,
+            cell: ({ row }) => <span className="font-mono text-xs text-muted-foreground">{row.getValue("imsi_after") || "-"}</span>,
         },
         {
             id: "gps",
@@ -72,8 +74,8 @@ export const useMaintenanceDetailColumns = (): ColumnDef<MaintenanceDetailRecord
             cell: ({ row }) => {
                 const lat = row.original.lat || "-"
                 const lng = row.original.lng || "-"
-                const display = `${lat} , ${lng}`
-                return <div className="text-gray-500">{display}</div>
+                const display = `${lat}, ${lng}`
+                return <span className="text-xs font-mono text-muted-foreground">{display}</span>
             },
         },
         {
@@ -82,7 +84,7 @@ export const useMaintenanceDetailColumns = (): ColumnDef<MaintenanceDetailRecord
             cell: ({ row }) => {
                 const lampCase = row.getValue("lamp_case") as string
                 return (
-                    <div className="flex items-center">
+                    <div className="flex items-center gap-1.5">
                         {getReportCauseIcon(lampCase)}
                     </div>
                 )
@@ -93,7 +95,7 @@ export const useMaintenanceDetailColumns = (): ColumnDef<MaintenanceDetailRecord
             header: t("detail.table.maintenance"),
             cell: ({ row }) => {
                 const mCase = row.getValue("maintenance_case") as string
-                return <div className="text-gray-500">{getMaintenanceActionText(mCase)}</div>
+                return <span className="text-sm text-foreground">{getMaintenanceActionText(mCase)}</span>
             },
         },
         {
@@ -101,14 +103,20 @@ export const useMaintenanceDetailColumns = (): ColumnDef<MaintenanceDetailRecord
             header: t("detail.table.status"),
             cell: ({ row }) => {
                 const status = row.getValue("lamp_status") as string
-                // Based on screenshot, "T" = Repaired (Green), "F" = Pending (Red)
-                if (status === "T") {
-                    return <span className="text-green-500 font-medium">{t("detail.status.repaired")}</span>
-                }
-                if (status === "F") {
-                    return <span className="text-red-500 font-medium">{t("detail.status.pending")}</span>
-                }
-                return <span>{status}</span>
+                const isRepaired = status === "T"
+                return (
+                    <Badge
+                        variant="outline"
+                        className={cn(
+                            "font-medium border text-xs py-0.5 px-2",
+                            isRepaired
+                                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                                : "border-destructive/30 bg-destructive/10 text-destructive"
+                        )}
+                    >
+                        {isRepaired ? t("detail.status.repaired") : t("detail.status.pending")}
+                    </Badge>
+                )
             },
         },
     ]

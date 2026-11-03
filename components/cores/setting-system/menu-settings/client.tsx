@@ -148,7 +148,7 @@ export function MenuSettingsClient({ initialRoles = [], isSuperAdmin = false }: 
     return (
         <div className="flex flex-1 flex-col gap-3 w-full h-full">
             {/* Header Toolbar: Standard Compact Container */}
-            <div className="rounded-lg border bg-card p-3 shadow-2xs">
+            <div className="rounded-lg border bg-card text-card-foreground p-2 shadow-2xs">
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full">
                     {/* Role Filter */}
                     <div className="w-full sm:w-[240px] shrink-0">

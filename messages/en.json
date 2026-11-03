@@ -185,7 +185,8 @@
     "powerLessDesc": "Alert when power consumption drops below threshold",
     "voltOverDesc": "Alert when voltage exceeds threshold (Surge)",
     "voltLessDesc": "Alert when voltage drops below threshold (Drop)",
-    "dailyReportDesc": "Specify scheduled time for daily system summary alert"
+    "dailyReportDesc": "Specify scheduled time for daily system summary alert",
+    "autoNotice": "System automatically dispatches notifications based on active channels and criteria."
   },
   "Personal": {
     "title": "Personal Management",
@@ -284,7 +285,19 @@
       "profileHeader": "Edit Profile",
       "profileDescription": "Update your personal information. You must enter your current password to save changes.",
       "generalTab": "General",
-      "securityTab": "Security"
+      "securityTab": "Security",
+      "accountDetails": "Account Details",
+      "reloginWarning": "If you change your password, you will be automatically logged out to sign in again.",
+      "passwordMismatch": "Passwords do not match",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "currentPasswordRequired": "Current password is required to save changes",
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "securitySection": "Security & Password",
+      "securitySectionDesc": "Enter a new password if you want to change it (leave blank to keep current)",
+      "confirmSection": "Confirm Changes",
+      "editProfile": "Edit Profile Information",
+      "userId": "User ID"
     },
     "messages": {
       "successAdd": "User added successfully",
@@ -316,6 +329,7 @@
       },
       "searchButton": "Search",
       "printButton": "Print",
+      "clearButton": "Clear",
       "pickDate": "Pick a date",
       "pickWeek": "Pick a week",
       "quarter": "Quarter",
@@ -758,7 +772,10 @@
     "kpi": {
       "totalGroups": "Total Groups",
       "totalDevices": "Grouped Devices",
-      "activeGroups": "Active Groups"
+      "activeGroups": "Active Groups",
+      "emptyGroups": "Empty Groups",
+      "groupsUnit": "groups",
+      "devicesUnit": "devices"
     }
   },
   "MaintenanceDashboard": {
@@ -770,12 +787,27 @@
     "filter": {
       "startDate": "Start from :",
       "endDate": "To :",
-      "technician": "Technician :",
-      "supervisor": "Supervisor :",
-      "all": "-- All --",
-      "search": "Search"
+      "dateRange": "Date Range :",
+      "selectDateRange": "Select date range",
+      "technician": "Technician",
+      "supervisor": "Supervisor",
+      "allTechnicians": "All Technicians",
+      "allSupervisors": "All Supervisors",
+      "all": "All",
+      "search": "Search",
+      "searchPlaceholder": "Search records...",
+      "reset": "Reset"
     },
     "summary": {
+      "totalLamps": "Total Lamps",
+      "reported": "Total Reported",
+      "pending": "Pending Repair",
+      "repaired": "Completed Repair",
+      "lampsUnit": "Lamps",
+      "completionRate": "Completed {rate}%",
+      "wasteRatio": "{ratio}% of project",
+      "remaining": "Awaiting action",
+      "inProject": "In project",
       "reportedTitle": "Reported {count} Lamp",
       "totalReported": "Total {count} Lamp",
       "pendingTitle": "Pending {count} Lamp",
@@ -785,6 +817,7 @@
     },
     "table": {
       "no": "#",
+      "listName": "Task Name",
       "technician": "Technician",
       "supervisor": "Supervisor",
       "repaired": "Repaired",
@@ -876,6 +909,36 @@
       "confirmed": "Confirmed",
       "pending": "Pending",
       "index": "#"
+    },
+    "kpi": {
+      "totalLists": "Total Tickets",
+      "totalLamps": "Total Lamps",
+      "repairedLamps": "Completed Repairs",
+      "pendingLamps": "Pending Repairs",
+      "listsUnit": "tickets",
+      "lampsUnit": "lamps"
+    },
+    "filter": {
+      "searchPlaceholder": "Search list name, operator...",
+      "statusAll": "All Statuses",
+      "statusConfirmed": "Confirmed",
+      "statusPending": "Pending",
+      "operatorAll": "All Operators",
+      "operator": "Operator",
+      "reset": "Reset Filters"
+    },
+    "pagination": {
+      "showing": "Total {total} items (showing {start} - {end})"
+    },
+    "tabs": {
+      "tasks": "Map & Tasks",
+      "gallery": "Repair Gallery"
+    },
+    "dialog": {
+      "title": "Maintenance Detail",
+      "description": "Inspect lamp coordinates, update repairs, and upload photo records",
+      "saveRtu": "Save New RTU",
+      "close": "Close"
     }
   },
   "MenuSettings": {
@@ -953,6 +1016,13 @@
   },
   "ScheduleSettings": {
     "title": "Schedule Settings",
+    "kpi": {
+      "totalSchedules": "Total Schedules",
+      "timeSchedules": "Time-based",
+      "lightSchedules": "Ambient Light",
+      "manualSchedules": "Manual Mode",
+      "schedulesUnit": "schedules"
+    },
     "filter": {
       "searchPlaceholder": "Search schedule...",
       "allTypes": "All Types",
@@ -1071,7 +1141,7 @@
     "loading": "Loading...",
     "noData": "No data.",
     "buttons": {
-      "add": "Add Maintenance Config"
+      "add": "Add Maintenance Task"
     },
     "table": {
       "no": "#",
@@ -1091,15 +1161,15 @@
     "form": {
       "itemName": "Item Name",
       "itemNamePlaceholder": "Enter maintenance task name",
-      "operatorName": "Operator Name",
+      "operatorName": "Operator / Technician Name",
       "reporterName": "Reporter Name",
-      "selectOperator": "-- Select Operator --",
+      "selectOperator": "Select Operator",
       "searchOperatorPlaceholder": "Search operator...",
       "noOperatorFound": "No operator found.",
       "searchGroupPlaceholder": "Search group...",
       "noGroupFound": "No group found.",
       "searchBy": "Search By :",
-      "selectStatus": "-- Select Status --",
+      "selectStatus": "Select Status",
       "search": "Search",
       "addTitle": "Add Maintenance Task",
       "addDescription": "Add a new maintenance task overlay"
@@ -1132,7 +1202,9 @@
       "noData": "No items found",
       "showing": "Showing {start} to {end} of {total} items",
       "close": "Close",
-      "save": "Save"
+      "save": "Save",
+      "clearAll": "Clear All",
+      "hintEmpty": "Click street light markers on the map to add devices to the repair list"
     },
     "confirmDialog": {
       "title": "Confirm Status Change",
@@ -1148,6 +1220,26 @@
       "deleting": "Deleting...",
       "success": "Maintenance task deleted successfully",
       "error": "Failed to delete maintenance task"
+    },
+    "kpi": {
+      "totalLists": "Total Tickets",
+      "totalLamps": "Total Lamps",
+      "repairedLamps": "Completed Repairs",
+      "pendingLamps": "Pending Repairs",
+      "listsUnit": "tickets",
+      "lampsUnit": "lamps"
+    },
+    "filter": {
+      "searchPlaceholder": "Search list name, operator...",
+      "statusAll": "All Statuses",
+      "statusConfirmed": "Confirmed",
+      "statusPending": "Not Confirmed",
+      "operatorAll": "All Operators",
+      "operator": "Operator",
+      "reset": "Reset Filters"
+    },
+    "pagination": {
+      "showing": "Total {total} items (showing {start} - {end})"
     }
   },
   "ProjectSettings": {

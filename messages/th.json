@@ -185,7 +185,8 @@
     "powerLessDesc": "แจ้งเตือนเมื่อค่ากำลังไฟฟ้าต่ำกว่าเกณฑ์ที่กำหนด",
     "voltOverDesc": "แจ้งเตือนเมื่อแรงดันไฟฟ้าสูงกว่าเกณฑ์ (ไฟกระชาก)",
     "voltLessDesc": "แจ้งเตือนเมื่อแรงดันไฟฟ้าต่ำกว่าเกณฑ์ (ไฟตก)",
-    "dailyReportDesc": "กำหนดเวลาสำหรับการส่งรายงานสถานะระบบประจำวัน"
+    "dailyReportDesc": "กำหนดเวลาสำหรับการส่งรายงานสถานะระบบประจำวัน",
+    "autoNotice": "ระบบจะส่งการแจ้งเตือนตามช่องทางและเกณฑ์ที่เปิดใช้งานอัตโนมัติ"
   },
   "Personal": {
     "title": "การจัดการบุคลากร",
@@ -284,7 +285,19 @@
       "profileHeader": "แก้ไขโปรไฟล์",
       "profileDescription": "อัปเดตข้อมูลส่วนตัวของคุณ คุณต้องกรอกรหัสผ่านปัจจุบันเพื่อบันทึกการเปลี่ยนแปลง",
       "generalTab": "ทั่วไป",
-      "securityTab": "ความปลอดภัย"
+      "securityTab": "ความปลอดภัย",
+      "accountDetails": "ข้อมูลบัญชีผู้ใช้",
+      "reloginWarning": "หากเปลี่ยนรหัสผ่านใหม่ ระบบจะออกจากระบบอัตโนมัติเพื่อให้เข้าสู่ระบบใหม่อีกครั้ง",
+      "passwordMismatch": "รหัสผ่านใหม่ไม่ตรงกัน",
+      "passwordMinLength": "รหัสผ่านต้องมีความยาวอย่างน้อย 6 ตัวอักษร",
+      "currentPasswordRequired": "กรุณากรอกรหัสผ่านปัจจุบันเพื่อบันทึกการเปลี่ยนแปลง",
+      "firstNameRequired": "กรุณากรอกชื่อจริง",
+      "lastNameRequired": "กรุณากรอกนามสกุล",
+      "securitySection": "ความปลอดภัยและรหัสผ่าน",
+      "securitySectionDesc": "กรอกรหัสผ่านใหม่หากต้องการเปลี่ยน (เว้นว่างไว้หากใช้รหัสผ่านเดิม)",
+      "confirmSection": "ยืนยันการเปลี่ยนแปลง",
+      "editProfile": "แก้ไขข้อมูลส่วนตัว",
+      "userId": "รหัสผู้ใช้"
     },
     "messages": {
       "successAdd": "เพิ่มผู้ใช้สำเร็จ",
@@ -316,6 +329,7 @@
       },
       "searchButton": "ค้นหา",
       "printButton": "พิมพ์",
+      "clearButton": "ล้าง",
       "pickDate": "เลือกวันที่",
       "pickWeek": "เลือกสัปดาห์",
       "quarter": "ไตรมาส",
@@ -759,7 +773,10 @@
     "kpi": {
       "totalGroups": "กลุ่มทั้งหมด",
       "totalDevices": "อุปกรณ์ที่จัดกลุ่ม",
-      "activeGroups": "กลุ่มที่มีอุปกรณ์"
+      "activeGroups": "กลุ่มที่มีอุปกรณ์",
+      "emptyGroups": "กลุ่มว่าง",
+      "groupsUnit": "กลุ่ม",
+      "devicesUnit": "โคม"
     }
   },
   "MaintenanceDashboard": {
@@ -771,12 +788,27 @@
     "filter": {
       "startDate": "เริ่มต้น :",
       "endDate": "ถึง :",
-      "technician": "ช่างซ่อม :",
-      "supervisor": "ผู้ควบคุม :",
-      "all": "-- ทั้งหมด --",
-      "search": "ค้นหา"
+      "dateRange": "ช่วงวันที่ :",
+      "selectDateRange": "เลือกช่วงวันที่",
+      "technician": "ช่างซ่อม",
+      "supervisor": "ผู้ควบคุม",
+      "allTechnicians": "ช่างซ่อมทั้งหมด",
+      "allSupervisors": "ผู้ควบคุมทั้งหมด",
+      "all": "ทั้งหมด",
+      "search": "ค้นหา",
+      "searchPlaceholder": "ค้นหารายการ...",
+      "reset": "ล้างตัวกรอง"
     },
     "summary": {
+      "totalLamps": "โคมไฟทั้งหมด",
+      "reported": "แจ้งซ่อมทั้งหมด",
+      "pending": "รอดำเนินการ",
+      "repaired": "ซ่อมแซมเสร็จสิ้น",
+      "lampsUnit": "โคม",
+      "completionRate": "สำเร็จแล้ว {rate}%",
+      "wasteRatio": "{ratio}% ของทั้งโครงการ",
+      "remaining": "รอเข้าดำเนินการ",
+      "inProject": "ในโครงการ",
       "reportedTitle": "แจ้งซ่อม {count} โคม",
       "totalReported": "ทั้งหมด {count} โคม",
       "pendingTitle": "รอดำเนินการ {count} โคม",
@@ -786,6 +818,7 @@
     },
     "table": {
       "no": "ลำดับ",
+      "listName": "ชื่อรายการ",
       "technician": "ช่างซ่อม",
       "supervisor": "ผู้ควบคุม",
       "repaired": "ซ่อมแล้ว",
@@ -877,6 +910,36 @@
       "confirmed": "ยืนยันแล้ว",
       "pending": "รอยืนยัน",
       "index": "ลำดับ"
+    },
+    "kpi": {
+      "totalLists": "รายการแจ้งซ่อมทั้งหมด",
+      "totalLamps": "โคมไฟทั้งหมด",
+      "repairedLamps": "ซ่อมเสร็จสิ้น",
+      "pendingLamps": "รอเข้าซ่อม",
+      "listsUnit": "รายการ",
+      "lampsUnit": "โคม"
+    },
+    "filter": {
+      "searchPlaceholder": "ค้นหาชื่อรายการ, หัวหน้าช่าง...",
+      "statusAll": "สถานะทั้งหมด",
+      "statusConfirmed": "ยืนยันแล้ว",
+      "statusPending": "รอยืนยัน",
+      "operatorAll": "หัวหน้าช่างทั้งหมด",
+      "operator": "หัวหน้าช่าง",
+      "reset": "ล้างตัวกรอง"
+    },
+    "pagination": {
+      "showing": "ทั้งหมด {total} รายการ (แสดง {start} - {end})"
+    },
+    "tabs": {
+      "tasks": "แผนที่และรายการโคม",
+      "gallery": "รูปภาพรายงานการซ่อม"
+    },
+    "dialog": {
+      "title": "รายละเอียดงานซ่อมบำรุง",
+      "description": "ตรวจสอบพิกัดโคมไฟ บันทึกผลการซ่อม และอัปโหลดภาพรายงาน",
+      "saveRtu": "บันทึกรหัสใหม่",
+      "close": "ปิดหน้าต่าง"
     }
   },
   "MenuSettings": {
@@ -955,6 +1018,13 @@
   },
   "ScheduleSettings": {
     "title": "ตั้งค่าตารางเวลา",
+    "kpi": {
+      "totalSchedules": "ตารางเวลาทั้งหมด",
+      "timeSchedules": "ทำงานตามเวลา",
+      "lightSchedules": "ตามแสงแวดล้อม",
+      "manualSchedules": "ปิดใช้งานเซนเซอร์",
+      "schedulesUnit": "ตาราง"
+    },
     "filter": {
       "searchPlaceholder": "ค้นหาชื่อการตั้งค่า...",
       "allTypes": "ทุกประเภท",
@@ -1075,7 +1145,7 @@
     "loading": "กำลังโหลด...",
     "noData": "ไม่พบข้อมูล",
     "buttons": {
-      "add": "เพิ่มรายการซ่อม"
+      "add": "เพิ่มรายการแจ้งซ่อม"
     },
     "table": {
       "no": "#",
@@ -1095,15 +1165,15 @@
     "form": {
       "itemName": "ชื่อรายการ",
       "itemNamePlaceholder": "กรอกชื่อรายการซ่อม",
-      "operatorName": "ชื่อหัวหน้าช่าง",
+      "operatorName": "ชื่อช่าง / หัวหน้าช่าง",
       "reporterName": "ชื่อผู้แจ้งซ่อม",
-      "selectOperator": "-- เลือก ช่าง --",
+      "selectOperator": "เลือกช่าง",
       "searchOperatorPlaceholder": "ค้นหาช่าง...",
       "noOperatorFound": "ไม่พบช่าง",
       "searchGroupPlaceholder": "ค้นหากลุ่ม...",
       "noGroupFound": "ไม่พบกลุ่ม",
       "searchBy": "ค้นหาด้วย :",
-      "selectStatus": "-- เลือก สถานะ --",
+      "selectStatus": "เลือกสถานะ",
       "search": "ค้นหา",
       "addTitle": "เพิ่มรายการซ่อม",
       "addDescription": "เพิ่มรายการแจ้งซ่อมใหม่"
@@ -1136,7 +1206,9 @@
       "noData": "ไม่พบรายการ",
       "showing": "แสดง {start} ถึง {end} ของ {total} รายการ",
       "close": "ปิด",
-      "save": "บันทึก"
+      "save": "บันทึก",
+      "clearAll": "ล้างทั้งหมด",
+      "hintEmpty": "คลิกที่โคมไฟบนแผนที่เพื่อเลือกอุปกรณ์เข้าสู่รายการแจ้งซ่อม"
     },
     "confirmDialog": {
       "title": "ยืนยันการเปลี่ยนสถานะ",
@@ -1152,6 +1224,26 @@
       "deleting": "กำลังลบ...",
       "success": "ลบรายการเรียบร้อยแล้ว",
       "error": "เกิดข้อผิดพลาดในการลบรายการ"
+    },
+    "kpi": {
+      "totalLists": "รายการแจ้งซ่อมทั้งหมด",
+      "totalLamps": "โคมไฟทั้งหมด",
+      "repairedLamps": "ซ่อมเสร็จสิ้น",
+      "pendingLamps": "รอเข้าซ่อม",
+      "listsUnit": "รายการ",
+      "lampsUnit": "โคม"
+    },
+    "filter": {
+      "searchPlaceholder": "ค้นหาชื่อรายการ, หัวหน้าช่าง...",
+      "statusAll": "สถานะทั้งหมด",
+      "statusConfirmed": "ยืนยันแล้ว",
+      "statusPending": "ยังไม่ยืนยัน",
+      "operatorAll": "หัวหน้าช่างทั้งหมด",
+      "operator": "หัวหน้าช่าง",
+      "reset": "ล้างตัวกรอง"
+    },
+    "pagination": {
+      "showing": "ทั้งหมด {total} รายการ (แสดง {start} - {end})"
     }
   },
   "ProjectSettings": {

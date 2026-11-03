@@ -149,7 +149,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
             startOfToday.setHours(0, 0, 0, 0)
 
             return (
-                <div className="flex items-center gap-1 w-full min-w-0">
+                <div className="flex items-center gap-2 w-full min-w-0">
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button
@@ -200,12 +200,12 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                     </Popover>
                     {dateRange && (
                         <Button
-                            variant="ghost"
-                            size="icon"
-                            className="cursor-pointer h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
+                            variant="outline"
                             onClick={() => setDateRange(undefined)}
+                            className="cursor-pointer h-9 px-3 sm:px-4 shrink-0 shadow-xs bg-background text-muted-foreground hover:text-foreground"
                         >
-                            <X className="h-4 w-4" />
+                            <X className="w-4 h-4 mr-1.5" />
+                            {t("clearButton")}
                         </Button>
                     )}
                 </div>
@@ -217,7 +217,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
             startOfToday.setHours(0, 0, 0, 0)
 
             return (
-                <div className="flex items-center gap-1 w-full min-w-0">
+                <div className="flex items-center gap-2 w-full min-w-0">
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button
@@ -254,12 +254,12 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                     </Popover>
                     {singleDate && (
                         <Button
-                            variant="ghost"
-                            size="icon"
-                            className="cursor-pointer h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
+                            variant="outline"
                             onClick={() => setSingleDate(undefined)}
+                            className="cursor-pointer h-9 px-3 sm:px-4 shrink-0 shadow-xs bg-background text-muted-foreground hover:text-foreground"
                         >
-                            <X className="h-4 w-4" />
+                            <X className="w-4 h-4 mr-1.5" />
+                            {t("clearButton")}
                         </Button>
                     )}
                 </div>
@@ -319,7 +319,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
             }
 
             return (
-                <div className="flex items-center gap-1 w-full min-w-0">
+                <div className="flex items-center gap-2 w-full min-w-0">
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button
@@ -392,12 +392,12 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                     </Popover>
                     {monthRange.from && (
                         <Button
-                            variant="ghost"
-                            size="icon"
-                            className="cursor-pointer h-9 w-9 shrink-0 text-muted-foreground hover:text-foreground"
+                            variant="outline"
                             onClick={() => setMonthRange({})}
+                            className="cursor-pointer h-9 px-3 sm:px-4 shrink-0 shadow-xs bg-background text-muted-foreground hover:text-foreground"
                         >
-                            <X className="h-4 w-4" />
+                            <X className="w-4 h-4 mr-1.5" />
+                            {t("clearButton")}
                         </Button>
                     )}
                 </div>

@@ -18,11 +18,10 @@ import {
 } from "@tabler/icons-react"
 import { ChevronDown } from "lucide-react"
 import { useTranslations } from "next-intl"
-import { NavUser } from "@/components/layout/nav-user"
+import { cn } from "@/lib/utils"
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -30,6 +29,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator,
 } from "@/components/ui/sidebar"
 import {
   Collapsible,
@@ -77,45 +77,45 @@ const MENU_ALIASES: Record<string, string> = {
   "system_device": "V_SettingDevice",
 }
 
-// Map menu_name to icon and title (supporting both new names and legacy V_ aliases)
-const menuMapping: Record<string, { title: string; icon: React.ElementType; url: string }> = {
+// Map menu_name to icon, title, url and distinct high-contrast colorful accent
+const menuMapping: Record<string, { title: string; icon: React.ElementType; url: string; color: string }> = {
   // New standardized names
-  "dashboard_overview": { title: "menu.overview", icon: IconBriefcase, url: "/dashboard/overview" },
-  "system_alert": { title: "menu.alerts", icon: IconBell, url: "/setting-system/alerts" },
-  "control_group": { title: "menu.groupConfig", icon: IconSettings, url: "/setting-control/group-config" },
-  "dashboard_group": { title: "menu.groupDashboard", icon: IconBriefcase, url: "/dashboard/group" },
-  "maintenance_request": { title: "menu.maintenanceConfig", icon: IconTool, url: "/maintenance/config" },
-  "maintenance_dashboard": { title: "menu.maintenanceDashboard", icon: IconBriefcase, url: "/maintenance/dashboard" },
-  "map_disconnect": { title: "menu.mapDisconnect", icon: IconMap2, url: "/map/disconnect" },
-  "map_global": { title: "menu.mapGlobal", icon: IconMap2, url: "/map/global" },
-  "system_personal": { title: "menu.personal", icon: IconUser, url: "/setting-system/personal" },
-  "system_menu_permission": { title: "menu.menuSettings", icon: IconSettings, url: "/setting-system/menu-settings" },
-  "system_api_setting": { title: "menu.apiSettings", icon: IconApi, url: "/setting-system/api-settings" },
-  "control_schedule": { title: "menu.scheduleSettings", icon: IconCalendarTime, url: "/setting-control/schedule-settings" },
-  "control_streetlight": { title: "menu.streetLight", icon: IconBulb, url: "/setting-control/street-light" },
-  "maintenance_list": { title: "menu.maintenanceDetail", icon: IconListDetails, url: "/maintenance/detail" },
-  "map_changelamp": { title: "menu.mapChangeLamp", icon: IconReplace, url: "/map/change-lamp" },
-  "system_device": { title: "menu.deviceSettings", icon: IconDeviceAnalytics, url: "/dashboard/settings-device" },
-  "system_project": { title: "menu.projectSettings", icon: IconFolders, url: "/setting-system/project" },
+  "dashboard_overview": { title: "menu.overview", icon: IconBriefcase, url: "/dashboard/overview", color: "text-emerald-600 skyblue:text-emerald-300 dark:text-emerald-400" },
+  "system_alert": { title: "menu.alerts", icon: IconBell, url: "/setting-system/alerts", color: "text-red-500 skyblue:text-red-300 dark:text-red-400" },
+  "control_group": { title: "menu.groupConfig", icon: IconSettings, url: "/setting-control/group-config", color: "text-purple-600 skyblue:text-purple-300 dark:text-purple-400" },
+  "dashboard_group": { title: "menu.groupDashboard", icon: IconBriefcase, url: "/dashboard/group", color: "text-amber-500 skyblue:text-amber-300 dark:text-amber-400" },
+  "maintenance_request": { title: "menu.maintenanceConfig", icon: IconTool, url: "/maintenance/config", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
+  "maintenance_dashboard": { title: "menu.maintenanceDashboard", icon: IconBriefcase, url: "/maintenance/dashboard", color: "text-cyan-600 skyblue:text-cyan-200 dark:text-cyan-300" },
+  "map_disconnect": { title: "menu.mapDisconnect", icon: IconMap2, url: "/map/disconnect", color: "text-rose-500 skyblue:text-rose-300 dark:text-rose-400" },
+  "map_global": { title: "menu.mapGlobal", icon: IconMap2, url: "/map/global", color: "text-teal-600 skyblue:text-teal-300 dark:text-teal-400" },
+  "system_personal": { title: "menu.personal", icon: IconUser, url: "/setting-system/personal", color: "text-teal-600 skyblue:text-teal-300 dark:text-teal-400" },
+  "system_menu_permission": { title: "menu.menuSettings", icon: IconSettings, url: "/setting-system/menu-settings", color: "text-amber-600 skyblue:text-amber-300 dark:text-amber-400" },
+  "system_api_setting": { title: "menu.apiSettings", icon: IconApi, url: "/setting-system/api-settings", color: "text-emerald-600 skyblue:text-emerald-300 dark:text-emerald-400" },
+  "control_schedule": { title: "menu.scheduleSettings", icon: IconCalendarTime, url: "/setting-control/schedule-settings", color: "text-violet-600 skyblue:text-violet-300 dark:text-violet-400" },
+  "control_streetlight": { title: "menu.streetLight", icon: IconBulb, url: "/setting-control/street-light", color: "text-yellow-500 skyblue:text-yellow-300 dark:text-yellow-400" },
+  "maintenance_list": { title: "menu.maintenanceDetail", icon: IconListDetails, url: "/maintenance/detail", color: "text-pink-600 skyblue:text-pink-300 dark:text-pink-400" },
+  "map_changelamp": { title: "menu.mapChangeLamp", icon: IconReplace, url: "/map/change-lamp", color: "text-lime-600 skyblue:text-lime-300 dark:text-lime-400" },
+  "system_device": { title: "menu.deviceSettings", icon: IconDeviceAnalytics, url: "/dashboard/settings-device", color: "text-fuchsia-600 skyblue:text-fuchsia-300 dark:text-fuchsia-400" },
+  "system_project": { title: "menu.projectSettings", icon: IconFolders, url: "/setting-system/project", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
 
   // Legacy aliases for backward compatibility
-  "V_Dashboard": { title: "menu.overview", icon: IconBriefcase, url: "/dashboard/overview" },
-  "V_AlertStreetLight": { title: "menu.alerts", icon: IconBell, url: "/setting-system/alerts" },
-  "V_GroupConfig": { title: "menu.groupConfig", icon: IconSettings, url: "/setting-control/group-config" },
-  "V_GroupDashboard": { title: "menu.groupDashboard", icon: IconBriefcase, url: "/dashboard/group" },
-  "V_MaintenanceConfig": { title: "menu.maintenanceConfig", icon: IconTool, url: "/maintenance/config" },
-  "V_MaintenanceDashboard": { title: "menu.maintenanceDashboard", icon: IconBriefcase, url: "/maintenance/dashboard" },
-  "V_MapDisconnect": { title: "menu.mapDisconnect", icon: IconMap2, url: "/map/disconnect" },
-  "V_MapGlobal": { title: "menu.mapGlobal", icon: IconMap2, url: "/map/global" },
-  "V_Personal": { title: "menu.personal", icon: IconUser, url: "/setting-system/personal" },
-  "V_SettingMenu": { title: "menu.menuSettings", icon: IconSettings, url: "/setting-system/menu-settings" },
-  "V_SettingApi": { title: "menu.apiSettings", icon: IconApi, url: "/setting-system/api-settings" },
-  "V_SettingSchedule": { title: "menu.scheduleSettings", icon: IconCalendarTime, url: "/setting-control/schedule-settings" },
-  "V_StreetLight": { title: "menu.streetLight", icon: IconBulb, url: "/setting-control/street-light" },
-  "V_MaintenanceDetail": { title: "menu.maintenanceDetail", icon: IconListDetails, url: "/maintenance/detail" },
-  "V_MapChangeLamp": { title: "menu.mapChangeLamp", icon: IconReplace, url: "/map/change-lamp" },
-  "V_SettingDevice": { title: "menu.deviceSettings", icon: IconDeviceAnalytics, url: "/dashboard/settings-device" },
-  "V_ProjectSetting": { title: "menu.projectSettings", icon: IconFolders, url: "/setting-system/project" },
+  "V_Dashboard": { title: "menu.overview", icon: IconBriefcase, url: "/dashboard/overview", color: "text-emerald-600 skyblue:text-emerald-300 dark:text-emerald-400" },
+  "V_AlertStreetLight": { title: "menu.alerts", icon: IconBell, url: "/setting-system/alerts", color: "text-red-500 skyblue:text-red-300 dark:text-red-400" },
+  "V_GroupConfig": { title: "menu.groupConfig", icon: IconSettings, url: "/setting-control/group-config", color: "text-purple-600 skyblue:text-purple-300 dark:text-purple-400" },
+  "V_GroupDashboard": { title: "menu.groupDashboard", icon: IconBriefcase, url: "/dashboard/group", color: "text-amber-500 skyblue:text-amber-300 dark:text-amber-400" },
+  "V_MaintenanceConfig": { title: "menu.maintenanceConfig", icon: IconTool, url: "/maintenance/config", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
+  "V_MaintenanceDashboard": { title: "menu.maintenanceDashboard", icon: IconBriefcase, url: "/maintenance/dashboard", color: "text-cyan-600 skyblue:text-cyan-200 dark:text-cyan-300" },
+  "V_MapDisconnect": { title: "menu.mapDisconnect", icon: IconMap2, url: "/map/disconnect", color: "text-rose-500 skyblue:text-rose-300 dark:text-rose-400" },
+  "V_MapGlobal": { title: "menu.mapGlobal", icon: IconMap2, url: "/map/global", color: "text-teal-600 skyblue:text-teal-300 dark:text-teal-400" },
+  "V_Personal": { title: "menu.personal", icon: IconUser, url: "/setting-system/personal", color: "text-teal-600 skyblue:text-teal-300 dark:text-teal-400" },
+  "V_SettingMenu": { title: "menu.menuSettings", icon: IconSettings, url: "/setting-system/menu-settings", color: "text-amber-600 skyblue:text-amber-300 dark:text-amber-400" },
+  "V_SettingApi": { title: "menu.apiSettings", icon: IconApi, url: "/setting-system/api-settings", color: "text-emerald-600 skyblue:text-emerald-300 dark:text-emerald-400" },
+  "V_SettingSchedule": { title: "menu.scheduleSettings", icon: IconCalendarTime, url: "/setting-control/schedule-settings", color: "text-violet-600 skyblue:text-violet-300 dark:text-violet-400" },
+  "V_StreetLight": { title: "menu.streetLight", icon: IconBulb, url: "/setting-control/street-light", color: "text-yellow-500 skyblue:text-yellow-300 dark:text-yellow-400" },
+  "V_MaintenanceDetail": { title: "menu.maintenanceDetail", icon: IconListDetails, url: "/maintenance/detail", color: "text-pink-600 skyblue:text-pink-300 dark:text-pink-400" },
+  "V_MapChangeLamp": { title: "menu.mapChangeLamp", icon: IconReplace, url: "/map/change-lamp", color: "text-lime-600 skyblue:text-lime-300 dark:text-lime-400" },
+  "V_SettingDevice": { title: "menu.deviceSettings", icon: IconDeviceAnalytics, url: "/dashboard/settings-device", color: "text-fuchsia-600 skyblue:text-fuchsia-300 dark:text-fuchsia-400" },
+  "V_ProjectSetting": { title: "menu.projectSettings", icon: IconFolders, url: "/setting-system/project", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
 }
 
 // Define menu groups
@@ -144,13 +144,13 @@ const menuGroups = [
 
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   menuItems?: MenuItem[]
-  user: {
+  user?: {
     name: string
     email?: string
     avatar?: string
     role?: string
   }
-  sidebarLogo?: string;
+  sidebarLogo?: string
 }
 
 export function AppSidebar({ menuItems = [], user, sidebarLogo, ...props }: AppSidebarProps) {
@@ -228,9 +228,9 @@ export function AppSidebar({ menuItems = [], user, sidebarLogo, ...props }: AppS
   }, [sidebarLogo])
 
   const isSuperAdmin = React.useMemo(() => {
-    const roleLower = (user?.role || "").toLowerCase();
-    return roleLower.includes("superadmin") || roleLower.includes("super_admin") || roleLower.includes("super-admin");
-  }, [user?.role]);
+    const roleLower = (user?.role || "").toLowerCase()
+    return roleLower.includes("superadmin") || roleLower.includes("super_admin") || roleLower.includes("super-admin")
+  }, [user?.role])
 
   // Create a map of readable menu items for easy lookup (supporting aliases)
   const readableItems = React.useMemo(() => {
@@ -246,6 +246,29 @@ export function AppSidebar({ menuItems = [], user, sidebarLogo, ...props }: AppS
     })
     return map
   }, [menuItems])
+
+  // Filter visible items for each group and ignore empty groups
+  const visibleGroups = React.useMemo(() => {
+    return menuGroups
+      .map((group) => {
+        const groupItems = group.items
+          .filter((menuName) => isSuperAdmin || readableItems.has(menuName))
+          .map((menuName) => {
+            const mapping = menuMapping[menuName]
+            return {
+              title: mapping ? mapping.title : menuName,
+              url: mapping ? mapping.url : "#",
+              icon: mapping ? mapping.icon : IconListDetails,
+              color: mapping?.color || "text-muted-foreground",
+            }
+          })
+        return {
+          title: group.title,
+          items: groupItems,
+        }
+      })
+      .filter((group) => group.items.length > 0)
+  }, [isSuperAdmin, readableItems])
 
   return (
     <Sidebar collapsible="offcanvas" {...props} className="border-r-0">
@@ -267,68 +290,68 @@ export function AppSidebar({ menuItems = [], user, sidebarLogo, ...props }: AppS
       </SidebarHeader>
 
       <SidebarContent className="z-20 pt-4 no-scrollbar">
-        {menuGroups.map((group) => {
-          // Filter items in this group that are readable (or all for SuperAdmin)
-          const groupItems = group.items
-            .filter((menuName) => isSuperAdmin || readableItems.has(menuName))
-            .map((menuName) => {
-              const mapping = menuMapping[menuName]
-              return {
-                title: mapping ? mapping.title : menuName,
-                url: mapping ? mapping.url : "#",
-                icon: mapping ? mapping.icon : IconListDetails,
-              }
-            })
-
-          if (groupItems.length === 0) return null
-
+        {visibleGroups.map((group, index) => {
           const isOpen = openGroups[group.title] ?? true
+          const isGroupActive = group.items.some((item) => {
+            return pathname === item.url || (item.url !== "#" && pathname.startsWith(item.url + "/"))
+          })
 
           return (
-            <Collapsible
-              key={group.title}
-              open={isOpen}
-              onOpenChange={(open) => handleToggleGroup(group.title, open)}
-              className="group/collapsible"
-            >
-              <SidebarGroup className="py-1">
-                <SidebarGroupLabel
-                  asChild
-                  className="text-sidebar-foreground/80 font-medium text-sm px-3 mb-1 h-9 cursor-pointer hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors select-none"
-                >
-                  <CollapsibleTrigger className="flex w-full items-center justify-between">
-                    <span className="truncate">{t(group.title)}</span>
-                    <ChevronDown className="size-4 shrink-0 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180" />
-                  </CollapsibleTrigger>
-                </SidebarGroupLabel>
-                <CollapsibleContent>
-                  <SidebarGroupContent>
-                    <SidebarMenu>
-                      {groupItems.map((item) => (
-                        <SidebarMenuItem key={item.title}>
-                          <SidebarMenuButton
-                            asChild
-                            isActive={pathname === item.url}
-                            className="my-0.5"
-                          >
-                            <Link href={item.url} className="px-4 py-3">
-                              <item.icon className="!size-5" />
-                              <span className="font-medium text-[15px]">{t(item.title)}</span>
-                            </Link>
-                          </SidebarMenuButton>
-                        </SidebarMenuItem>
-                      ))}
-                    </SidebarMenu>
-                  </SidebarGroupContent>
-                </CollapsibleContent>
-              </SidebarGroup>
-            </Collapsible>
+            <React.Fragment key={group.title}>
+              {index > 0 && <SidebarSeparator className="my-1 mx-3 bg-sidebar-foreground/25 h-px" />}
+              <Collapsible
+                open={isOpen}
+                onOpenChange={(open) => handleToggleGroup(group.title, open)}
+                className="group/collapsible"
+              >
+                <SidebarGroup className="py-1">
+                  <SidebarGroupLabel
+                    asChild
+                    className={cn(
+                      "text-sm px-3 mb-1 h-9 cursor-pointer transition-all select-none rounded-lg",
+                      isGroupActive
+                        ? "bg-sidebar-accent/70 text-sidebar-foreground font-semibold shadow-2xs"
+                        : "text-sidebar-foreground/60 font-medium hover:bg-sidebar-accent/30 hover:text-sidebar-foreground"
+                    )}
+                  >
+                    <CollapsibleTrigger className="flex w-full items-center justify-between">
+                      <span className="truncate">
+                        {t(group.title)}
+                      </span>
+                      <ChevronDown className={cn(
+                        "size-4 shrink-0 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180",
+                        isGroupActive ? "text-sidebar-foreground" : "text-sidebar-foreground/60"
+                      )} />
+                    </CollapsibleTrigger>
+                  </SidebarGroupLabel>
+                  <CollapsibleContent>
+                    <SidebarGroupContent>
+                      <SidebarMenu>
+                        {group.items.map((item) => (
+                          <SidebarMenuItem key={item.title}>
+                            <SidebarMenuButton
+                              asChild
+                              isActive={pathname === item.url}
+                              className="my-0.5"
+                            >
+                              <Link href={item.url} className="px-3 py-2 flex items-center gap-2.5">
+                                <div className="flex size-6.5 shrink-0 items-center justify-center rounded-md bg-black/10 dark:bg-white/10 skyblue:bg-white/20 shadow-2xs transition-transform duration-200 group-hover/menu-button:scale-110">
+                                  <item.icon className={cn("size-4 shrink-0", item.color)} />
+                                </div>
+                                <span className="font-medium text-[15px]">{t(item.title)}</span>
+                              </Link>
+                            </SidebarMenuButton>
+                          </SidebarMenuItem>
+                        ))}
+                      </SidebarMenu>
+                    </SidebarGroupContent>
+                  </CollapsibleContent>
+                </SidebarGroup>
+              </Collapsible>
+            </React.Fragment>
           )
         })}
       </SidebarContent>
-      <SidebarFooter className="z-20">
-        <NavUser user={user} />
-      </SidebarFooter>
     </Sidebar>
   )
 }

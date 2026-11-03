@@ -205,7 +205,7 @@ export function ProjectClient({ initialData }: ProjectClientProps) {
     return (
         <div className="flex flex-1 flex-col gap-3 w-full h-full">
             {/* Header Toolbar: Compact Container */}
-            <div className="rounded-lg border bg-card p-3 shadow-2xs">
+            <div className="rounded-lg border bg-card text-card-foreground p-2 shadow-2xs">
                 <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5 w-full">
                     {/* Left: Filters & Search */}
                     <div className="flex flex-1 flex-col sm:flex-row items-stretch sm:items-center gap-2">

@@ -61,6 +61,7 @@ interface EditScheduleDialogProps {
     onOpenChange: (open: boolean) => void
     schedule: ScheduleItem | null
     groups: DeviceGroup[] // Available groups to select
+    onSuccess?: () => void
 }
 
 export function EditScheduleDialog({
@@ -69,6 +70,7 @@ export function EditScheduleDialog({
     onOpenChange,
     schedule,
     groups,
+    onSuccess,
 }: EditScheduleDialogProps) {
     const t = useTranslations("ScheduleSettings.dialog")
     const tTypes = useTranslations("ScheduleSettings.types")
@@ -306,8 +308,7 @@ export function EditScheduleDialog({
             if (result.success) {
                 toast.success(t("saveSuccess"))
                 onOpenChange(false)
-                // Ideally refresh data
-                window.location.reload() // Simple refresh for now or use router.refresh()
+                onSuccess?.()
             } else {
                 toast.error(t("saveError") + (result.message ? `: ${result.message}` : ""))
             }

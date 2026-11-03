@@ -113,17 +113,26 @@ export async function getListDataOperator(): Promise<UserOption[]> {
             body: JSON.stringify({}),
         })
 
-        if (!response.ok) return []
-
-        const data = await response.json()
-        if (data.result && data.dataReturn) {
-            return data.dataReturn
+        if (response.ok) {
+            const data = await response.json()
+            if (data.result && data.dataReturn && Array.isArray(data.dataReturn) && data.dataReturn.length > 0) {
+                return data.dataReturn
+            }
         }
-        return []
     } catch (error) {
-        console.error("Error fetching operator list:", error)
-        return []
+        console.error("Error fetching operator list directly:", error)
     }
+
+    try {
+        const both = await getListDataOperatorAndAdmin()
+        if (both?.name_operator && Array.isArray(both.name_operator) && both.name_operator.length > 0) {
+            return both.name_operator
+        }
+    } catch (err) {
+        console.error("Error fallback fetching operators:", err)
+    }
+
+    return []
 }
 
 export async function getDataListAllMaintenanceDashboard(params: MaintenanceDashboardParams): Promise<MaintenanceDashboardData | null> {

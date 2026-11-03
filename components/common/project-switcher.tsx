@@ -152,12 +152,12 @@ export const ProjectSwitcher = ({
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
                 <Button
-                    className="cursor-pointer relative"
+                    className="cursor-pointer relative text-project-primary hover:bg-project-primary/10 hover:text-project-primary transition-colors"
                     variant="ghost"
                     size="icon"
                     aria-label={t("buttonLabel")}
                 >
-                    <Folders className="h-[1.2rem] w-[1.2rem] transition-transform duration-200 hover:scale-110" />
+                    <Folders className="h-[1.2rem] w-[1.2rem] text-project-primary transition-transform duration-200 hover:scale-110" />
                     <span className="sr-only">{t("buttonLabel")}</span>
                 </Button>
             </DialogTrigger>

@@ -15,6 +15,7 @@ import {
     extractRolesFromPayload,
     getKeycloakConfig,
     getKeycloakLogoutUrl,
+    isKeycloakTokenValid,
 } from "@/lib/keycloak"
 import { fetchNestJs } from "@/lib/nestjs"
 
@@ -420,19 +421,19 @@ export async function logout() {
     const appUrl = host ? `${proto}://${host}` : (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3008")
     const loginUrl = `${appUrl}/api/auth/login?prompt=login`
 
-    if (refreshToken) {
+    let keycloakLogoutUrl: string | undefined = loginUrl
+    const hasValidIdToken = isKeycloakTokenValid(idToken)
+
+    if (hasValidIdToken && idToken) {
+        const url = getKeycloakLogoutUrl(loginUrl, idToken, resolvedClientId)
+        if (url) {
+            keycloakLogoutUrl = url
+        }
+    } else if (refreshToken) {
         try {
             await logoutKeycloak(refreshToken, resolvedClientId)
         } catch (e) {
             console.warn("[Logout] Backchannel logout failed:", e)
-        }
-    }
-
-    let keycloakLogoutUrl: string | undefined = loginUrl
-    if (idToken) {
-        const url = getKeycloakLogoutUrl(loginUrl, idToken, resolvedClientId)
-        if (url) {
-            keycloakLogoutUrl = url
         }
     }
 
@@ -442,12 +443,15 @@ export async function logout() {
     cookieStore.set("id_token", "", { path: "/", maxAge: 0 })
     cookieStore.set("menuRole", "", { path: "/", maxAge: 0 })
     cookieStore.set("current_project", "", { path: "/", maxAge: 0 })
+    cookieStore.set("remember_me", "", { path: "/", maxAge: 0 })
     cookieStore.delete("jwt")
     cookieStore.delete("refresh_token")
     cookieStore.delete("id_token")
     cookieStore.delete("menuRole")
     cookieStore.delete("current_project")
     cookieStore.delete("current_tenant")
+    cookieStore.delete("remember_me")
+    cookieStore.delete("pkce_verifier")
 
     return { success: true, keycloakLogoutUrl }
 }
@@ -495,6 +499,15 @@ export async function refreshTokenAction(): Promise<{ success: boolean }> {
 
     if (newTokens.refresh_token) {
         cookieStore.set("refresh_token", newTokens.refresh_token, {
+            httpOnly: true,
+            secure: usingHttps,
+            sameSite: "lax",
+            path: "/",
+        })
+    }
+
+    if (newTokens.id_token) {
+        cookieStore.set("id_token", newTokens.id_token, {
             httpOnly: true,
             secure: usingHttps,
             sameSite: "lax",

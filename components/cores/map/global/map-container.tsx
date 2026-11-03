@@ -217,7 +217,7 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
     return (
         <div className="font-sans min-w-[280px] max-w-[340px] text-foreground space-y-3">
             {/* Header */}
-            <div className="border-b border-border/60 pb-1.5 mb-2">
+            <div className="border-b border-border/60 pb-1.5 mb-2 pr-6">
                 <h3 className="font-semibold text-base text-foreground leading-tight truncate m-0" title={detail.street_light_name || device.name_pole || device.street_light_name || t("popup.name")}>
                     {detail.street_light_name || device.name_pole || device.street_light_name || t("popup.name")}
                 </h3>
@@ -385,6 +385,7 @@ function GoogleMapComponent({ googleMapsApiKey, devices, defaultLat, defaultLng,
     return (
         <GoogleMap
             mapContainerStyle={containerStyle}
+            mapContainerClassName="google-map-root font-sans"
             center={{ lat: parseFloat(defaultLat || "13.736717"), lng: parseFloat(defaultLng || "100.523186") }}
             zoom={parseFloat(defaultZoom || "13")}
             onLoad={onLoad}

@@ -8,21 +8,35 @@ import { Loader2, X, Image as ImageIcon, Upload, Trash2, Check } from "lucide-re
 import { MaintenanceImageRecord, uploadImageAction, deleteImageAction } from "@/app/actions/maintenance"
 import { ConfirmButton } from "@/components/ui/confirm-button"
 import { toast } from "sonner"
+import { cn } from "@/lib/utils"
 
 interface DetailImageProps {
     detailId: string
     images: MaintenanceImageRecord[]
     loadingImages: boolean
+    canWrite?: boolean
+    canControl?: boolean
     onImagesChanged: () => void
 }
 
-export function DetailImage({ detailId, images, loadingImages, onImagesChanged }: DetailImageProps) {
+export function DetailImage({
+    detailId,
+    images,
+    loadingImages,
+    canWrite = true,
+    canControl = true,
+    onImagesChanged
+}: DetailImageProps) {
     const t = useTranslations("MaintenanceDashboard")
     const [previewImage, setPreviewImage] = useState<string | null>(null)
     const [uploading, setUploading] = useState(false)
     const [deletingId, setDeletingId] = useState<string | null>(null)
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!canWrite) {
+            toast.error(t("detail.permissionDenied") || t("messages.permissionDenied", { defaultMessage: "ไม่มีสิทธิ์ในการดำเนินการนี้" }))
+            return
+        }
         const file = e.target.files?.[0]
         if (!file || !detailId) return
 
@@ -60,6 +74,10 @@ export function DetailImage({ detailId, images, loadingImages, onImagesChanged }
     }
 
     const handleDelete = async (idList: string, idImg: string) => {
+        if (!canControl && !canWrite) {
+            toast.error(t("detail.permissionDenied") || t("messages.permissionDenied", { defaultMessage: "ไม่มีสิทธิ์ในการดำเนินการนี้" }))
+            return
+        }
         setDeletingId(idImg)
         try {
             const res = await deleteImageAction({ id_list: idList, id_img: idImg })
@@ -87,19 +105,27 @@ export function DetailImage({ detailId, images, loadingImages, onImagesChanged }
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <label htmlFor="image-upload" className="cursor-pointer">
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-xs font-medium shadow-2xs">
+                    <label
+                        htmlFor={canWrite ? "image-upload" : undefined}
+                        className={cn(canWrite ? "cursor-pointer" : "opacity-50 cursor-not-allowed")}
+                    >
+                        <div className={cn(
+                            "flex items-center gap-2 px-3 py-1.5 bg-primary text-primary-foreground rounded-lg text-xs font-medium shadow-2xs",
+                            canWrite ? "hover:bg-primary/90 transition-colors" : "opacity-50 pointer-events-none"
+                        )}>
                             {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
                             {t("detail.addImage", { defaultMessage: "Add Image" })}
                         </div>
-                        <input
-                            id="image-upload"
-                            type="file"
-                            accept=".jpg,.jpeg,.png,image/jpeg,image/png"
-                            className="hidden"
-                            onChange={handleFileChange}
-                            disabled={uploading}
-                        />
+                        {canWrite && (
+                            <input
+                                id="image-upload"
+                                type="file"
+                                accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                                className="hidden"
+                                onChange={handleFileChange}
+                                disabled={uploading || !canWrite}
+                            />
+                        )}
                     </label>
                 </div>
             </div>
@@ -135,16 +161,27 @@ export function DetailImage({ detailId, images, loadingImages, onImagesChanged }
 
                             {/* Delete Button */}
                             <div className="absolute top-2 left-2 z-10" onClick={(e) => e.stopPropagation()}>
-                                <ConfirmButton
-                                    initialLabel={<Trash2 className="h-3.5 w-3.5" />}
-                                    confirmLabel={<Check className="h-3.5 w-3.5" />}
-                                    onConfirm={() => handleDelete(img.id_list, img.id_img)}
-                                    onCancel={() => toast.info(t("detail.deleteCancelled", { defaultMessage: "Delete cancelled" }))}
-                                    variant="destructive"
-                                    size="icon"
-                                    className="h-7 w-7 rounded-full cursor-pointer shadow-md"
-                                    loading={deletingId === img.id_img}
-                                />
+                                {canWrite ? (
+                                    <ConfirmButton
+                                        initialLabel={<Trash2 className="h-3.5 w-3.5" />}
+                                        confirmLabel={<Check className="h-3.5 w-3.5" />}
+                                        onConfirm={() => handleDelete(img.id_list, img.id_img)}
+                                        onCancel={() => toast.info(t("detail.deleteCancelled", { defaultMessage: "Delete cancelled" }))}
+                                        variant="destructive"
+                                        size="icon"
+                                        className="h-7 w-7 rounded-full cursor-pointer shadow-md"
+                                        loading={deletingId === img.id_img}
+                                    />
+                                ) : (
+                                    <Button
+                                        disabled
+                                        variant="destructive"
+                                        size="icon"
+                                        className="h-7 w-7 rounded-full shadow-md opacity-50 cursor-not-allowed"
+                                    >
+                                        <Trash2 className="h-3.5 w-3.5" />
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     ))}

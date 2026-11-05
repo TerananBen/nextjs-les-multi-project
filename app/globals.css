@@ -190,6 +190,7 @@
 .leaflet-popup-content {
   margin: 0.875rem !important;
   line-height: 1.5 !important;
+  overflow: hidden !important;
 }
 .leaflet-container a.leaflet-popup-close-button {
   color: var(--muted-foreground) !important;
@@ -208,13 +209,18 @@
   border: 1px solid var(--border) !important;
   padding: 0.875rem !important;
   overflow: visible !important;
+  max-height: none !important;
 }
 .gm-style .gm-style-iw-tc::after {
   background-color: var(--card) !important;
 }
 .gm-style .gm-style-iw-d {
-  overflow: auto !important;
+  overflow: hidden !important;
+  max-height: none !important;
   padding: 0 !important;
+}
+.gm-style .gm-style-iw-d::-webkit-scrollbar {
+  display: none !important;
 }
 .gm-style .gm-style-iw-d p {
   margin: 0 !important;

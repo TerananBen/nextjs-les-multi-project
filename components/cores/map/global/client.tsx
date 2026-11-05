@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useMemo } from "react"
 import dynamic from "next/dynamic"
 import FilterSidebar from "./filter-sidebar"
 import {
@@ -71,7 +71,7 @@ export default function MapGlobalClient({ googleMapsApiKey, defaultLat, defaultL
             const result = await getDataLatLongSearchAction(
                 searchType,
                 searchValues,
-                statusFilter
+                "all"
             )
             setDevices(result)
         } catch (error) {
@@ -79,12 +79,26 @@ export default function MapGlobalClient({ googleMapsApiKey, defaultLat, defaultL
         } finally {
             setIsLoading(false)
         }
-    }, [searchType, searchValue, statusFilter, groupOptions])
+    }, [searchType, searchValue, groupOptions])
 
     // Load map data on mount and whenever search criteria change
     useEffect(() => {
         handleSearch()
     }, [handleSearch])
+
+    const filteredDevices = useMemo(() => {
+        if (!statusFilter || statusFilter === "all") return devices
+        if (statusFilter === "normal") {
+            return devices.filter(d => d.status === "0" || d.status === "1" || d.status === "2" || d.status === "3")
+        }
+        if (statusFilter === "4") {
+            return devices.filter(d => d.status === "4")
+        }
+        if (statusFilter === "5") {
+            return devices.filter(d => d.status === "5" || d.status === "6")
+        }
+        return devices.filter(d => d.status === statusFilter)
+    }, [devices, statusFilter])
 
     const currentOptions = () => {
         switch (searchType) {
@@ -114,7 +128,7 @@ export default function MapGlobalClient({ googleMapsApiKey, defaultLat, defaultL
                 <MapContainerComponent
                     mode={mapMode}
                     offlineUrl={mapOfflineUrl}
-                    devices={devices}
+                    devices={filteredDevices}
                     defaultLat={defaultLat}
                     defaultLng={defaultLng}
                     defaultZoom={defaultZoom}

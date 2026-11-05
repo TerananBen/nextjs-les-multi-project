@@ -8,7 +8,8 @@ import { useMenuSettingsColumns } from "./columns"
 import { DataTable } from "./data-table"
 import { Input } from "@/components/ui/input"
 import { toast } from "sonner"
-import { Search, X } from "lucide-react"
+import { Search, X, ShieldAlert } from "lucide-react"
+import { usePermission } from "@/components/providers/permission-provider"
 import {
     Select,
     SelectContent,
@@ -24,6 +25,15 @@ interface MenuSettingsClientProps {
 
 export function MenuSettingsClient({ initialRoles = [], isSuperAdmin = false }: MenuSettingsClientProps) {
     const t = useTranslations("MenuSettings")
+    const { getPermission, permissions } = usePermission()
+
+    const perm = React.useMemo(() => {
+        if (!permissions.length) return { readable: true, writable: true, control: true }
+        return getPermission("system_menu_permission")
+    }, [getPermission, permissions])
+
+    const isReadable = isSuperAdmin || perm.readable
+    const canWrite = isSuperAdmin || perm.writable
 
     const isSuperAdminRole = React.useCallback((role: KeycloakRoleItem) => {
         const name = (role.name || "").toLowerCase()
@@ -78,6 +88,10 @@ export function MenuSettingsClient({ initialRoles = [], isSuperAdmin = false }: 
     }, [initialRoles, isSuperAdmin, isSuperAdminRole])
 
     const handleToggle = React.useCallback(async (item: MenuData, field: string, value: string) => {
+        if (!canWrite) {
+            toast.error(t("permissionDenied"), { id: "menu-setting-toast" })
+            return
+        }
         try {
             const updatedItem = { ...item, [field]: value }
 
@@ -104,10 +118,10 @@ export function MenuSettingsClient({ initialRoles = [], isSuperAdmin = false }: 
             console.error("Toggle error", error)
             toast.error(t("saveError"), { id: "menu-setting-toast" })
         }
-    }, [selectedRole, t])
+    }, [selectedRole, canWrite, t])
 
     // Columns
-    const columns = useMenuSettingsColumns(handleToggle)
+    const columns = useMenuSettingsColumns(handleToggle, canWrite)
 
     // Fetch Data
     React.useEffect(() => {
@@ -144,6 +158,15 @@ export function MenuSettingsClient({ initialRoles = [], isSuperAdmin = false }: 
             return rawName.includes(lowerQuery) || translatedName.includes(lowerQuery)
         })
     }, [data, searchQuery, t])
+
+    if (!isReadable) {
+        return (
+            <div className="flex flex-1 flex-col items-center justify-center min-h-[400px] gap-3 text-muted-foreground">
+                <ShieldAlert className="h-12 w-12 text-muted-foreground/60" />
+                <p className="text-base font-medium">{t("noAccess", { defaultValue: "You do not have permission to access this page" })}</p>
+            </div>
+        )
+    }
 
     return (
         <div className="flex flex-1 flex-col gap-3 w-full h-full">

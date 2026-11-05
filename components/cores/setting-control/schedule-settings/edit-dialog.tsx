@@ -35,6 +35,8 @@ import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 import { saveScheduleSettingsAction } from "@/app/actions/schedule-settings"
 import { Loader2 } from "lucide-react"
+import { usePermission } from "@/components/providers/permission-provider"
+import { cn } from "@/lib/utils"
 
 const sceneSchema = z.object({
     time: z.string().optional().nullable(),
@@ -75,6 +77,8 @@ export function EditScheduleDialog({
     const t = useTranslations("ScheduleSettings.dialog")
     const tTypes = useTranslations("ScheduleSettings.types")
     const tValidation = useTranslations("ScheduleSettings.validation")
+    const { getPermission } = usePermission()
+    const { writable: canManage } = getPermission("V_SettingSchedule")
     const [isSaving, setIsSaving] = React.useState(false)
 
     const scheduleSchema = React.useMemo(() => z.object({
@@ -258,6 +262,10 @@ export function EditScheduleDialog({
     }, [open, schedule, form])
 
     const onSubmit = async (data: ScheduleFormValues, versionLightSensor: string) => {
+        if (!canManage) {
+            toast.error(t("permissionDenied"))
+            return
+        }
         setIsSaving(true)
         try {
             // Construct list_group_name_code: " GroupName$GroupCode"
@@ -275,32 +283,45 @@ export function EditScheduleDialog({
             let finalScenes: unknown = []
             if (data.typeSchedule === "time") {
                 finalScenes = data.listScenes.map(s => ({
-                    time: s.time,
-                    dim: s.dim
+                    time: String(s.time ?? ""),
+                    dim: String(s.dim ?? "0")
                 }))
             } else if (data.typeSchedule === "light") {
-                const s = data.listScenes[0] || { open_volt: "350", open_time: "100", close_volt: "1250", close_time: "0" }
+                const s = data.listScenes[0] || { open_volt: "20", open_time: "5", close_volt: "80", close_time: "5" }
                 finalScenes = {
-                    open_volt: s.open_volt,
-                    open_time: s.open_time,
-                    close_volt: s.close_volt,
-                    close_time: s.close_time
+                    open_volt: String(s.open_volt ?? "20"),
+                    open_time: String(s.open_time ?? "5"),
+                    close_volt: String(s.close_volt ?? "80"),
+                    close_time: String(s.close_time ?? "5")
                 }
+            } else if (data.typeSchedule === "manual") {
+                finalScenes = []
             }
+
+            // In Edit mode, code_name must be the GROUP_CODE of the schedule
+            const scheduleCode = schedule
+                ? (
+                    String(
+                        schedule.GROUP_CODE ||
+                        schedule.group_code ||
+                        schedule.groupCode ||
+                        schedule.code_name ||
+                        data.groupCode ||
+                        ""
+                    ).trim() || "new"
+                  )
+                : "new"
 
             // Construct Payload
             const payload: Record<string, unknown> = {
                 name_schedule: data.scheduleName,
-                code_name: schedule ? schedule.groupCode : "new", // "new" for Add, groupCode for Edit
-                // API expects JSON STRING of the array, e.g. "[\" Group$Code\"]"
-                list_group_name_code: JSON.stringify(list_group_name_code_array),
-                // API expects JSON STRING of the object list
-                list_scenes_light: JSON.stringify(finalScenes),
+                code_name: scheduleCode,
                 type_schedule: data.typeSchedule,
                 type_set: "group", // Default "group"
-                // API expects JSON STRING of the array
-                list_days: JSON.stringify(["sun", "mon", "tue", "wed", "thu", "fri", "sat"]),
-                version_light_sensor: versionLightSensor
+                list_group_name_code: list_group_name_code_array,
+                list_days: ["sun", "mon", "tue", "wed", "thu", "fri", "sat"],
+                list_scenes_light: finalScenes,
+                version_light_sensor: String(versionLightSensor || "1")
             }
 
             const result = await saveScheduleSettingsAction(payload)
@@ -693,8 +714,11 @@ export function EditScheduleDialog({
                         onClick={handleSubmit((data) => onSubmit(data, versionLightSensor), () => {
                             toast.error(t("validateError"));
                         })}
-                        disabled={isSaving}
-                        className="cursor-pointer"
+                        disabled={isSaving || !canManage}
+                        className={cn(
+                            "cursor-pointer",
+                            !canManage && "opacity-50 cursor-not-allowed"
+                        )}
                     >
                         {isSaving ? (
                             <>

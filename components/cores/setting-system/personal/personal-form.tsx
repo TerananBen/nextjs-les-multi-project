@@ -83,6 +83,7 @@ interface PersonalFormProps {
     onSubmit: (values: PersonalFormValues) => void
     onCancel: () => void
     isLoading?: boolean
+    isWritable?: boolean
 }
 
 export function PersonalForm({
@@ -95,6 +96,7 @@ export function PersonalForm({
     onSubmit,
     onCancel,
     isLoading,
+    isWritable = true,
 }: PersonalFormProps) {
     const t = useTranslations('Personal')
     const [isProjectPopoverOpen, setIsProjectPopoverOpen] = React.useState(false)
@@ -775,8 +777,11 @@ export function PersonalForm({
                     <Button
                         type="submit"
                         size="sm"
-                        disabled={isLoading}
-                        className="cursor-pointer h-9 px-4 text-xs font-medium shadow-2xs"
+                        disabled={isLoading || !isWritable}
+                        className={cn(
+                            "cursor-pointer h-9 px-4 text-xs font-medium shadow-2xs",
+                            !isWritable && "opacity-50 cursor-not-allowed"
+                        )}
                     >
                         {isLoading ? t('form.saving') : t('form.save')}
                     </Button>

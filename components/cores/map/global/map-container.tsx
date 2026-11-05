@@ -5,7 +5,7 @@ import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import { LatLongData, getDataDetailIMSIAction, ImsiDetail, sendCommandMqttAction, readDataMqttAction } from "@/app/actions/map-actions"
 import { GoogleMap, useJsApiLoader, Marker as GoogleMarker, InfoWindow } from "@react-google-maps/api"
-import { Loader2, Power, Sun, RefreshCcw, ChevronDown, ChevronUp, PowerOff } from "lucide-react"
+import { Loader2, Power, Sun, RefreshCcw, ChevronDown, ChevronUp, PowerOff, MapPin } from "lucide-react"
 import { getLeafletIconUrl, getGoogleMapsIconHtml, MarkerColor, MarkerBadge } from "@/lib/map-icons"
 import { useTranslations, useLocale } from "next-intl"
 import { createRoot } from "react-dom/client"
@@ -200,10 +200,23 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
                 <h3 className="font-semibold text-base text-foreground">{device.name_pole || device.street_light_name || "-"}</h3>
                 <p className="text-xs text-muted-foreground">{t("popup.imsi")} {device.imsi}</p>
                 <p className="text-destructive text-xs">{t("popup.failedToLoadDetailedData")}</p>
-                <Button variant="outline" size="sm" onClick={fetchDetail} className="h-8 text-xs cursor-pointer">
-                    <RefreshCcw className="w-3.5 h-3.5 mr-1.5" />
-                    {t("popup.retry")}
-                </Button>
+                <div className="flex items-center justify-between gap-2 pt-1">
+                    <Button variant="outline" size="sm" onClick={fetchDetail} className="h-8 text-xs cursor-pointer">
+                        <RefreshCcw className="w-3.5 h-3.5 mr-1.5" />
+                        {t("popup.retry")}
+                    </Button>
+                    {isValidGPS(device.lat, device.lng) && (
+                        <a
+                            href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(device.lat)},${encodeURIComponent(device.lng)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary/80 font-medium hover:underline transition-colors cursor-pointer"
+                        >
+                            <MapPin className="w-3.5 h-3.5" />
+                            <span>{t("popup.navigate")}</span>
+                        </a>
+                    )}
+                </div>
             </div>
         )
     }
@@ -215,7 +228,7 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
     const config = getMarkerConfig(device, t);
 
     return (
-        <div className="font-sans min-w-[280px] max-w-[340px] text-foreground space-y-3">
+        <div className="font-sans min-w-[280px] max-w-[340px] text-foreground space-y-3 overflow-hidden">
             {/* Header */}
             <div className="border-b border-border/60 pb-1.5 mb-2 pr-6">
                 <h3 className="font-semibold text-base text-foreground leading-tight truncate m-0" title={detail.street_light_name || device.name_pole || device.street_light_name || t("popup.name")}>
@@ -267,9 +280,15 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer"
-                        onClick={handleReadPower}
-                        disabled={reading || sending}
+                        className={cn(
+                            "h-6 px-2 text-xs text-muted-foreground hover:text-foreground cursor-pointer",
+                            !canControl && "opacity-50 cursor-not-allowed"
+                        )}
+                        onClick={() => {
+                            if (canControl) handleReadPower()
+                            else toast.error(t("control.permissionDenied") || t("control.error"))
+                        }}
+                        disabled={reading || sending || !canControl}
                     >
                         {reading ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <RefreshCcw className="w-3 h-3 mr-1" />}
                         {t("control.readPower")}
@@ -280,9 +299,15 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
                 <div className="grid grid-cols-2 gap-2">
                     <Button
                         size="sm"
-                        onClick={() => handleCommand("1", 100)}
-                        disabled={sending || reading}
-                        className="h-8 cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white dark:bg-emerald-600 dark:hover:bg-emerald-700 shadow-2xs font-medium text-xs"
+                        onClick={() => {
+                            if (canControl) handleCommand("1", 100)
+                            else toast.error(t("control.permissionDenied") || t("control.error"))
+                        }}
+                        disabled={sending || reading || !canControl}
+                        className={cn(
+                            "h-8 cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white dark:bg-emerald-600 dark:hover:bg-emerald-700 shadow-2xs font-medium text-xs",
+                            !canControl && "opacity-50 cursor-not-allowed"
+                        )}
                     >
                         {sending ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <Power className="w-3.5 h-3.5 mr-1.5" />}
                         {t("control.on")}
@@ -290,9 +315,15 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
                     <Button
                         size="sm"
                         variant="destructive"
-                        onClick={() => handleCommand("0", 0)}
-                        disabled={sending || reading}
-                        className="h-8 cursor-pointer shadow-2xs font-medium text-xs"
+                        onClick={() => {
+                            if (canControl) handleCommand("0", 0)
+                            else toast.error(t("control.permissionDenied") || t("control.error"))
+                        }}
+                        disabled={sending || reading || !canControl}
+                        className={cn(
+                            "h-8 cursor-pointer shadow-2xs font-medium text-xs",
+                            !canControl && "opacity-50 cursor-not-allowed"
+                        )}
                     >
                         {sending ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-1.5" /> : <PowerOff className="w-3.5 h-3.5 mr-1.5" />}
                         {t("control.off")}
@@ -327,9 +358,15 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
                         <Button
                             size="sm"
                             variant="outline"
-                            className="h-7 px-2.5 text-xs font-medium cursor-pointer shrink-0"
-                            disabled={sending || reading}
-                            onClick={() => handleCommand("1", dimValue)}
+                            className={cn(
+                                "h-7 px-2.5 text-xs font-medium cursor-pointer shrink-0",
+                                !canControl && "opacity-50 cursor-not-allowed"
+                            )}
+                            disabled={sending || reading || !canControl}
+                            onClick={() => {
+                                if (canControl) handleCommand("1", dimValue)
+                                else toast.error(t("control.permissionDenied") || t("control.error"))
+                            }}
                         >
                             {t("control.set")}
                         </Button>
@@ -338,8 +375,23 @@ function DeviceDetailPopup({ device, t, onUpdatePosition, canControl }: DeviceDe
             </div>
 
             {/* Footer */}
-            <div className="text-[11px] text-muted-foreground text-right pt-2 border-t border-border/60">
-                {t("popup.lastUpdate")} {detail.last_update || "-"}
+            <div className="pt-2 border-t border-border/60">
+                <div className="flex items-center justify-between text-xs">
+                    {isValidGPS(device.lat, device.lng) ? (
+                        <a
+                            href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(device.lat)},${encodeURIComponent(device.lng)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-medium transition-colors hover:underline cursor-pointer"
+                        >
+                            <MapPin className="w-3.5 h-3.5" />
+                            <span>{t("popup.navigate")}</span>
+                        </a>
+                    ) : <span />}
+                    <span className="text-[11px] text-muted-foreground text-right truncate">
+                        {t("popup.lastUpdate")} {detail.last_update || "-"}
+                    </span>
+                </div>
             </div>
         </div>
     )
@@ -351,7 +403,8 @@ let loadedMapLang: string | null = null;
 function GoogleMapComponent({ googleMapsApiKey, devices, defaultLat, defaultLng, defaultZoom, iconScale }: { googleMapsApiKey?: string, devices: LatLongData[], defaultLat?: string, defaultLng?: string, defaultZoom?: string, iconScale?: string }) {
     const t = useTranslations("MapGlobal");
     const { getPermission } = usePermission();
-    const { control: canControl } = getPermission("V_MapGlobal");
+    const { control: hasControl, writable: hasWritable } = getPermission("V_MapGlobal");
+    const canControl = hasControl || hasWritable;
     const locale = useLocale();
     const mapLang = loadedMapLang || locale;
     
@@ -365,6 +418,7 @@ function GoogleMapComponent({ googleMapsApiKey, devices, defaultLat, defaultLng,
     const [map, setMap] = useState<google.maps.Map | null>(null)
     const [zoom, setZoom] = useState(parseFloat(defaultZoom || "13"))
     const [selectedDevice, setSelectedDevice] = useState<LatLongData | null>(null)
+    const [infoWindowKey, setInfoWindowKey] = useState(0)
 
     const onLoad = useCallback((map: google.maps.Map) => {
         setMap(map)
@@ -377,6 +431,15 @@ function GoogleMapComponent({ googleMapsApiKey, devices, defaultLat, defaultLng,
     }, [map])
 
     const onUnmount = useCallback(() => setMap(null), [])
+
+    const handleMapClick = useCallback(() => {
+        setSelectedDevice(null)
+    }, [])
+
+    const handleMarkerClick = useCallback((device: LatLongData) => {
+        setSelectedDevice(device)
+        setInfoWindowKey(prev => prev + 1)
+    }, [])
 
     if (!isLoaded) return <div className="h-full w-full flex items-center justify-center"><Loader2 className="animate-spin text-muted-foreground" /></div>
 
@@ -391,6 +454,7 @@ function GoogleMapComponent({ googleMapsApiKey, devices, defaultLat, defaultLng,
             onLoad={onLoad}
             onUnmount={onUnmount}
             onZoomChanged={onZoomChanged}
+            onClick={handleMapClick}
             options={{ rotateControl: true }}
         >
             {devices.map((device, idx) => {
@@ -406,12 +470,13 @@ function GoogleMapComponent({ googleMapsApiKey, devices, defaultLat, defaultLng,
                             scaledSize: new window.google.maps.Size(iconSize, iconSize),
                             anchor: new window.google.maps.Point(iconSize / 2, iconSize)
                         }}
-                        onClick={() => setSelectedDevice(device)}
+                        onClick={() => handleMarkerClick(device)}
                     />
                 )
             })}
             {selectedDevice && (
                 <InfoWindow
+                    key={`${selectedDevice.SN}-${infoWindowKey}`}
                     position={{ lat: parseFloat(selectedDevice.lat), lng: parseFloat(selectedDevice.lng) }}
                     onCloseClick={() => setSelectedDevice(null)}
                 >
@@ -425,7 +490,8 @@ function GoogleMapComponent({ googleMapsApiKey, devices, defaultLat, defaultLng,
 function LeafletMapComponent({ offlineUrl, devices, defaultLat, defaultLng, defaultZoom, iconScale }: { offlineUrl?: string, devices: LatLongData[], defaultLat?: string, defaultLng?: string, defaultZoom?: string, iconScale?: string }) {
     const t = useTranslations("MapGlobal");
     const { getPermission } = usePermission();
-    const { control: canControl } = getPermission("V_MapGlobal");
+    const { control: hasControl, writable: hasWritable } = getPermission("V_MapGlobal");
+    const canControl = hasControl || hasWritable;
     const containerRef = useRef<HTMLDivElement>(null)
     const mapInstanceRef = useRef<L.Map | null>(null)
     const markersRef = useRef<L.Marker[]>([])

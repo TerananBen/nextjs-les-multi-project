@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ArrowUpDown, MoreHorizontal, Edit, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 
 export const COLOR_PRESET_BG_CLASSES: Record<ColorPreset, string> = {
     blue: "bg-blue-600",
@@ -154,11 +155,6 @@ export const getColumns = (
         header: () => <div className="text-center">{t("table.actions")}</div>,
         cell: ({ row }) => {
             const isDefault = row.original.id === DEFAULT_PROJECT || row.original.id === "project_a"
-            const canAnyAction = canWrite || (canControl && !isDefault)
-
-            if (!canAnyAction) {
-                return <div className="text-center text-muted-foreground text-xs">-</div>
-            }
 
             return (
                 <div className="flex justify-center">
@@ -170,20 +166,38 @@ export const getColumns = (
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                            {canWrite && (
-                                <DropdownMenuItem
-                                    onClick={() => onEdit(row.original)}
-                                    className="cursor-pointer"
-                                >
-                                    <Edit className="mr-2 h-4 w-4" />
-                                    {t("table.edit")}
-                                </DropdownMenuItem>
-                            )}
-                            {canControl && !isDefault && (
+                            <DropdownMenuItem
+                                onClick={() => {
+                                    if (canWrite) {
+                                        onEdit(row.original)
+                                    } else {
+                                        toast.error(t("table.permissionDenied") || t("messages.permissionDenied"))
+                                    }
+                                }}
+                                disabled={!canWrite}
+                                className={cn(
+                                    "cursor-pointer",
+                                    !canWrite && "opacity-50 cursor-not-allowed"
+                                )}
+                            >
+                                <Edit className="mr-2 h-4 w-4" />
+                                {t("table.edit")}
+                            </DropdownMenuItem>
+                            {!isDefault && (
                                 <DropdownMenuItem
                                     variant="destructive"
-                                    onClick={() => onDelete(row.original)}
-                                    className="cursor-pointer text-destructive focus:text-destructive"
+                                    onClick={() => {
+                                        if (canControl) {
+                                            onDelete(row.original)
+                                        } else {
+                                            toast.error(t("table.permissionDenied") || t("messages.permissionDenied"))
+                                        }
+                                    }}
+                                    disabled={!canControl}
+                                    className={cn(
+                                        "cursor-pointer text-destructive focus:text-destructive",
+                                        !canControl && "opacity-50 cursor-not-allowed"
+                                    )}
                                 >
                                     <Trash2 className="mr-2 h-4 w-4 text-destructive" />
                                     {t("table.delete")}

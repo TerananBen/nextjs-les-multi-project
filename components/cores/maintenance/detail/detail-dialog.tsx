@@ -31,6 +31,8 @@ interface DetailDialogProps {
     defaultZoom?: string
     iconScale?: string
     googleMapsApiKey?: string
+    canWrite?: boolean
+    canControl?: boolean
     onClose: () => void
 }
 
@@ -60,6 +62,8 @@ export function DetailDialog({
     defaultZoom = "14",
     iconScale = "1",
     googleMapsApiKey = "",
+    canWrite = true,
+    canControl = true,
     onClose
 }: DetailDialogProps) {
     const tMap = useTranslations("MapGlobal")
@@ -184,7 +188,7 @@ export function DetailDialog({
                                         <span className="text-xs font-medium">{tDetail("loading")}</span>
                                     </div>
                                 ) : (
-                                    <DetailDataTable data={data} detailId={detailId} />
+                                    <DetailDataTable data={data} detailId={detailId} canWrite={canWrite} />
                                 )}
                             </div>
                         </TabsContent>
@@ -196,6 +200,8 @@ export function DetailDialog({
                                     detailId={detailId}
                                     images={images}
                                     loadingImages={loadingImages}
+                                    canWrite={canWrite}
+                                    canControl={canControl}
                                     onImagesChanged={() => setImageRefreshTrigger(prev => prev + 1)}
                                 />
                             )}

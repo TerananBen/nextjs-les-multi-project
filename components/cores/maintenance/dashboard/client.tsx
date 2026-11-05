@@ -9,7 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { DataTable } from "./data-table"
 import { useMaintenanceColumns } from "./columns"
 import { DetailDialog } from "@/components/cores/maintenance/detail/detail-dialog"
-import { Search, RotateCcw, AlertCircle, Clock, CheckCircle2, Lightbulb, CalendarIcon, X } from "lucide-react"
+import { Search, RotateCcw, AlertCircle, Clock, CheckCircle2, Lightbulb, CalendarIcon, X, ShieldAlert } from "lucide-react"
+import { usePermission } from "@/components/providers/permission-provider"
 import { format } from "date-fns"
 import { th, enUS } from "date-fns/locale"
 import { DateRange } from "react-day-picker"
@@ -51,6 +52,17 @@ export default function MaintenanceDashboardClient({
     const t = useTranslations("MaintenanceDashboard")
     const locale = useLocale()
     const dateLocale = locale === "th" ? th : enUS
+
+    const { getPermission, permissions } = usePermission()
+
+    const perm = React.useMemo(() => {
+        if (!permissions.length) return { readable: true, writable: true, control: true }
+        return getPermission("maintenance_dashboard")
+    }, [getPermission, permissions])
+
+    const isReadable = perm.readable
+    const canWrite = perm.writable
+    const canControl = perm.control
 
     const [selectedDetailId, setSelectedDetailId] = React.useState<string | null>(null)
     const columns = useMaintenanceColumns(setSelectedDetailId)
@@ -127,6 +139,15 @@ export default function MaintenanceDashboardClient({
 
     const wasteRatio = totalLamp > 0 ? ((totalWaste / totalLamp) * 100).toFixed(1) : "0"
     const completionRate = totalWaste > 0 ? Math.round((totalRepaired / totalWaste) * 100) : 0
+
+    if (!isReadable) {
+        return (
+            <div className="flex flex-1 flex-col items-center justify-center min-h-[400px] gap-3 text-muted-foreground">
+                <ShieldAlert className="h-12 w-12 text-muted-foreground/60" />
+                <p className="text-base font-medium">{t("noAccess", { defaultMessage: "คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้" })}</p>
+            </div>
+        )
+    }
 
     return (
         <div className="flex flex-1 flex-col gap-3 w-full h-full">
@@ -358,6 +379,8 @@ export default function MaintenanceDashboardClient({
                 mapMode={mapMode}
                 mapOfflineUrl={mapOfflineUrl}
                 googleMapsApiKey={googleMapsApiKey}
+                canWrite={canWrite}
+                canControl={canControl}
                 onClose={() => setSelectedDetailId(null)}
             />
         </div>

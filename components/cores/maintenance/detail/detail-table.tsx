@@ -17,22 +17,26 @@ import { MaintenanceDetailRecord, confirmDataMaintenanceDetailAction, maintenanc
 import { getLeafletIconUrl, MarkerBadge } from "@/lib/map-icons"
 import { toast } from "sonner"
 import { Loader2, CheckCircle2, Clock, Check, Inbox } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 interface DetailDataTableProps {
     data: MaintenanceDetailRecord[]
     detailId?: string | null
+    canWrite?: boolean
 }
 
 function DetailTableRow({
     row,
     index,
     getReportCauseIcon,
-    detailId
+    detailId,
+    canWrite = true
 }: {
     row: MaintenanceDetailRecord
     index: number
     getReportCauseIcon: (cause: string) => React.ReactNode
     detailId: string | null | undefined
+    canWrite?: boolean
 }) {
     const t = useTranslations("MaintenanceDashboard")
     const [rtuNew, setRtuNew] = useState(row.imsi_after || "")
@@ -43,6 +47,10 @@ function DetailTableRow({
     const isRtuModified = rtuNew.trim() !== (row.imsi_after || "").trim()
 
     const handleSaveRtu = async () => {
+        if (!canWrite) {
+            toast.error(t("detail.permissionDenied") || t("messages.permissionDenied", { defaultMessage: "ไม่มีสิทธิ์ในการดำเนินการนี้" }))
+            return
+        }
         if (!detailId) return
         setSavingRtu(true)
         const res = await confirmDataMaintenanceDetailAction({
@@ -60,6 +68,10 @@ function DetailTableRow({
     }
 
     const handleStatusToggle = async () => {
+        if (!canWrite) {
+            toast.error(t("detail.permissionDenied") || t("messages.permissionDenied", { defaultMessage: "ไม่มีสิทธิ์ในการดำเนินการนี้" }))
+            return
+        }
         if (!detailId) return
         setUpdating(true)
         const nextStatus = status === "T" ? "F" : "T"
@@ -79,6 +91,10 @@ function DetailTableRow({
     }
 
     const handleMaintenanceCaseChange = async (val: string) => {
+        if (!canWrite) {
+            toast.error(t("detail.permissionDenied") || t("messages.permissionDenied", { defaultMessage: "ไม่มีสิทธิ์ในการดำเนินการนี้" }))
+            return
+        }
         if (!detailId) return
         setUpdating(true)
         const res = await maintenanceCaseSaveAction({
@@ -105,15 +121,22 @@ function DetailTableRow({
                         value={rtuNew}
                         onChange={(e) => setRtuNew(e.target.value)}
                         placeholder={t("detail.table.enterNewDevice")}
-                        className="h-8 text-xs font-mono bg-background flex-1"
+                        disabled={!canWrite}
+                        className={cn(
+                            "h-8 text-xs font-mono bg-background flex-1",
+                            !canWrite && "opacity-60 cursor-not-allowed"
+                        )}
                     />
                     {isRtuModified && (
                         <Button
                             size="icon"
                             variant="default"
                             onClick={handleSaveRtu}
-                            disabled={savingRtu || !detailId}
-                            className="h-8 w-8 shrink-0 cursor-pointer shadow-2xs"
+                            disabled={savingRtu || !detailId || !canWrite}
+                            className={cn(
+                                "h-8 w-8 shrink-0 shadow-2xs",
+                                canWrite ? "cursor-pointer" : "opacity-50 cursor-not-allowed"
+                            )}
                             title={t("detail.actionSuccess")}
                         >
                             {savingRtu ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
@@ -132,8 +155,8 @@ function DetailTableRow({
                 </div>
             </TableCell>
             <TableCell>
-                <Select defaultValue={row.maintenance_case || ""} onValueChange={handleMaintenanceCaseChange}>
-                    <SelectTrigger className="cursor-pointer h-8 w-[140px] text-xs bg-background" disabled={updating || !detailId}>
+                <Select defaultValue={row.maintenance_case || ""} onValueChange={handleMaintenanceCaseChange} disabled={updating || !detailId || !canWrite}>
+                    <SelectTrigger className={cn("h-8 w-[140px] text-xs bg-background", canWrite ? "cursor-pointer" : "opacity-60 cursor-not-allowed")} disabled={updating || !detailId || !canWrite}>
                         <SelectValue placeholder={t("detail.table.selectAction")} />
                     </SelectTrigger>
                     <SelectContent>
@@ -147,14 +170,16 @@ function DetailTableRow({
             <TableCell className="text-center">
                 <Button
                     onClick={handleStatusToggle}
-                    disabled={updating || !detailId}
+                    disabled={updating || !detailId || !canWrite}
                     size="sm"
                     variant="outline"
-                    className={`cursor-pointer h-8 text-xs font-medium gap-1.5 px-3 transition-colors ${
+                    className={cn(
+                        "h-8 text-xs font-medium gap-1.5 px-3 transition-colors",
+                        canWrite ? "cursor-pointer" : "opacity-60 cursor-not-allowed",
                         status === "T"
                             ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
                             : "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20"
-                    }`}
+                    )}
                 >
                     {updating ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -175,7 +200,7 @@ function DetailTableRow({
     )
 }
 
-export function DetailDataTable({ data, detailId }: DetailDataTableProps) {
+export function DetailDataTable({ data, detailId, canWrite = true }: DetailDataTableProps) {
     const t = useTranslations("MaintenanceDashboard")
 
     const getReportCauseIcon = (lampCase: string) => {
@@ -239,6 +264,7 @@ export function DetailDataTable({ data, detailId }: DetailDataTableProps) {
                             index={index}
                             getReportCauseIcon={getReportCauseIcon}
                             detailId={detailId}
+                            canWrite={canWrite}
                         />
                     ))}
                 </TableBody>

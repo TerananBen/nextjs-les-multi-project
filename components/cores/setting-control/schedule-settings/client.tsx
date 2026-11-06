@@ -32,6 +32,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
+import { usePermission } from "@/components/providers/permission-provider"
 
 interface ScheduleSettingsClientProps {
     versionLightSensor: string
@@ -39,6 +40,9 @@ interface ScheduleSettingsClientProps {
 
 export function ScheduleSettingsClient({ versionLightSensor }: ScheduleSettingsClientProps) {
     const t = useTranslations("ScheduleSettings")
+    const { getPermission } = usePermission()
+    const { writable: canManage } = getPermission("V_SettingSchedule")
+
     const [data, setData] = React.useState<ScheduleItem[]>([])
     const [groups, setGroups] = React.useState<DeviceGroup[]>([])
     const [loading, setLoading] = React.useState(true)
@@ -72,7 +76,8 @@ export function ScheduleSettingsClient({ versionLightSensor }: ScheduleSettingsC
             setOpenDeleteDialog(true)
         },
         onFeedback: (item) => {
-            setResponseScheduleCode(item.groupCode) // Using groupCode as code_name as per API requirement usually
+            const groupCode = item.GROUP_CODE || item.group_code || item.groupCode || item.code_name || ""
+            setResponseScheduleCode(groupCode)
             setResponseScheduleName(item.scheduleName)
             setResponseTypeSchedule(item.typeSchedule)
             setOpenResponseDialog(true)
@@ -101,16 +106,25 @@ export function ScheduleSettingsClient({ versionLightSensor }: ScheduleSettingsC
     }, [fetchData])
 
     const handleAdd = () => {
+        if (!canManage) {
+            toast.error(t("permissionDenied"))
+            return
+        }
         setSelectedSchedule(null) // Ensure we are in "Add" mode
         setOpenDialog(true)
     }
 
     const handleDeleteConfirm = async () => {
+        if (!canManage) {
+            toast.error(t("permissionDenied"))
+            return
+        }
         if (!scheduleToDelete) return
 
         setIsDeleting(true)
         try {
-            const result = await deleteScheduleAction(scheduleToDelete.groupCode)
+            const code = scheduleToDelete.GROUP_CODE || scheduleToDelete.group_code || scheduleToDelete.groupCode || scheduleToDelete.code_name || ""
+            const result = await deleteScheduleAction(code)
             if (result.success) {
                 toast.success(t("deleteDialog.success"))
                 setOpenDeleteDialog(false)
@@ -207,7 +221,11 @@ export function ScheduleSettingsClient({ versionLightSensor }: ScheduleSettingsC
                     {/* Add Schedule Button */}
                     <Button
                         onClick={handleAdd}
-                        className="cursor-pointer shrink-0 h-9 px-4 text-sm font-medium shadow-2xs"
+                        disabled={!canManage}
+                        className={cn(
+                            "cursor-pointer shrink-0 h-9 px-4 text-sm font-medium shadow-2xs",
+                            !canManage && "opacity-50 cursor-not-allowed"
+                        )}
                     >
                         <Plus className="mr-1.5 h-4 w-4" />
                         {t("buttons.add")}
@@ -317,7 +335,7 @@ export function ScheduleSettingsClient({ versionLightSensor }: ScheduleSettingsC
 
             <EditScheduleDialog
                 versionLightSensor={versionLightSensor}
-                open={openDialog}
+                open={openDialog && canManage}
                 onOpenChange={setOpenDialog}
                 schedule={selectedSchedule}
                 groups={groups}
@@ -332,7 +350,7 @@ export function ScheduleSettingsClient({ versionLightSensor }: ScheduleSettingsC
                 typeSchedule={responseTypeSchedule}
             />
 
-            <AlertDialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
+            <AlertDialog open={openDeleteDialog && canManage} onOpenChange={setOpenDeleteDialog}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>

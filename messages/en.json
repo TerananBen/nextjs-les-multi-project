@@ -36,6 +36,7 @@
       "mapGlobal": "Map Global",
       "personal": "Personal",
       "menuSettings": "Menu Settings",
+      "projectPermissionsApi": "Projects, Permissions & API",
       "apiSettings": "API Settings",
       "scheduleSettings": "Schedule Settings",
       "streetLight": "Street Light",
@@ -191,6 +192,9 @@
   "Personal": {
     "title": "Personal Management",
     "subtitle": "Manage users, roles, and access permissions.",
+    "noAccess": "You do not have permission to access this page",
+    "noPermission": "No permission to edit settings",
+    "permissionDenied": "Permission Denied",
     "searchPlaceholder": "Search name, username, email...",
     "addUser": "Add User",
     "filter": {
@@ -216,6 +220,7 @@
       "active": "Active",
       "disabled": "Disabled",
       "actions": "Actions",
+      "permissionDenied": "Permission Denied",
       "more": "more",
       "allRoles": "All Roles",
       "projectsCount": "projects",
@@ -313,7 +318,7 @@
   },
   "GroupDashboard": {
     "filter": {
-      "allGroups": "All Groups",
+      "allGroups": "ALL",
       "searchLabel": "Search :",
       "selectGroupPlaceholder": "-- Select Group --",
       "searchGroupPlaceholder": "Search group...",
@@ -389,7 +394,7 @@
       "group": "Group",
       "imsi": "Device ID (IMSI)",
       "streetLightName": "Lamp Name",
-      "all": "All",
+      "all": "ALL",
       "search": "Search",
       "noResult": "No results found"
     },
@@ -413,7 +418,8 @@
       "govName": "Gov Name:",
       "mode": "Mode:",
       "failedToLoadDetailedData": "Failed to load detailed data.",
-      "retry": "Retry"
+      "retry": "Retry",
+      "navigate": "Directions"
     },
     "serviceStatus": {
       "on": "On",
@@ -784,6 +790,8 @@
     "rowsPerPage": "Rows per page :",
     "loading": "Loading...",
     "noData": "No data",
+    "noAccess": "You do not have permission to access this page",
+    "permissionDenied": "Permission denied",
     "filter": {
       "startDate": "Start from :",
       "endDate": "To :",
@@ -889,6 +897,7 @@
       "deleteCancelled": "Delete cancelled",
       "actionSuccess": "Action updated successfully",
       "actionError": "Failed to update action",
+      "permissionDenied": "Permission denied",
       "close": "Close"
     }
   },
@@ -898,6 +907,8 @@
     "rowsPerPage": "Rows per page :",
     "loading": "Loading...",
     "noData": "No data available.",
+    "noAccess": "You do not have permission to access this page",
+    "permissionDenied": "Permission denied",
     "table": {
       "listName": "List Name",
       "operatorName": "Operator Name",
@@ -908,6 +919,7 @@
       "confirmStatus": "Status",
       "confirmed": "Confirmed",
       "pending": "Pending",
+      "permissionDenied": "Permission denied",
       "index": "#"
     },
     "kpi": {
@@ -950,6 +962,8 @@
     "rowsPerPage": "Rows per page :",
     "loading": "Loading...",
     "noData": "No Data",
+    "noAccess": "You do not have permission to access this page",
+    "permissionDenied": "Permission denied",
     "searchPlaceholder": "Search by menu name...",
     "selectRole": "Select Role",
     "reset": "Reset Filters",
@@ -1016,6 +1030,7 @@
   },
   "ScheduleSettings": {
     "title": "Schedule Settings",
+    "permissionDenied": "Permission Denied",
     "kpi": {
       "totalSchedules": "Total Schedules",
       "timeSchedules": "Time-based",
@@ -1035,7 +1050,8 @@
       "feedback": "Feedback",
       "delete": "Delete",
       "groups": "Groups",
-      "actions": "More Options"
+      "actions": "More Options",
+      "permissionDenied": "Permission Denied"
     },
     "types": {
       "time": "Time Schedule",
@@ -1053,6 +1069,7 @@
     "dialog": {
       "title": "Edit Schedule",
       "addTitle": "Add Schedule",
+      "permissionDenied": "Permission Denied",
       "scheduleNameLabel": "Schedule Name",
       "scheduleNamePlaceholder": "Enter schedule name...",
       "addGroup": "Add Group",
@@ -1109,6 +1126,7 @@
     },
     "responseDialog": {
       "title": "Response Status",
+      "permissionDenied": "Permission Denied",
       "loading": "Loading response data...",
       "description": "Feedback response status",
       "table": {
@@ -1123,6 +1141,7 @@
       },
       "close": "Close",
       "reload": "Reload",
+      "reloadSuccess": "Data reloaded successfully",
       "resendSuccess": "Resend command successfully",
       "resendFailed": "Resend command failed",
       "resendError": "Error resending command",
@@ -1140,6 +1159,8 @@
     "rowsPerPage": "Rows per page :",
     "loading": "Loading...",
     "noData": "No data.",
+    "noAccess": "You do not have permission to access this page",
+    "permissionDenied": "Permission denied",
     "buttons": {
       "add": "Add Maintenance Task"
     },
@@ -1152,7 +1173,8 @@
       "all": "All",
       "detail": "Detail",
       "status": "Status",
-      "delete": "Delete"
+      "delete": "Delete",
+      "permissionDenied": "Permission denied"
     },
     "status": {
       "pending": "Not Confirmed",
@@ -1186,7 +1208,8 @@
       "loadDataError": "Failed to load data",
       "pendingRepairs": "Pending repairs remaining: {count}",
       "confirmSuccess": "Maintenance task status updated successfully",
-      "confirmError": "Failed to update maintenance task status"
+      "confirmError": "Failed to update maintenance task status",
+      "permissionDenied": "Permission denied"
     },
     "map": {
       "reportIssue": "Report Issue"
@@ -1248,6 +1271,8 @@
     "searchPlaceholder": "Search by ID, name, or domain...",
     "addProject": "Add Project",
     "noData": "No Data",
+    "noAccess": "You do not have permission to access this page",
+    "permissionDenied": "Permission denied",
     "filter": {
       "allColors": "All Theme Colors",
       "allStatus": "All OTP Statuses",
@@ -1269,6 +1294,7 @@
       "edit": "Edit",
       "delete": "Delete",
       "actions": "Actions",
+      "permissionDenied": "Permission denied",
       "loading": "Loading...",
       "rowsPerPage": "Rows per page :"
     },
@@ -1321,5 +1347,15 @@
       "errorGeneric": "An unexpected error occurred",
       "permissionDenied": "Permission denied"
     }
+  },
+  "ProjectPermissionsApi": {
+    "title": "Projects, Permissions & API",
+    "description": "Manage project configurations, menu permissions, and API menu versions",
+    "tabs": {
+      "projects": "Projects",
+      "permissions": "Menu Permissions",
+      "apiSettings": "API Settings"
+    },
+    "noAccess": "You do not have permission to access this page"
   }
 }

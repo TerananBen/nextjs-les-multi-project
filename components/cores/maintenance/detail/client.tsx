@@ -10,8 +10,9 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, RotateCcw, X, Wrench, Lightbulb, CheckCircle2, Clock } from "lucide-react"
+import { Search, RotateCcw, X, Wrench, Lightbulb, CheckCircle2, Clock, ShieldAlert } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { usePermission } from "@/components/providers/permission-provider"
 
 interface MaintenanceDetailClientProps {
     initialData: MaintenanceDetailListRecord[]
@@ -35,6 +36,17 @@ export function MaintenanceDetailClient({
     googleMapsApiKey
 }: MaintenanceDetailClientProps) {
     const t = useTranslations("MaintenanceDetail")
+    const { getPermission, permissions } = usePermission()
+
+    const perm = React.useMemo(() => {
+        if (!permissions.length) return { readable: true, writable: true, control: true }
+        return getPermission("maintenance_list")
+    }, [getPermission, permissions])
+
+    const isReadable = perm.readable
+    const canWrite = perm.writable
+    const canControl = perm.control
+
     const [selectedDetailId, setSelectedDetailId] = React.useState<string | null>(null)
     const columns = useMaintenanceDetailColumns(setSelectedDetailId)
 
@@ -91,6 +103,15 @@ export function MaintenanceDetailClient({
         setSearchQuery("")
         setStatusFilter("ALL")
         setOperatorFilter("ALL")
+    }
+
+    if (!isReadable) {
+        return (
+            <div className="flex flex-1 flex-col items-center justify-center min-h-[400px] gap-3 text-muted-foreground">
+                <ShieldAlert className="h-12 w-12 text-muted-foreground/60" />
+                <p className="text-base font-medium">{t("noAccess", { defaultMessage: "คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้" })}</p>
+            </div>
+        )
     }
 
     return (
@@ -250,6 +271,8 @@ export function MaintenanceDetailClient({
                 iconScale={iconScale || "1"}
                 googleMapsApiKey={googleMapsApiKey}
                 detailId={selectedDetailId}
+                canWrite={canWrite}
+                canControl={canControl}
                 onClose={() => setSelectedDetailId(null)}
             />
         </div>

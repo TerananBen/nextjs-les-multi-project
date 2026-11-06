@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Search, Plus, X } from "lucide-react"
+import { Search, Plus, X, ShieldAlert } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
@@ -60,8 +60,16 @@ interface ProjectClientProps {
 export function ProjectClient({ initialData }: ProjectClientProps) {
     const router = useRouter()
     const t = useTranslations("ProjectSettings")
-    const { getPermission } = usePermission()
-    const { writable: canWrite, control: canControl } = getPermission("system_project")
+    const { getPermission, permissions } = usePermission()
+
+    const perm = React.useMemo(() => {
+        if (!permissions.length) return { readable: true, writable: true, control: true }
+        return getPermission("system_project")
+    }, [getPermission, permissions])
+
+    const canWrite = perm.writable
+    const canControl = perm.control
+    const isReadable = perm.readable
 
     const [data, setData] = React.useState<ProjectConfig[]>(initialData)
     const [searchQuery, setSearchQuery] = React.useState("")
@@ -107,22 +115,31 @@ export function ProjectClient({ initialData }: ProjectClientProps) {
     }, [data, searchQuery, colorFilter, otpFilter])
 
     const handleEdit = React.useCallback((project: ProjectConfig) => {
-        if (!canWrite) return
+        if (!canWrite) {
+            toast.error(t("messages.permissionDenied"))
+            return
+        }
         setEditingProject(project)
         setIsEditOpen(true)
-    }, [canWrite])
+    }, [canWrite, t])
 
     const handleAdd = React.useCallback(() => {
-        if (!canWrite) return
+        if (!canWrite) {
+            toast.error(t("messages.permissionDenied"))
+            return
+        }
         setEditingProject(null)
         setIsEditOpen(true)
-    }, [canWrite])
+    }, [canWrite, t])
 
     const handleDeleteClick = React.useCallback((project: ProjectConfig) => {
-        if (!canControl) return
+        if (!canControl) {
+            toast.error(t("messages.permissionDenied"))
+            return
+        }
         setDeletingProject(project)
         setIsDeleteOpen(true)
-    }, [canControl])
+    }, [canControl, t])
 
     const handleSave = async (values: SaveProjectPayload) => {
         if (!canWrite) {
@@ -202,6 +219,15 @@ export function ProjectClient({ initialData }: ProjectClientProps) {
         [t, handleEdit, handleDeleteClick, canWrite, canControl]
     )
 
+    if (!isReadable) {
+        return (
+            <div className="flex flex-1 flex-col items-center justify-center min-h-[400px] gap-3 text-muted-foreground">
+                <ShieldAlert className="h-12 w-12 text-muted-foreground/60" />
+                <p className="text-base font-medium">{t("noAccess", { defaultValue: "You do not have permission to access this page" })}</p>
+            </div>
+        )
+    }
+
     return (
         <div className="flex flex-1 flex-col gap-3 w-full h-full">
             {/* Header Toolbar: Compact Container */}
@@ -261,13 +287,18 @@ export function ProjectClient({ initialData }: ProjectClientProps) {
                     </div>
 
                     {/* Right: Actions */}
-                    {canWrite && (
-                        <div className="flex items-center justify-end shrink-0 w-full md:w-auto">
-                            <Button onClick={handleAdd} className="cursor-pointer h-9 px-3.5 text-xs font-medium shadow-2xs w-full md:w-auto">
-                                <Plus className="mr-1.5 h-4 w-4" /> {t("addProject")}
-                            </Button>
-                        </div>
-                    )}
+                    <div className="flex items-center justify-end shrink-0 w-full md:w-auto">
+                        <Button
+                            onClick={handleAdd}
+                            disabled={!canWrite}
+                            className={cn(
+                                "cursor-pointer shrink-0 h-9 px-3.5 text-xs font-medium shadow-2xs w-full md:w-auto",
+                                !canWrite && "opacity-50 cursor-not-allowed"
+                            )}
+                        >
+                            <Plus className="mr-1.5 h-4 w-4" /> {t("addProject")}
+                        </Button>
+                    </div>
                 </div>
             </div>
 
@@ -277,7 +308,7 @@ export function ProjectClient({ initialData }: ProjectClientProps) {
             </div>
 
             {/* Create/Edit Dialog */}
-            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+            <Dialog open={isEditOpen && canWrite} onOpenChange={setIsEditOpen}>
                 <DialogContent className="sm:max-w-[550px] max-h-[85vh] p-0 gap-0 overflow-hidden flex flex-col">
                     <DialogHeader className="px-6 pt-5 pb-3 border-b border-border/40 shrink-0">
                         <DialogTitle>{editingProject ? t("form.editTitle") : t("form.addTitle")}</DialogTitle>
@@ -295,7 +326,7 @@ export function ProjectClient({ initialData }: ProjectClientProps) {
             </Dialog>
 
             {/* Delete Confirmation Alert */}
-            <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+            <AlertDialog open={isDeleteOpen && canControl} onOpenChange={setIsDeleteOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>{t("form.deleteTitle")}</AlertDialogTitle>

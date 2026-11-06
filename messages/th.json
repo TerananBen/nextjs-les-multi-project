@@ -36,6 +36,7 @@
       "mapGlobal": "แผนที่ทั่วโลก",
       "personal": "จัดการบุคลากร",
       "menuSettings": "ตั้งค่าเมนู",
+      "projectPermissionsApi": "โปรเจกต์, สิทธิ์ และ API",
       "apiSettings": "ตั้งค่า API",
       "scheduleSettings": "ตั้งค่าตารางเวลา",
       "streetLight": "โคมไฟถนน",
@@ -191,6 +192,9 @@
   "Personal": {
     "title": "การจัดการบุคลากร",
     "subtitle": "จัดการผู้ใช้ บทบาท และสิทธิ์การเข้าถึง",
+    "noAccess": "คุณไม่มีสิทธิ์เข้าถึงหน้านี้",
+    "noPermission": "ไม่มีสิทธิ์แก้ไขข้อมูล",
+    "permissionDenied": "ไม่ได้รับอนุญาต",
     "searchPlaceholder": "ค้นหาชื่อ, นามสกุล, ชื่อผู้ใช้...",
     "addUser": "เพิ่มผู้ใช้งาน",
     "filter": {
@@ -216,6 +220,7 @@
       "active": "ใช้งาน",
       "disabled": "ปิดใช้งาน",
       "actions": "ตัวเลือกเพิ่มเติม",
+      "permissionDenied": "ไม่ได้รับอนุญาต",
       "more": "อื่นๆ",
       "allRoles": "บทบาททั้งหมด",
       "projectsCount": "โปรเจกต์",
@@ -313,7 +318,7 @@
   },
   "GroupDashboard": {
     "filter": {
-      "allGroups": "ทุกกลุ่ม",
+      "allGroups": "ALL",
       "searchLabel": "ค้นหา :",
       "selectGroupPlaceholder": "-- เลือกกลุ่ม --",
       "searchGroupPlaceholder": "ค้นหากลุ่ม...",
@@ -389,7 +394,7 @@
       "group": "กลุ่ม",
       "imsi": "เลขอุปกรณ์ (IMSI)",
       "streetLightName": "ชื่อโคม",
-      "all": "ทั้งหมด",
+      "all": "ALL",
       "search": "ค้นหา",
       "noResult": "ไม่พบข้อมูล"
     },
@@ -413,7 +418,8 @@
       "govName": "ครุภัณฑ์ :",
       "mode": "โหมด :",
       "failedToLoadDetailedData": "ไม่สามารถโหลดข้อมูลรายละเอียดได้",
-      "retry": "ลองอีกครั้ง"
+      "retry": "ลองอีกครั้ง",
+      "navigate": "นำทาง"
     },
     "serviceStatus": {
       "on": "เปิด",
@@ -785,6 +791,8 @@
     "rowsPerPage": "แถวต่อหน้า :",
     "loading": "กำลังโหลด...",
     "noData": "ไม่พบข้อมูล",
+    "noAccess": "คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้",
+    "permissionDenied": "ไม่มีสิทธิ์ในการดำเนินการนี้",
     "filter": {
       "startDate": "เริ่มต้น :",
       "endDate": "ถึง :",
@@ -890,6 +898,7 @@
       "deleteCancelled": "ยกเลิกการลบ",
       "actionSuccess": "อัปเดตการดำเนินการสำเร็จ",
       "actionError": "อัปเดตการดำเนินการไม่สำเร็จ",
+      "permissionDenied": "ไม่มีสิทธิ์ในการดำเนินการนี้",
       "close": "ปิด"
     }
   },
@@ -899,6 +908,8 @@
     "rowsPerPage": "แถวต่อหน้า :",
     "loading": "กำลังโหลด...",
     "noData": "ไม่พบข้อมูล",
+    "noAccess": "คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้",
+    "permissionDenied": "ไม่มีสิทธิ์ในการดำเนินการนี้",
     "table": {
       "listName": "ชื่อรายการ",
       "operatorName": "ชื่อหัวหน้าช่าง",
@@ -909,6 +920,7 @@
       "confirmStatus": "ยืนยันการซ่อม",
       "confirmed": "ยืนยันแล้ว",
       "pending": "รอยืนยัน",
+      "permissionDenied": "ไม่มีสิทธิ์ในการดำเนินการนี้",
       "index": "ลำดับ"
     },
     "kpi": {
@@ -951,6 +963,8 @@
     "rowsPerPage": "แถวต่อหน้า :",
     "loading": "กำลังโหลด...",
     "noData": "ไม่พบข้อมูล",
+    "noAccess": "คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้",
+    "permissionDenied": "ไม่มีสิทธิ์ในการดำเนินการนี้",
     "searchPlaceholder": "ค้นหาด้วยชื่อเมนู...",
     "selectRole": "เลือกสิทธิ์การใช้งาน",
     "reset": "ล้างตัวกรอง",
@@ -1018,6 +1032,7 @@
   },
   "ScheduleSettings": {
     "title": "ตั้งค่าตารางเวลา",
+    "permissionDenied": "ไม่ได้รับอนุญาต",
     "kpi": {
       "totalSchedules": "ตารางเวลาทั้งหมด",
       "timeSchedules": "ทำงานตามเวลา",
@@ -1037,7 +1052,8 @@
       "feedback": "การตอบกลับ",
       "delete": "ลบ",
       "groups": "กลุ่มอุปกรณ์",
-      "actions": "ตัวเลือกเพิ่มเติม"
+      "actions": "ตัวเลือกเพิ่มเติม",
+      "permissionDenied": "ไม่ได้รับอนุญาต"
     },
     "types": {
       "time": "ทำงานตามเวลา",
@@ -1055,6 +1071,7 @@
     "dialog": {
       "title": "รายละเอียดการตั้งค่า",
       "addTitle": "เพิ่มการตั้งค่า",
+      "permissionDenied": "ไม่ได้รับอนุญาต",
       "scheduleNameLabel": "ชื่อการตั้งค่า",
       "scheduleNamePlaceholder": "กรอกชื่อการตั้งค่า...",
       "addGroup": "เพิ่มกลุ่ม",
@@ -1113,6 +1130,7 @@
     },
     "responseDialog": {
       "title": "สถานะการตอบกลับ",
+      "permissionDenied": "ไม่ได้รับอนุญาต",
       "loading": "กำลังโหลดข้อมูล...",
       "description": "สถานะการตอบกลับ",
       "table": {
@@ -1127,6 +1145,7 @@
       },
       "close": "ปิด",
       "reload": "รีโหลด",
+      "reloadSuccess": "รีโหลดข้อมูลสำเร็จ",
       "resendSuccess": "ส่งคำสั่งซ้ำสำเร็จ",
       "resendFailed": "ส่งคำสั่งซ้ำไม่สำเร็จ",
       "resendError": "เกิดข้อผิดพลาดในการส่งคำสั่งซ้ำ",
@@ -1144,6 +1163,8 @@
     "rowsPerPage": "แถวต่อหน้า :",
     "loading": "กำลังโหลด...",
     "noData": "ไม่พบข้อมูล",
+    "noAccess": "คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้",
+    "permissionDenied": "ไม่มีสิทธิ์ในการดำเนินการนี้",
     "buttons": {
       "add": "เพิ่มรายการแจ้งซ่อม"
     },
@@ -1156,7 +1177,8 @@
       "all": "ทั้งหมด",
       "detail": "รายละเอียด",
       "status": "ยืนยันการซ่อม",
-      "delete": "ลบรายการ"
+      "delete": "ลบรายการ",
+      "permissionDenied": "ไม่มีสิทธิ์ในการดำเนินการนี้"
     },
     "status": {
       "pending": "ยังไม่ยืนยัน",
@@ -1190,7 +1212,8 @@
       "loadDataError": "โหลดข้อมูลไม่สำเร็จ",
       "pendingRepairs": "ยังมีโคมรอซ่อมอีก {count} รายการ",
       "confirmSuccess": "อัปเดตสถานะการซ่อมบำรุงสำเร็จ",
-      "confirmError": "เกิดข้อผิดพลาดในการอัปเดตสถานะ"
+      "confirmError": "เกิดข้อผิดพลาดในการอัปเดตสถานะ",
+      "permissionDenied": "ไม่มีสิทธิ์ในการดำเนินการนี้"
     },
     "map": {
       "reportIssue": "แจ้งซ่อม"
@@ -1252,6 +1275,8 @@
     "searchPlaceholder": "ค้นหาด้วยรหัส, ชื่อ, หรือโดเมน...",
     "addProject": "เพิ่มโปรเจกต์",
     "noData": "ไม่พบข้อมูล",
+    "noAccess": "คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้",
+    "permissionDenied": "ไม่มีสิทธิ์ในการดำเนินการนี้",
     "filter": {
       "allColors": "ทุกสีธีม",
       "allStatus": "ทุกสถานะ OTP",
@@ -1273,6 +1298,7 @@
       "edit": "แก้ไข",
       "delete": "ลบ",
       "actions": "ตัวเลือกเพิ่มเติม",
+      "permissionDenied": "ไม่มีสิทธิ์ในการดำเนินการนี้",
       "loading": "กำลังโหลด...",
       "rowsPerPage": "แถวต่อหน้า :"
     },
@@ -1325,5 +1351,15 @@
       "errorGeneric": "เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง",
       "permissionDenied": "ไม่มีสิทธิ์ในการดำเนินการนี้"
     }
+  },
+  "ProjectPermissionsApi": {
+    "title": "โปรเจกต์, สิทธิ์ และ API",
+    "description": "จัดการข้อมูลโปรเจกต์ สิทธิ์การเข้าถึงเมนู และการเชื่อมต่อเวอร์ชัน API",
+    "tabs": {
+      "projects": "รายชื่อโปรเจกต์",
+      "permissions": "สิทธิ์การเข้าถึงเมนู",
+      "apiSettings": "ตั้งค่า API"
+    },
+    "noAccess": "คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้"
   }
 }

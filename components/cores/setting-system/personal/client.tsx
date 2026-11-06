@@ -2,12 +2,12 @@
 
 import * as React from "react"
 
-
-import { Search, Plus, X, Calendar as CalendarIcon } from "lucide-react"
+import { Search, Plus, X, Calendar as CalendarIcon, ShieldAlert } from "lucide-react"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { format } from "date-fns"
+import { usePermission } from "@/components/providers/permission-provider"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -61,6 +61,16 @@ export function PersonalClient({
 }: PersonalClientProps) {
     const router = useRouter()
     const t = useTranslations('Personal')
+    const { getPermission, permissions } = usePermission()
+
+    const perm = React.useMemo(() => {
+        if (!permissions.length) return { readable: true, writable: true, control: true }
+        return getPermission("system_personal")
+    }, [getPermission, permissions])
+
+    const isReadable = isSuperAdmin || perm.readable
+    const isWritable = isSuperAdmin || perm.writable
+
     const [data, setData] = React.useState<PersonalItem[]>(initialData)
 
     // Project Map lookup for columns and badges
@@ -233,27 +243,47 @@ export function PersonalClient({
     }, [data, searchQuery, projectFilter, roleFilter, statusFilter, selectedDate, isSuperAdmin, currentProjectId, projects])
 
     const handleEdit = React.useCallback((personal: PersonalItem) => {
+        if (!isWritable) {
+            toast.error(t('permissionDenied'))
+            return
+        }
         setEditingPersonal(personal)
         setIsEditOpen(true)
-    }, [])
+    }, [isWritable, t])
 
     const handleAdd = React.useCallback(() => {
+        if (!isWritable) {
+            toast.error(t('permissionDenied'))
+            return
+        }
         setEditingPersonal(null)
         setIsEditOpen(true)
-    }, [])
+    }, [isWritable, t])
 
     const handleDeleteClick = React.useCallback((personal: PersonalItem) => {
+        if (!isWritable) {
+            toast.error(t('permissionDenied'))
+            return
+        }
         setDeletingPersonal(personal)
         setIsDeleteOpen(true)
-    }, [])
+    }, [isWritable, t])
 
     const handleToggleStatus = React.useCallback((personal: PersonalItem) => {
+        if (!isWritable) {
+            toast.error(t('permissionDenied'))
+            return
+        }
         setPersonalToToggle(personal)
         setIsStatusConfirmOpen(true)
-    }, [])
+    }, [isWritable, t])
 
     const handleConfirmToggleStatus = async () => {
         if (!personalToToggle) return
+        if (!isWritable) {
+            toast.error(t('permissionDenied'))
+            return
+        }
 
         setIsLoading(true)
         try {
@@ -275,6 +305,10 @@ export function PersonalClient({
     }
 
     const handleSave = async (values: PersonalFormValues) => {
+        if (!isWritable) {
+            toast.error(t('permissionDenied'))
+            return
+        }
         setIsLoading(true)
         try {
             const isSuperAdminForm = values.access_level === "SUPER_ADMIN"
@@ -311,6 +345,10 @@ export function PersonalClient({
 
     const handleDeleteConfirm = async () => {
         if (!deletingPersonal) return
+        if (!isWritable) {
+            toast.error(t('permissionDenied'))
+            return
+        }
 
         setIsLoading(true)
         try {
@@ -338,9 +376,10 @@ export function PersonalClient({
                     onToggleStatus: handleToggleStatus,
                 },
                 t,
-                projectMap
+                projectMap,
+                isWritable
             ),
-        [t, handleEdit, handleDeleteClick, handleToggleStatus, projectMap]
+        [t, handleEdit, handleDeleteClick, handleToggleStatus, projectMap, isWritable]
     )
 
     const dateButtonLabel = React.useMemo(() => {
@@ -349,6 +388,15 @@ export function PersonalClient({
         }
         return format(selectedDate, "dd/MM/yyyy")
     }, [selectedDate, t])
+
+    if (!isReadable) {
+        return (
+            <div className="flex flex-1 flex-col items-center justify-center min-h-[400px] gap-3 text-muted-foreground">
+                <ShieldAlert className="h-12 w-12 text-muted-foreground/60" />
+                <p className="text-base font-medium">{t("noAccess", { defaultValue: "You do not have permission to access this page" })}</p>
+            </div>
+        )
+    }
 
     return (
         <div className="flex flex-1 flex-col gap-3 w-full h-full">
@@ -468,7 +516,14 @@ export function PersonalClient({
                         )}
                     </div>
 
-                    <Button onClick={handleAdd} className="cursor-pointer shrink-0 h-9 px-4 text-xs font-medium shadow-2xs w-full sm:w-auto">
+                    <Button
+                        onClick={handleAdd}
+                        disabled={!isWritable}
+                        className={cn(
+                            "cursor-pointer shrink-0 h-9 px-4 text-xs font-medium shadow-2xs w-full sm:w-auto",
+                            !isWritable && "opacity-50 cursor-not-allowed"
+                        )}
+                    >
                         <Plus className="mr-1.5 h-4 w-4" /> {t('addUser')}
                     </Button>
                 </div>
@@ -480,7 +535,7 @@ export function PersonalClient({
             </div>
 
             {/* Edit/Add Modal */}
-            <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+            <Dialog open={isEditOpen && isWritable} onOpenChange={setIsEditOpen}>
                 <DialogContent className="sm:max-w-[550px] max-h-[85vh] p-0 gap-0 overflow-hidden flex flex-col">
                     <DialogHeader className="px-6 pt-5 pb-3 border-b border-border/40 shrink-0">
                         <DialogTitle>{editingPersonal ? t('form.editTitle') : t('form.addTitle')}</DialogTitle>
@@ -500,12 +555,13 @@ export function PersonalClient({
                         onSubmit={handleSave}
                         onCancel={() => setIsEditOpen(false)}
                         isLoading={isLoading}
+                        isWritable={isWritable}
                     />
                 </DialogContent>
             </Dialog>
 
             {/* Delete Confirmation Modal */}
-            <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
+            <AlertDialog open={isDeleteOpen && isWritable} onOpenChange={setIsDeleteOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>{t('form.deleteTitle')}</AlertDialogTitle>
@@ -530,7 +586,7 @@ export function PersonalClient({
             </AlertDialog>
 
             {/* Status Change Confirmation Modal */}
-            <AlertDialog open={isStatusConfirmOpen} onOpenChange={setIsStatusConfirmOpen}>
+            <AlertDialog open={isStatusConfirmOpen && isWritable} onOpenChange={setIsStatusConfirmOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>{t('form.statusTitle')}</AlertDialogTitle>

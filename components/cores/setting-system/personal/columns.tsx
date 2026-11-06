@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { ArrowUpDown, MoreHorizontal, Edit, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 
 export type PersonalColumnActions = {
     onEdit: (personal: PersonalItem) => void
@@ -31,7 +32,8 @@ export const getColumns = (
         onToggleStatus,
     }: PersonalColumnActions,
     t: (key: string) => string,
-    projectMap?: Map<string, string>
+    projectMap?: Map<string, string>,
+    isWritable: boolean = true
 ): ColumnDef<PersonalItem>[] => {
     const cols: ColumnDef<PersonalItem>[] = [
         {
@@ -217,10 +219,14 @@ export const getColumns = (
                         <Badge
                             variant={isUsable ? "default" : "secondary"}
                             className={cn(
-                                "text-xs font-normal cursor-pointer",
+                                "text-xs font-normal",
+                                isWritable ? "cursor-pointer" : "cursor-not-allowed opacity-60",
                                 isUsable && "bg-emerald-600 hover:bg-emerald-700 text-white border-transparent"
                             )}
-                            onClick={() => onToggleStatus(row.original)}
+                            onClick={() => {
+                                if (isWritable) onToggleStatus(row.original)
+                                else toast.error(t('table.permissionDenied') || t('permissionDenied'))
+                            }}
                         >
                             {isUsable ? t('table.active') : t('table.disabled')}
                         </Badge>
@@ -251,8 +257,15 @@ export const getColumns = (
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                                 <DropdownMenuItem
-                                    onClick={() => onEdit(row.original)}
-                                    className="cursor-pointer"
+                                    onClick={() => {
+                                        if (isWritable) onEdit(row.original)
+                                        else toast.error(t('table.permissionDenied') || t('permissionDenied'))
+                                    }}
+                                    disabled={!isWritable}
+                                    className={cn(
+                                        "cursor-pointer",
+                                        !isWritable && "opacity-50 cursor-not-allowed"
+                                    )}
                                 >
                                     <Edit className="mr-2 h-4 w-4" />
                                     {t('table.edit')}
@@ -260,8 +273,15 @@ export const getColumns = (
                                 {!isSuperAdminUser && (
                                     <DropdownMenuItem
                                         variant="destructive"
-                                        onClick={() => onDelete(row.original)}
-                                        className="cursor-pointer text-destructive focus:text-destructive"
+                                        onClick={() => {
+                                            if (isWritable) onDelete(row.original)
+                                            else toast.error(t('table.permissionDenied') || t('permissionDenied'))
+                                        }}
+                                        disabled={!isWritable}
+                                        className={cn(
+                                            "cursor-pointer text-destructive focus:text-destructive",
+                                            !isWritable && "opacity-50 cursor-not-allowed"
+                                        )}
                                     >
                                         <Trash2 className="mr-2 h-4 w-4 text-destructive" />
                                         {t('table.delete')}

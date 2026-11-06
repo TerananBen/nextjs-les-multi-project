@@ -19,10 +19,11 @@ import {
 import { Button } from "@/components/ui/button"
 import { useTranslations } from "next-intl"
 import { ScheduleResponseItem } from "@/types/schedule-settings"
-import { getScheduleResponseAction, setModeResendAction } from "@/app/actions/schedule-settings"
+import { getScheduleResponseAction, setModeResendAction, resendAllScheduleByGroupAction } from "@/app/actions/schedule-settings"
 import { Loader2, RefreshCw, RotateCw, Send, Info } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import { usePermission } from "@/components/providers/permission-provider"
 
 interface ResponseDialogProps {
     open: boolean
@@ -40,12 +41,16 @@ export function ResponseDialog({
     typeSchedule
 }: ResponseDialogProps) {
     const t = useTranslations("ScheduleSettings.responseDialog")
+    const { getPermission } = usePermission()
+    const { writable: canManage, control: canControl } = getPermission("V_SettingSchedule")
+    const canSend = canManage || canControl
+
     const [data, setData] = React.useState<ScheduleResponseItem[]>([])
     const [loading, setLoading] = React.useState(false)
     const [resendingImsi, setResendingImsi] = React.useState<string | null>(null)
     const [isResendingAll, setIsResendingAll] = React.useState(false)
 
-    const fetchData = React.useCallback(async () => {
+    const fetchData = React.useCallback(async (showToast = false) => {
         if (!codeName) return
 
         setLoading(true)
@@ -53,16 +58,25 @@ export function ResponseDialog({
             const result = await getScheduleResponseAction(codeName)
             if (result.result && Array.isArray(result.dataReturn)) {
                 setData(result.dataReturn as ScheduleResponseItem[])
+                if (showToast) {
+                    toast.success(t("reloadSuccess"))
+                }
             } else {
                 setData([])
+                if (showToast) {
+                    toast.info(t("noData"))
+                }
             }
         } catch (error) {
             console.error("Failed to fetch response data", error)
             setData([])
+            if (showToast) {
+                toast.error(t("resendError"))
+            }
         } finally {
             setLoading(false)
         }
-    }, [codeName])
+    }, [codeName, t])
 
     React.useEffect(() => {
         if (open && codeName) {
@@ -72,13 +86,20 @@ export function ResponseDialog({
 
     const handleResend = async (item: ScheduleResponseItem) => {
         if (!typeSchedule) return
+        if (!canSend) {
+            toast.error(t("permissionDenied"))
+            return
+        }
 
-        setResendingImsi(item.imsi)
+        const deviceImsi = item.imsi || item.SN || ""
+        setResendingImsi(deviceImsi)
         try {
             const payload = {
-                imsi: item.imsi,
-                mode: typeSchedule,
+                code_name: codeName || "",
+                imsi: deviceImsi,
                 last_update: item.last_update,
+                mode: typeSchedule,
+                wait_time: 20
             }
 
             const result = await setModeResendAction(payload)
@@ -108,7 +129,7 @@ export function ResponseDialog({
         return (
             <span
                 className={cn(
-                    "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border shadow-2xs",
+                    "inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border shadow-2xs",
                     isResponse
                         ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20"
                         : isWait
@@ -122,44 +143,33 @@ export function ResponseDialog({
     }
 
     const handleResendAll = async () => {
-        if (!typeSchedule || data.length === 0) return
-
-        const pendingItems = data.filter(item => item.status !== "respone")
-
-        if (pendingItems.length === 0) return
+        if (!codeName || !typeSchedule) return
+        if (!canSend) {
+            toast.error(t("permissionDenied"))
+            return
+        }
 
         setIsResendingAll(true)
-        let successCount = 0
-        let failCount = 0
-
         toast.loading(t("resendingAll"), { id: "resend-all-toast" })
 
         try {
-            for (const item of pendingItems) {
-                const payload = {
-                    imsi: item.imsi,
-                    mode: typeSchedule,
-                    last_update: item.last_update,
-                }
-
-                try {
-                    const result = await setModeResendAction(payload)
-                    if (result.success) {
-                        successCount++
-                    } else {
-                        failCount++
-                    }
-                } catch (error) {
-                    console.error(`Error resending to ${item.imsi}:`, error)
-                    failCount++
-                }
-            }
+            const result = await resendAllScheduleByGroupAction({
+                groupCode: codeName,
+                mode: typeSchedule,
+                waitTime: 20
+            })
 
             toast.dismiss("resend-all-toast")
-            toast.success(t("resendAllComplete", { success: successCount, failed: failCount }))
+
+            if (result.total === 0) {
+                toast.info(t("noData"))
+            } else if (result.success || result.successCount > 0) {
+                toast.success(t("resendAllComplete", { success: result.successCount, failed: result.failCount }))
+            } else {
+                toast.error(t("resendFailed") + (result.message ? `: ${result.message}` : ""))
+            }
 
             fetchData()
-
         } catch (error) {
             console.error("Error in resend all batch:", error)
             toast.dismiss("resend-all-toast")
@@ -195,8 +205,11 @@ export function ResponseDialog({
                             variant="default"
                             size="sm"
                             onClick={handleResendAll}
-                            disabled={loading || isResendingAll || !data.some(item => item.status !== "respone")}
-                            className="cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground shadow-2xs font-medium h-9"
+                            disabled={loading || isResendingAll || !canSend || !codeName}
+                            className={cn(
+                                "cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground shadow-2xs font-medium h-9",
+                                !canSend && "opacity-50 cursor-not-allowed"
+                            )}
                         >
                             {isResendingAll ? (
                                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -208,7 +221,7 @@ export function ResponseDialog({
                         <Button
                             variant="outline"
                             size="sm"
-                            onClick={fetchData}
+                            onClick={() => fetchData(true)}
                             disabled={loading || isResendingAll}
                             className="cursor-pointer shadow-2xs font-medium h-9"
                         >
@@ -228,18 +241,18 @@ export function ResponseDialog({
                             <Table>
                                 <TableHeader className="bg-muted/40">
                                     <TableRow className="hover:bg-transparent">
-                                        <TableHead className="font-semibold text-xs h-10 px-3">{t("table.imsi")}</TableHead>
-                                        <TableHead className="font-semibold text-xs h-10 px-3">{t("table.group")}</TableHead>
-                                        <TableHead className="font-semibold text-xs h-10 px-3 text-center">{t("table.status")}</TableHead>
-                                        <TableHead className="font-semibold text-xs h-10 px-3 text-center">{t("table.sendAgain")}</TableHead>
+                                        <TableHead className="font-semibold text-sm h-10 px-3">{t("table.imsi")}</TableHead>
+                                        <TableHead className="font-semibold text-sm h-10 px-3">{t("table.group")}</TableHead>
+                                        <TableHead className="font-semibold text-sm h-10 px-3 text-center">{t("table.status")}</TableHead>
+                                        <TableHead className="font-semibold text-sm h-10 px-3 text-center">{t("table.sendAgain")}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {data.length > 0 ? (
                                         data.map((item, index) => (
-                                            <TableRow key={index} className="hover:bg-muted/40 transition-colors">
-                                                <TableCell className="font-mono text-xs py-2.5 px-3">{item.imsi}</TableCell>
-                                                <TableCell className="text-xs py-2.5 px-3">
+                                            <TableRow key={item.SN || item.imsi || index} className="hover:bg-muted/40 transition-colors">
+                                                <TableCell className="font-mono text-sm py-2.5 px-3">{item.imsi}</TableCell>
+                                                <TableCell className="text-sm py-2.5 px-3">
                                                     {Array.isArray(item.group_name)
                                                         ? item.group_name.join(", ")
                                                         : item.group_name}
@@ -249,15 +262,21 @@ export function ResponseDialog({
                                                     <Button
                                                         size="icon"
                                                         variant="outline"
-                                                        className="cursor-pointer h-7 w-7 text-primary hover:bg-primary/10 border-primary/20 shadow-2xs"
-                                                        onClick={() => handleResend(item)}
-                                                        disabled={resendingImsi === item.imsi}
+                                                        className={cn(
+                                                            "cursor-pointer h-8 w-8 text-primary hover:bg-primary/10 border-primary/20 shadow-2xs",
+                                                            !canSend && "opacity-50 cursor-not-allowed"
+                                                        )}
+                                                        onClick={() => {
+                                                            if (canSend) handleResend(item)
+                                                            else toast.error(t("permissionDenied"))
+                                                        }}
+                                                        disabled={resendingImsi === (item.imsi || item.SN) || !canSend}
                                                         title={t("table.sendAgain")}
                                                     >
-                                                        {resendingImsi === item.imsi ? (
-                                                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                                        {resendingImsi === (item.imsi || item.SN) ? (
+                                                            <Loader2 className="h-4 w-4 animate-spin" />
                                                         ) : (
-                                                            <RefreshCw className="h-3.5 w-3.5" />
+                                                            <RefreshCw className="h-4 w-4" />
                                                         )}
                                                     </Button>
                                                 </TableCell>

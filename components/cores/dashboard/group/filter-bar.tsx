@@ -46,20 +46,32 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
     const locale = useLocale()
     const [selectedGroup, setSelectedGroup] = useState<string>(defaultGroupCode || "")
 
-    const allGroupsLabel = t("allGroups", { defaultValue: "ทุกกลุ่ม" })
+    const allGroupsLabel = t("allGroups", { defaultValue: "ALL" })
     const groupOptions = useMemo(() => {
-        if (!defaultGroupCode) return groups
-        const hasDefault = groups.some(g => g.group_code === defaultGroupCode)
-        if (hasDefault) return groups
-        return [
-            {
-                group_code: defaultGroupCode,
-                group_name: allGroupsLabel,
-                sub_district: "-",
-                total_rtu: "0"
-            },
-            ...groups
-        ]
+        const hasDefault = groups.some(g => (defaultGroupCode && g.group_code === defaultGroupCode) || g.group_name?.toUpperCase() === "ALL" || g.group_name === "ทุกกลุ่ม")
+        const rawList = hasDefault
+            ? groups.map(g => ((defaultGroupCode && g.group_code === defaultGroupCode) || g.group_name?.toUpperCase() === "ALL" || g.group_name === "ทุกกลุ่ม") ? { ...g, group_name: allGroupsLabel } : g)
+            : [
+                {
+                    group_code: defaultGroupCode || "ALL",
+                    group_name: allGroupsLabel,
+                    sub_district: "-",
+                    total_rtu: "0"
+                },
+                ...groups
+            ]
+
+        // Deduplicate by group_name to prevent duplicate select values and keys
+        const seen = new Set<string>()
+        const dedupedGroups: typeof rawList = []
+        for (const g of rawList) {
+            const nameKey = (g.group_name || "").trim().toUpperCase()
+            if (nameKey && !seen.has(nameKey)) {
+                seen.add(nameKey)
+                dedupedGroups.push(g)
+            }
+        }
+        return dedupedGroups
     }, [groups, defaultGroupCode, allGroupsLabel])
     const [selectedType, setSelectedType] = useState<string>("Month")
     // State for Week picker (Single Date) — default: any day in last week

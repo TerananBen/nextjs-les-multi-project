@@ -6,14 +6,24 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Eye, Trash2, CheckCircle2, Clock, ArrowUpDown } from "lucide-react"
 import { useTranslations } from "next-intl"
+import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 
 interface UseMaintenanceColumnsProps {
     onDetail: (item: MaintenanceConfigRecord) => void
     onStatusChange: (item: MaintenanceConfigRecord) => void
     onDelete: (item: MaintenanceConfigRecord) => void
+    canWrite?: boolean
+    canControl?: boolean
 }
 
-export const useMaintenanceColumns = ({ onDetail, onStatusChange, onDelete }: UseMaintenanceColumnsProps) => {
+export const useMaintenanceColumns = ({
+    onDetail,
+    onStatusChange,
+    onDelete,
+    canWrite = true,
+    canControl = true,
+}: UseMaintenanceColumnsProps) => {
     const t = useTranslations("MaintenanceConfig")
 
     const columns: ColumnDef<MaintenanceConfigRecord>[] = [
@@ -144,12 +154,20 @@ export const useMaintenanceColumns = ({ onDetail, onStatusChange, onDelete }: Us
                     <div className="flex justify-center">
                         <Badge
                             variant="outline"
-                            className={`cursor-pointer gap-1.5 py-1 px-3 font-medium transition-colors ${
+                            className={cn(
+                                "gap-1.5 py-1 px-3 font-medium transition-colors",
+                                canWrite ? "cursor-pointer" : "cursor-not-allowed opacity-60",
                                 isConfirmed
                                     ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20"
                                     : "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400 hover:bg-amber-500/20"
-                            }`}
-                            onClick={() => onStatusChange(row.original)}
+                            )}
+                            onClick={() => {
+                                if (canWrite) {
+                                    onStatusChange(row.original)
+                                } else {
+                                    toast.error(t("table.permissionDenied") || t("messages.permissionDenied"))
+                                }
+                            }}
                             title={t("table.status")}
                         >
                             {isConfirmed ? (
@@ -178,8 +196,20 @@ export const useMaintenanceColumns = ({ onDetail, onStatusChange, onDelete }: Us
                         <Button
                             variant="outline"
                             size="sm"
-                            className="h-8 w-8 p-0 cursor-pointer text-muted-foreground hover:text-destructive hover:border-destructive/40 hover:bg-destructive/10 shadow-2xs transition-colors"
-                            onClick={() => onDelete(row.original)}
+                            disabled={!canControl}
+                            className={cn(
+                                "h-8 w-8 p-0 shadow-2xs transition-colors",
+                                canControl
+                                    ? "cursor-pointer text-muted-foreground hover:text-destructive hover:border-destructive/40 hover:bg-destructive/10"
+                                    : "opacity-50 cursor-not-allowed text-muted-foreground"
+                            )}
+                            onClick={() => {
+                                if (canControl) {
+                                    onDelete(row.original)
+                                } else {
+                                    toast.error(t("table.permissionDenied") || t("messages.permissionDenied"))
+                                }
+                            }}
                             title={t("table.delete")}
                         >
                             <Trash2 className="h-4 w-4" />

@@ -43,9 +43,9 @@ export default function FilterSidebar({
 
     const counts = useMemo(() => {
         const total = devices.length
-        const normal = devices.filter(d => d.status !== "4" && d.status !== "5").length
+        const normal = devices.filter(d => d.status === "0" || d.status === "1" || d.status === "2" || d.status === "3").length
         const powerFail = devices.filter(d => d.status === "4").length
-        const commFail = devices.filter(d => d.status === "5").length
+        const commFail = devices.filter(d => d.status === "5" || d.status === "6").length
         const withGps = devices.filter(d => isValidGPS(d.lat, d.lng)).length
         const noGps = total - withGps
 
@@ -108,6 +108,7 @@ export default function FilterSidebar({
                                         {dataOptions.map((opt, idx) => {
                                             const val = typeof opt === 'string' ? opt : opt.groupName
                                             const label = typeof opt === 'string' ? opt : opt.groupName
+                                            if (val?.toUpperCase() === "ALL") return null
                                             return (
                                                 <ComboboxItem key={idx} value={val}>
                                                     {label}
@@ -127,22 +128,22 @@ export default function FilterSidebar({
                         <StatusChip
                             label={t("status.all")}
                             count={counts.total}
-                            icon={<Globe className="h-4 w-4" />}
+                            icon={<Globe className="h-4 w-4 shrink-0" />}
                             isActive={statusFilter === "all"}
                             onClick={() => handleChipClick("all")}
                         />
                         <StatusChip
                             label={t("status.normal")}
                             count={counts.normal}
-                            icon={<Zap className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />}
-                            isActive={statusFilter === "3"}
+                            icon={<Zap className="h-4 w-4 shrink-0" />}
+                            isActive={statusFilter === "normal"}
                             variant="normal"
-                            onClick={() => handleChipClick("3")}
+                            onClick={() => handleChipClick("normal")}
                         />
                         <StatusChip
                             label={t("status.powerFailure")}
                             count={counts.powerFail}
-                            icon={<ShieldAlert className="h-4 w-4 text-destructive" />}
+                            icon={<ShieldAlert className="h-4 w-4 shrink-0" />}
                             isActive={statusFilter === "4"}
                             variant="powerFailure"
                             onClick={() => handleChipClick("4")}
@@ -150,7 +151,7 @@ export default function FilterSidebar({
                         <StatusChip
                             label={t("status.commFailure")}
                             count={counts.commFail}
-                            icon={<WifiOff className="h-4 w-4 text-amber-600 dark:text-amber-400" />}
+                            icon={<WifiOff className="h-4 w-4 shrink-0" />}
                             isActive={statusFilter === "5"}
                             variant="commFailure"
                             onClick={() => handleChipClick("5")}
@@ -193,17 +194,17 @@ function StatusChip({
 }: StatusChipProps) {
     const variantStyles = {
         default: isActive
-            ? "bg-primary text-primary-foreground border-primary"
-            : "bg-background border-border text-foreground hover:bg-muted/60",
+            ? "bg-primary text-primary-foreground border-primary [&_svg]:text-primary-foreground"
+            : "bg-background border-border text-foreground hover:bg-muted/60 [&_svg]:text-muted-foreground",
         normal: isActive
-            ? "bg-emerald-600 text-white border-emerald-600"
-            : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20",
+            ? "bg-emerald-600 text-white border-emerald-600 [&_svg]:text-white dark:bg-emerald-600 dark:text-white dark:[&_svg]:text-white"
+            : "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20 hover:bg-emerald-500/20 [&_svg]:text-emerald-600 dark:[&_svg]:text-emerald-400",
         powerFailure: isActive
-            ? "bg-destructive text-destructive-foreground border-destructive"
-            : "bg-destructive/10 text-destructive border-destructive/20 hover:bg-destructive/20",
+            ? "bg-destructive text-white border-destructive [&_svg]:text-white dark:bg-destructive dark:text-white dark:[&_svg]:text-white"
+            : "bg-destructive/10 text-destructive border-destructive/20 hover:bg-destructive/20 [&_svg]:text-destructive",
         commFailure: isActive
-            ? "bg-amber-600 text-white border-amber-600"
-            : "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500/20",
+            ? "bg-amber-600 text-white border-amber-600 [&_svg]:text-white dark:bg-amber-600 dark:text-white dark:[&_svg]:text-white"
+            : "bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20 hover:bg-amber-500/20 [&_svg]:text-amber-600 dark:[&_svg]:text-amber-400",
     }
 
     return (

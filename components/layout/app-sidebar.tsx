@@ -15,6 +15,7 @@ import {
   IconTool,
   IconFolders,
   IconApi,
+  IconServerCog,
 } from "@tabler/icons-react"
 import { ChevronDown } from "lucide-react"
 import { useTranslations } from "next-intl"
@@ -88,6 +89,7 @@ const menuMapping: Record<string, { title: string; icon: React.ElementType; url:
   "maintenance_dashboard": { title: "menu.maintenanceDashboard", icon: IconBriefcase, url: "/maintenance/dashboard", color: "text-cyan-600 skyblue:text-cyan-200 dark:text-cyan-300" },
   "map_disconnect": { title: "menu.mapDisconnect", icon: IconMap2, url: "/map/disconnect", color: "text-rose-500 skyblue:text-rose-300 dark:text-rose-400" },
   "map_global": { title: "menu.mapGlobal", icon: IconMap2, url: "/map/global", color: "text-teal-600 skyblue:text-teal-300 dark:text-teal-400" },
+  "system_project_permissions_api": { title: "menu.projectPermissionsApi", icon: IconServerCog, url: "/setting-system/project-permissions-api", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
   "system_personal": { title: "menu.personal", icon: IconUser, url: "/setting-system/personal", color: "text-teal-600 skyblue:text-teal-300 dark:text-teal-400" },
   "system_menu_permission": { title: "menu.menuSettings", icon: IconSettings, url: "/setting-system/menu-settings", color: "text-amber-600 skyblue:text-amber-300 dark:text-amber-400" },
   "system_api_setting": { title: "menu.apiSettings", icon: IconApi, url: "/setting-system/api-settings", color: "text-emerald-600 skyblue:text-emerald-300 dark:text-emerald-400" },
@@ -138,7 +140,7 @@ const menuGroups = [
   },
   {
     title: "groups.systemSettings",
-    items: ["system_menu_permission", "system_api_setting", "system_project", "system_alert", "system_personal"],
+    items: ["system_personal", "system_project_permissions_api", "system_alert"],
   },
 ]
 
@@ -252,7 +254,17 @@ export function AppSidebar({ menuItems = [], user, sidebarLogo, ...props }: AppS
     return menuGroups
       .map((group) => {
         const groupItems = group.items
-          .filter((menuName) => isSuperAdmin || readableItems.has(menuName))
+          .filter((menuName) => {
+            if (isSuperAdmin) return true
+            if (menuName === "system_project_permissions_api") {
+              return (
+                readableItems.has("system_project") ||
+                readableItems.has("system_menu_permission") ||
+                readableItems.has("system_api_setting")
+              )
+            }
+            return readableItems.has(menuName)
+          })
           .map((menuName) => {
             const mapping = menuMapping[menuName]
             return {

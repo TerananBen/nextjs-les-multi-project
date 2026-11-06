@@ -6,9 +6,11 @@ import { MenuData } from "@/types/menu-settings"
 import { Switch } from "@/components/ui/switch"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 
 export const useMenuSettingsColumns = (
-    onToggle: (item: MenuData, field: string, value: string) => void
+    onToggle: (item: MenuData, field: string, value: string) => void,
+    canWrite: boolean = true
 ): ColumnDef<MenuData>[] => {
     const t = useTranslations("MenuSettings")
 
@@ -37,10 +39,18 @@ export const useMenuSettingsColumns = (
                     <div className="flex justify-center items-center">
                         <Switch
                             checked={isChecked}
+                            disabled={!canWrite}
                             onCheckedChange={(checked) => {
-                                onToggle(row.original, "readable", checked ? "1" : "0")
+                                if (canWrite) {
+                                    onToggle(row.original, "readable", checked ? "1" : "0")
+                                } else {
+                                    toast.error(t("permissionDenied"))
+                                }
                             }}
-                            className="cursor-pointer data-[state=checked]:bg-emerald-600"
+                            className={cn(
+                                canWrite ? "cursor-pointer" : "cursor-not-allowed opacity-40",
+                                "data-[state=checked]:bg-emerald-600"
+                            )}
                         />
                     </div>
                 )
@@ -53,16 +63,21 @@ export const useMenuSettingsColumns = (
             cell: ({ row }) => {
                 const isChecked = row.original.writable === "1"
                 const isReadable = row.original.readable === "1"
+                const isAllowed = canWrite && isReadable
                 return (
                     <div className="flex justify-center items-center">
                         <Switch
                             checked={isChecked}
-                            disabled={!isReadable}
+                            disabled={!isAllowed}
                             onCheckedChange={(checked) => {
-                                onToggle(row.original, "writable", checked ? "1" : "0")
+                                if (canWrite) {
+                                    onToggle(row.original, "writable", checked ? "1" : "0")
+                                } else {
+                                    toast.error(t("permissionDenied"))
+                                }
                             }}
                             className={cn(
-                                isReadable ? "cursor-pointer" : "cursor-not-allowed opacity-40",
+                                isAllowed ? "cursor-pointer" : "cursor-not-allowed opacity-40",
                                 "data-[state=checked]:bg-emerald-600"
                             )}
                         />
@@ -77,16 +92,21 @@ export const useMenuSettingsColumns = (
             cell: ({ row }) => {
                 const isChecked = row.original.control === "1"
                 const isReadable = row.original.readable === "1"
+                const isAllowed = canWrite && isReadable
                 return (
                     <div className="flex justify-center items-center">
                         <Switch
                             checked={isChecked}
-                            disabled={!isReadable}
+                            disabled={!isAllowed}
                             onCheckedChange={(checked) => {
-                                onToggle(row.original, "control", checked ? "1" : "0")
+                                if (canWrite) {
+                                    onToggle(row.original, "control", checked ? "1" : "0")
+                                } else {
+                                    toast.error(t("permissionDenied"))
+                                }
                             }}
                             className={cn(
-                                isReadable ? "cursor-pointer" : "cursor-not-allowed opacity-40",
+                                isAllowed ? "cursor-pointer" : "cursor-not-allowed opacity-40",
                                 "data-[state=checked]:bg-emerald-600"
                             )}
                         />
@@ -94,5 +114,5 @@ export const useMenuSettingsColumns = (
                 )
             },
         },
-    ], [t, onToggle])
+    ], [t, onToggle, canWrite])
 }

@@ -10,9 +10,10 @@ import { Combobox, ComboboxInput, ComboboxContent, ComboboxEmpty, ComboboxList, 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
-import { Loader2, Plus, Search, RotateCcw, X, Wrench, Lightbulb, CheckCircle2, Clock } from "lucide-react"
+import { Loader2, Plus, Search, RotateCcw, X, Wrench, Lightbulb, CheckCircle2, Clock, ShieldAlert } from "lucide-react"
 import { getLeafletIconUrl, MarkerColor, MarkerBadge } from "@/lib/map-icons"
 import { cn } from "@/lib/utils"
+import { usePermission } from "@/components/providers/permission-provider"
 
 import {
     MaintenanceConfigRecord,
@@ -450,6 +451,17 @@ export function MaintenanceConfigClient({
     const tMessages = useTranslations("MaintenanceConfig.messages")
     const tForm = useTranslations("MaintenanceConfig.form")
 
+    const { getPermission, permissions } = usePermission()
+
+    const perm = React.useMemo(() => {
+        if (!permissions.length) return { readable: true, writable: true, control: true }
+        return getPermission("maintenance_request")
+    }, [getPermission, permissions])
+
+    const isReadable = perm.readable
+    const canWrite = perm.writable
+    const canControl = perm.control
+
     const [data, setData] = React.useState<MaintenanceConfigRecord[]>([])
     const [loading, setLoading] = React.useState(true)
     const [isAddOpen, setIsAddOpen] = React.useState(false)
@@ -537,6 +549,10 @@ export function MaintenanceConfigClient({
             setDetailId(item.detail)
         },
         onStatusChange: (item) => {
+            if (!canWrite) {
+                toast.error(tMessages("permissionDenied", { defaultMessage: "ไม่มีสิทธิ์ในการดำเนินการนี้" }))
+                return
+            }
             if (isConfirming) return
 
             const waitRepair = parseInt(item.wait_repair || "0", 10)
@@ -548,12 +564,22 @@ export function MaintenanceConfigClient({
             setConfirmingStatusItem(item)
         },
         onDelete: (item) => {
+            if (!canControl) {
+                toast.error(tMessages("permissionDenied", { defaultMessage: "ไม่มีสิทธิ์ในการดำเนินการนี้" }))
+                return
+            }
             setDeletingId(item.detail)
             setIsDeleteDialogOpen(true)
-        }
+        },
+        canWrite,
+        canControl,
     })
 
     const handleAdd = () => {
+        if (!canWrite) {
+            toast.error(tMessages("permissionDenied", { defaultMessage: "ไม่มีสิทธิ์ในการดำเนินการนี้" }))
+            return
+        }
         setIsAddOpen(true)
     }
 
@@ -567,6 +593,10 @@ export function MaintenanceConfigClient({
     }
 
     const handleConfirmStatus = async () => {
+        if (!canWrite) {
+            toast.error(tMessages("permissionDenied", { defaultMessage: "ไม่มีสิทธิ์ในการดำเนินการนี้" }))
+            return
+        }
         if (!confirmingStatusItem) return
 
         const isConfirmed = confirmingStatusItem.confrime === "T" || confirmingStatusItem.confrime === "1" || confirmingStatusItem.confrime?.toLowerCase() === "true"
@@ -591,6 +621,10 @@ export function MaintenanceConfigClient({
     }
 
     const handleDelete = async () => {
+        if (!canControl) {
+            toast.error(tMessages("permissionDenied", { defaultMessage: "ไม่มีสิทธิ์ในการดำเนินการนี้" }))
+            return
+        }
         if (!deletingId) return
 
         setIsDeleting(true)
@@ -610,6 +644,15 @@ export function MaintenanceConfigClient({
             setIsDeleting(false)
             setDeletingId(null)
         }
+    }
+
+    if (!isReadable) {
+        return (
+            <div className="flex flex-1 flex-col items-center justify-center min-h-[400px] gap-3 text-muted-foreground">
+                <ShieldAlert className="h-12 w-12 text-muted-foreground/60" />
+                <p className="text-base font-medium">{t("noAccess", { defaultMessage: "คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้" })}</p>
+            </div>
+        )
     }
 
     return (
@@ -668,7 +711,11 @@ export function MaintenanceConfigClient({
 
                     <Button
                         onClick={handleAdd}
-                        className="h-9 px-4 shrink-0 cursor-pointer shadow-2xs font-medium gap-2"
+                        disabled={!canWrite}
+                        className={cn(
+                            "h-9 px-4 shrink-0 shadow-2xs font-medium gap-2",
+                            canWrite ? "cursor-pointer" : "opacity-50 cursor-not-allowed"
+                        )}
                     >
                         <Plus className="h-4 w-4" />
                         {tButtons("add")}
@@ -768,7 +815,7 @@ export function MaintenanceConfigClient({
             </div>
 
             {/* Add Maintenance Task Modal (Styled exactly like setting-control/group-config) */}
-            <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+            <Dialog open={isAddOpen && canWrite} onOpenChange={setIsAddOpen}>
                 <DialogContent className="sm:max-w-[95vw] md:max-w-[95vw] lg:max-w-[85vw] xl:max-w-[1240px] h-[90vh] flex flex-col p-0 gap-0 overflow-hidden">
                     {/* 1. Title Dialog Header (Matches setting-control/group-config) */}
                     <DialogHeader className="px-6 py-4 border-b shrink-0 text-left">
@@ -811,11 +858,13 @@ export function MaintenanceConfigClient({
                 defaultZoom={defaultZoom}
                 iconScale={iconScale}
                 googleMapsApiKey={googleMapsApiKey}
+                canWrite={canWrite}
+                canControl={canControl}
                 onClose={() => setDetailId(null)}
             />
 
             {/* Delete Confirmation Alert Dialog */}
-            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+            <AlertDialog open={isDeleteDialogOpen && canControl} onOpenChange={setIsDeleteDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>{tDelete("title")}</AlertDialogTitle>

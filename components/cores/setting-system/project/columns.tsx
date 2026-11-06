@@ -16,15 +16,23 @@ import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
 export const COLOR_PRESET_BG_CLASSES: Record<ColorPreset, string> = {
-    blue: "bg-blue-600",
-    skyblue: "bg-sky-500",
-    green: "bg-green-600",
-    purple: "bg-purple-600",
-    amber: "bg-amber-500",
-    rose: "bg-rose-600",
-    indigo: "bg-indigo-600",
-    emerald: "bg-emerald-600",
-    slate: "bg-slate-600",
+    blue: "bg-[#3072f1]",
+    skyblue: "bg-[#0895d8]",
+    green: "bg-[#45a976]",
+    purple: "bg-[#9e44f1]",
+    amber: "bg-[#e78b08]",
+    rose: "bg-[#b95387]",
+    indigo: "bg-[#5956eb]",
+    emerald: "bg-[#10a697]",
+    slate: "bg-[#56647a]",
+    red: "bg-[#a32828]",
+    orange: "bg-[#bf5800]",
+    teal: "bg-[#45a976]",
+    cyan: "bg-[#429ec1]",
+    pink: "bg-[#b95387]",
+    navy: "bg-[#001941]",
+    charcoal: "bg-[#4b4b4b]",
+    gray: "bg-[#4b4b4b]",
 }
 
 export type ProjectColumnActions = {
@@ -118,7 +126,7 @@ export const getColumns = (
         header: () => <div className="text-center">{t("table.color")}</div>,
         cell: ({ row }) => {
             const color = row.original.color || "skyblue"
-            const bgClass = COLOR_PRESET_BG_CLASSES[color] || "bg-sky-500"
+            const bgClass = COLOR_PRESET_BG_CLASSES[color] || "bg-[#0895d8]"
             return (
                 <div className="flex items-center justify-center">
                     <div

@@ -594,7 +594,7 @@ export function PersonalForm({
                                                         {selectedIds.length > 0 ? (
                                                             selectedIds.map((projectId) => {
                                                                 const project = projects.find((p) => p.id === projectId || p.uuid === projectId || p.code === projectId)
-                                                                const colorClass = COLOR_PRESET_BG_CLASSES[project?.color || "skyblue"] || "bg-sky-500"
+                                                                const colorClass = COLOR_PRESET_BG_CLASSES[project?.color || "skyblue"] || "bg-[#0895d8]"
                                                                 return (
                                                                     <Badge
                                                                         key={projectId}
@@ -647,7 +647,7 @@ export function PersonalForm({
                                             <div className="max-h-56 overflow-y-auto space-y-1">
                                                 {projects.map((project) => {
                                                     const isSelected = selectedIds.includes(project.id)
-                                                    const colorClass = COLOR_PRESET_BG_CLASSES[project.color || "skyblue"] || "bg-sky-500"
+                                                    const colorClass = COLOR_PRESET_BG_CLASSES[project.color || "skyblue"] || "bg-[#0895d8]"
                                                     return (
                                                         <div
                                                             key={project.id}
@@ -707,7 +707,7 @@ export function PersonalForm({
                                             p.uuid === pr.project_id ||
                                             p.code === pr.project_id
                                     )
-                                    const colorClass = COLOR_PRESET_BG_CLASSES[project?.color || "skyblue"] || "bg-sky-500"
+                                    const colorClass = COLOR_PRESET_BG_CLASSES[project?.color || "skyblue"] || "bg-[#0895d8]"
                                     const availRoles = getRolesForProject(pr.project_id)
 
                                     return (

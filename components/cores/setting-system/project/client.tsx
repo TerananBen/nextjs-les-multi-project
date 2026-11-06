@@ -42,15 +42,17 @@ import { usePermission } from "@/components/providers/permission-provider"
 import { cn } from "@/lib/utils"
 
 const COLOR_OPTIONS: { value: ColorPreset; label: string }[] = [
-    { value: "skyblue", label: "Sky Blue" },
     { value: "blue", label: "Blue" },
-    { value: "green", label: "Green" },
-    { value: "purple", label: "Purple" },
-    { value: "amber", label: "Amber" },
-    { value: "rose", label: "Rose" },
-    { value: "indigo", label: "Indigo" },
-    { value: "emerald", label: "Emerald" },
     { value: "slate", label: "Slate" },
+    { value: "emerald", label: "Emerald" },
+    { value: "indigo", label: "Indigo" },
+    { value: "red", label: "Red" },
+    { value: "rose", label: "Rose" },
+    { value: "orange", label: "Orange" },
+    { value: "green", label: "Green" },
+    { value: "cyan", label: "Cyan" },
+    { value: "navy", label: "Navy" },
+    { value: "charcoal", label: "Charcoal" },
 ]
 
 interface ProjectClientProps {

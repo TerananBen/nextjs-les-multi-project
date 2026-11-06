@@ -86,8 +86,8 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 w-full">
             {/* Chart 1: Energy Consumption */}
-            <Card className="rounded-xl border border-border/80 bg-card shadow-xs overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 px-4 py-3 border-b">
+            <Card className="rounded-xl border border-border/80 bg-card shadow-xs overflow-hidden gap-0 py-0">
+                <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b border-border/70 [.border-b]:pb-3">
                     <CardTitle className="text-base font-semibold text-foreground">
                         {t("energyConsumption")}
                     </CardTitle>
@@ -97,7 +97,7 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
                         </Badge>
                     )}
                 </CardHeader>
-                <CardContent className="p-4 pl-0" id="energy-chart-container">
+                <CardContent className="p-3 pl-0 pt-2" id="energy-chart-container">
                     {renderChartContent(
                         <AreaChart data={energyData} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
                             <defs>
@@ -159,20 +159,18 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
             </Card>
 
             {/* Chart 2: Lamp Failure */}
-            <Card className="rounded-xl border border-border/80 bg-card shadow-xs overflow-hidden">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 px-4 py-3 border-b">
+            <Card className="rounded-xl border border-border/80 bg-card shadow-xs overflow-hidden gap-0 py-0">
+                <CardHeader className="flex flex-row items-center justify-between px-4 py-3 border-b border-border/70 [.border-b]:pb-3">
                     <CardTitle className="text-base font-semibold text-foreground">
                         {t("lampFailure")}
                     </CardTitle>
-                    {hasFailureData && (
+                    {hasFailureData && failureData.length > 0 && (
                         <Badge variant="outline" className="font-mono text-xs font-normal">
-                            {failureData.length > 0
-                                ? `${Math.max(...failureData.map(d => Number(d.value) || 0))} max`
-                                : ""}
+                            {`${Math.max(...failureData.map(d => Number(d.value) || 0))} max`}
                         </Badge>
                     )}
                 </CardHeader>
-                <CardContent className="p-4 pl-0" id="failure-chart-container">
+                <CardContent className="p-3 pl-0 pt-2" id="failure-chart-container">
                     {renderChartContent(
                         <BarChart data={failureData} margin={{ top: 10, right: 16, left: 0, bottom: 0 }}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" strokeOpacity={0.6} />

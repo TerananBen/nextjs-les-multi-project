@@ -7,7 +7,15 @@ export type ColorPreset =
   | "indigo"
   | "emerald"
   | "slate"
-  | "skyblue";
+  | "skyblue"
+  | "red"
+  | "orange"
+  | "teal"
+  | "cyan"
+  | "pink"
+  | "navy"
+  | "charcoal"
+  | "gray";
 
 export interface ProjectConfig {
   id: string;

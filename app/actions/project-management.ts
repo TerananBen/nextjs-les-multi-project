@@ -62,7 +62,7 @@ export async function saveProject(payload: SaveProjectPayload): Promise<{ result
     const domain = payload.domain?.trim() || `${code}.localhost`
     const logo = payload.logo.trim() || "/logo-le-full.svg"
     const appIcon = payload.appIcon.trim() || "/logo-le.svg"
-    const color = payload.color || "skyblue"
+    const color = payload.color || "blue"
     const enableLoginOtp = Boolean(payload.enableLoginOtp)
 
     if (!name) {

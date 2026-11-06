@@ -32,15 +32,17 @@ import { Upload, Loader2, Image as ImageIcon } from "lucide-react"
 import { toast } from "sonner"
 
 const COLOR_OPTIONS: { value: ColorPreset; label: string }[] = [
-    { value: "skyblue", label: "Sky Blue" },
     { value: "blue", label: "Blue" },
-    { value: "green", label: "Green" },
-    { value: "purple", label: "Purple" },
-    { value: "amber", label: "Amber" },
-    { value: "rose", label: "Rose" },
-    { value: "indigo", label: "Indigo" },
-    { value: "emerald", label: "Emerald" },
     { value: "slate", label: "Slate" },
+    { value: "emerald", label: "Emerald" },
+    { value: "indigo", label: "Indigo" },
+    { value: "red", label: "Red" },
+    { value: "rose", label: "Rose" },
+    { value: "orange", label: "Orange" },
+    { value: "green", label: "Green" },
+    { value: "cyan", label: "Cyan" },
+    { value: "navy", label: "Navy" },
+    { value: "charcoal", label: "Charcoal" },
 ]
 
 const formSchema = z.object({
@@ -49,7 +51,25 @@ const formSchema = z.object({
     domain: z.string().min(1, "Domain is required"),
     logo: z.string().min(1, "Logo path is required"),
     appIcon: z.string().min(1, "Favicon icon path is required"),
-    color: z.enum(["blue", "green", "purple", "amber", "rose", "indigo", "emerald", "slate", "skyblue"]),
+    color: z.enum([
+        "blue",
+        "slate",
+        "emerald",
+        "indigo",
+        "red",
+        "rose",
+        "orange",
+        "green",
+        "teal",
+        "cyan",
+        "navy",
+        "charcoal",
+        "gray",
+        "pink",
+        "purple",
+        "amber",
+        "skyblue",
+    ]),
     enableLoginOtp: z.boolean(),
 })
 
@@ -78,7 +98,7 @@ export function ProjectForm({
             domain: initialData?.domain || "",
             logo: initialData?.logo || "/logo-le-full.svg",
             appIcon: initialData?.appIcon || "/logo-le.svg",
-            color: (initialData?.color as ColorPreset) || "skyblue",
+            color: (initialData?.color as ColorPreset) || "blue",
             enableLoginOtp: initialData?.enableLoginOtp ?? false,
         },
     })
@@ -280,7 +300,7 @@ export function ProjectForm({
                                                     <div className="flex items-center gap-2">
                                                         <span
                                                             className={cn(
-                                                                "h-3.5 w-3.5 rounded-full border border-border shadow-2xs",
+                                                                "h-3 w-3 rounded-full border border-border/70 shadow-2xs shrink-0",
                                                                 COLOR_PRESET_BG_CLASSES[opt.value]
                                                             )}
                                                         />

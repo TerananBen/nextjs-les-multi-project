@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getKeycloakLoginUrl, isKeycloakConfigured, generatePkcePair, getAuthCallbackUri } from "@/lib/keycloak";
-import { isIpAddress } from "@/config/projects";
+import { isIpAddress, DEFAULT_PROJECT, resolveProjectSlug, normalizeHostWithProject } from "@/config/projects";
 
 export async function GET(request: NextRequest) {
   if (!isKeycloakConfigured()) {
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   const hostWithoutPort = host.split(":")[0].toLowerCase();
   const isIp = isIpAddress(hostWithoutPort);
   const parts = hostWithoutPort.split(".");
-  const isLocalhost = hostWithoutPort.endsWith("localhost");
+  const isLocalhost = hostWithoutPort.endsWith("localhost") || hostWithoutPort === "127.0.0.1";
   const minParts = isLocalhost ? 1 : 2;
 
   let projectClientId: string | undefined;
@@ -33,7 +33,15 @@ export async function GET(request: NextRequest) {
   }
 
   if (!projectClientId) {
-    projectClientId = process.env.KEYCLOAK_CLIENT_ID || "project-a";
+    projectClientId = process.env.KEYCLOAK_CLIENT_ID || DEFAULT_PROJECT || "nb32-nbiot";
+  }
+
+  // In local dev: redirect bare localhost/127.0.0.1 to project subdomain so auth flow runs on tenant origin
+  if (isLocalhost && (hostWithoutPort === "localhost" || hostWithoutPort === "127.0.0.1")) {
+    const slug = resolveProjectSlug(projectClientId) || DEFAULT_PROJECT || "nb32-nbiot";
+    const targetHost = normalizeHostWithProject(host, slug);
+    const forwardUrl = new URL(request.nextUrl.pathname + request.nextUrl.search, `http://${targetHost}`);
+    return NextResponse.redirect(forwardUrl);
   }
 
   const state = JSON.stringify({

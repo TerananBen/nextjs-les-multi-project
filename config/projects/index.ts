@@ -118,13 +118,72 @@ export const isIpAddress = (host?: string): boolean => {
   return /^(\d{1,3}\.){3}\d{1,3}$/.test(clean);
 };
 
+export const DEFAULT_PROJECT =
+  process.env.DEFAULT_PROJECT ||
+  process.env.DEFAULT_PROJECT_ID ||
+  process.env.DEFAULT_PROJECT_CODE ||
+  process.env.KEYCLOAK_CLIENT_ID ||
+  "nb32-nbiot";
+
+export const normalizeHostWithProject = (
+  rawHost: string,
+  projectSlug?: string
+): string => {
+  if (!rawHost) return rawHost;
+  const cleanHost = rawHost.split(",")[0].trim();
+  const [hostname, ...portParts] = cleanHost.split(":");
+  const port = portParts.length > 0 ? `:${portParts.join(":")}` : "";
+  const lowerHost = hostname.toLowerCase();
+
+  const slug = (
+    projectSlug ||
+    resolveProjectSlug() ||
+    DEFAULT_PROJECT ||
+    "nb32-nbiot"
+  )
+    .toLowerCase()
+    .replace(/_/g, "-");
+
+  if (!slug) return cleanHost;
+
+  // Localhost or 127.0.0.1 without subdomain
+  if (lowerHost === "localhost" || lowerHost === "127.0.0.1") {
+    return `${slug}.localhost${port}`;
+  }
+
+  // Subdomain of localhost (e.g. current-proj.localhost:3008)
+  if (lowerHost.endsWith(".localhost")) {
+    const currentSub = lowerHost.replace(/\.localhost$/, "");
+    if (currentSub !== slug && slug && currentSub !== "www") {
+      return `${slug}.localhost${port}`;
+    }
+    return cleanHost;
+  }
+
+  // lesplatform.com production domain without subdomain
+  if (lowerHost === "lesplatform.com") {
+    return `${slug}.lesplatform.com${port}`;
+  }
+
+  if (lowerHost.endsWith(".lesplatform.com")) {
+    const currentSub = lowerHost.replace(/\.lesplatform\.com$/, "");
+    if (currentSub !== slug && slug && currentSub !== "auth" && currentSub !== "file" && currentSub !== "www") {
+      return `${slug}.lesplatform.com${port}`;
+    }
+    return cleanHost;
+  }
+
+  return cleanHost;
+};
+
 export const resolveProjectSlug = (idOrUuid?: string): string => {
   if (!idOrUuid || typeof idOrUuid !== "string" || idOrUuid.toLowerCase().includes("[object")) {
     const all = Object.values(projects);
     if (all.length > 0 && all[0].code) {
       return all[0].code.toLowerCase().replace(/_/g, "-");
     }
-    return (process.env.DEFAULT_PROJECT_CODE || "project-a").toLowerCase().replace(/_/g, "-");
+    const fallback = process.env.DEFAULT_PROJECT_CODE || DEFAULT_PROJECT;
+    return fallback ? fallback.toLowerCase().replace(/_/g, "-") : "";
   }
   const clean = idOrUuid.trim().toLowerCase();
   if (UUID_TO_PROJECT_SLUG[clean]) {
@@ -161,8 +220,6 @@ export const resolveProjectSlug = (idOrUuid?: string): string => {
   }
   return clean;
 };
-
-export const DEFAULT_PROJECT = process.env.DEFAULT_PROJECT || process.env.DEFAULT_PROJECT_ID || "project-a";
 
 export const createDynamicProject = (projectId: string, customCode?: string): ProjectConfig => {
   const code = customCode || resolveProjectSlug(projectId) || projectId;

@@ -253,6 +253,6 @@ export const getActiveProjectCode = async (): Promise<string> => {
       p.uuid?.toLowerCase() === defaultId.toLowerCase() ||
       p.code?.toLowerCase() === defaultId.toLowerCase()
   );
-  return foundDefault?.code || defaultId || "project-a";
+  return foundDefault?.code || defaultId || DEFAULT_PROJECT;
 };
 

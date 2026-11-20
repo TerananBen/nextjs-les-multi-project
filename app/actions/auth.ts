@@ -13,11 +13,11 @@ import {
     extractAllProjectIdsFromPayload,
     extractProjectCodeFromPayload,
     extractRolesFromPayload,
-    getKeycloakConfig,
     getKeycloakLogoutUrl,
     isKeycloakTokenValid,
 } from "@/lib/keycloak"
 import { fetchNestJs } from "@/lib/nestjs"
+import { SUPERADMIN_FULL_MENUS } from "@/config/menus"
 
 interface LoginState {
     success: boolean
@@ -99,7 +99,7 @@ export async function login(prevState: LoginState, formData: FormData): Promise<
             activeProjectId = dbProjects.length > 0 ? (dbProjects[0].code || dbProjects[0].id) : DEFAULT_PROJECT;
         }
 
-        const projectSlug = resolveProjectSlug(activeProjectId) || "project-a";
+        const projectSlug = resolveProjectSlug(activeProjectId) || activeProjectId || DEFAULT_PROJECT;
 
         // Update active project attribute in Keycloak and refresh tokens
         if (keycloakResult.payload?.sub && projectSlug) {
@@ -175,7 +175,7 @@ export async function login(prevState: LoginState, formData: FormData): Promise<
 
     // ── Legacy API Login Fallback ─────────────────────────
     const projectConfig = await getProjectConfig()
-    const projectName = projectConfig.id || process.env.PROJECT_NAME
+    const projectName = projectConfig.code || projectConfig.id || DEFAULT_PROJECT
     const apiUrl = process.env.API_URL
 
     if (!apiUrl) {
@@ -249,27 +249,6 @@ export interface MenuItem {
     path?: string
     api_version?: number
 }
-
-const SUPERADMIN_FULL_MENUS: MenuItem[] = [
-    { menu_id: "1", menu_name: "dashboard_group", label: "Dashboard", path: "/dashboard", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "2", menu_name: "smart_pole", label: "Smart Pole", path: "/smart-pole", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "3", menu_name: "street_light", label: "Street Light", path: "/street-light", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "4", menu_name: "building_light", label: "Building Light", path: "/building-light", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "5", menu_name: "solar_cell", label: "Solar Cell", path: "/solar-cell", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "6", menu_name: "cctv", label: "CCTV", path: "/cctv", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "7", menu_name: "emergency_call", label: "Emergency Call", path: "/emergency-call", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "8", menu_name: "schedule", label: "Schedule", path: "/schedule", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "9", menu_name: "history", label: "History", path: "/history", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "10", menu_name: "report", label: "Report", path: "/report", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "11", menu_name: "alarm", label: "Alarm", path: "/alarm", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "12", menu_name: "map", label: "Map", path: "/map", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "13", menu_name: "setting_group", label: "Device Setting", path: "/setting-device", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "14", menu_name: "maintenance_group", label: "Maintenance", path: "/maintenance", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "15", menu_name: "user_management", label: "User Management", path: "/user-management", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "16", menu_name: "setting_system", label: "Setting System", path: "/setting-system", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "17", menu_name: "system_api_setting", label: "API Settings", path: "/setting-system/api-settings", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "18", menu_name: "system_project", label: "Project Settings", path: "/setting-system/project", readable: "1", writable: "1", control: "1", api_version: 1 },
-]
 
 export async function getAuthorizedMenu(): Promise<MenuItem[]> {
     const cookieStore = await cookies()
@@ -404,8 +383,20 @@ export async function logout() {
 
     // Resolve client ID for Keycloak
     let resolvedClientId: string | undefined
+    if (refreshToken) {
+        const refreshPayload = decodeJwtPayload<{ azp?: string }>(refreshToken)
+        if (refreshPayload?.azp && typeof refreshPayload.azp === "string" && refreshPayload.azp.trim()) {
+            resolvedClientId = refreshPayload.azp.trim()
+        }
+    }
+    if (!resolvedClientId && idToken) {
+        const idPayload = decodeJwtPayload<{ azp?: string }>(idToken)
+        if (idPayload?.azp && typeof idPayload.azp === "string" && idPayload.azp.trim()) {
+            resolvedClientId = idPayload.azp.trim()
+        }
+    }
     const hostWithoutPort = host.split(":")[0].toLowerCase()
-    if (hostWithoutPort && !isIpAddress(hostWithoutPort)) {
+    if (!resolvedClientId && hostWithoutPort && !isIpAddress(hostWithoutPort)) {
         const sub = hostWithoutPort.split(".")[0]
         if (sub && sub !== "localhost" && sub !== "www") {
             resolvedClientId = sub.toLowerCase()
@@ -415,7 +406,7 @@ export async function logout() {
         resolvedClientId = currentProject
     }
     if (!resolvedClientId) {
-        resolvedClientId = process.env.KEYCLOAK_CLIENT_ID || "project-a"
+        resolvedClientId = process.env.KEYCLOAK_CLIENT_ID || DEFAULT_PROJECT
     }
 
     const appUrl = host ? `${proto}://${host}` : (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3008")

@@ -331,9 +331,13 @@ export async function savePersonal(data: SavePersonalParams): Promise<{ result: 
                 const projects = await getProjectsList()
                 const projectMap: Record<string, string> = {}
 
+                const realmRoles = await getRealmRolesAction()
+                const superAdminRole = realmRoles.find(
+                    (r) => (r.name || "").toLowerCase().includes("superadmin") || (r.code || "").toLowerCase().includes("superadmin")
+                )
                 const isSuperAdminRole =
                     (data.cmb_role || "").toLowerCase().includes("superadmin") ||
-                    data.cmb_role === "855125b5-a3ea-48aa-a9e7-7e5abbecfaca";
+                    (Boolean(superAdminRole?.id) && data.cmb_role === superAdminRole?.id);
 
                 if (isSuperAdminRole) {
                     payload.roleId = data.cmb_role || "";
@@ -388,9 +392,13 @@ export async function savePersonal(data: SavePersonalParams): Promise<{ result: 
                 const projects = await getProjectsList()
                 const projectMap: Record<string, string> = {}
 
+                const realmRoles = await getRealmRolesAction()
+                const superAdminRole = realmRoles.find(
+                    (r) => (r.name || "").toLowerCase().includes("superadmin") || (r.code || "").toLowerCase().includes("superadmin")
+                )
                 const isSuperAdminRole =
                     (data.cmb_role || "").toLowerCase().includes("superadmin") ||
-                    data.cmb_role === "855125b5-a3ea-48aa-a9e7-7e5abbecfaca";
+                    (Boolean(superAdminRole?.id) && data.cmb_role === superAdminRole?.id);
 
                 if (isSuperAdminRole) {
                     payload.roleId = data.cmb_role || undefined;

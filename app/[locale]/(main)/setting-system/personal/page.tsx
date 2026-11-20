@@ -33,6 +33,9 @@ export default async function PersonalPage() {
         getRealmRolesAction(),
     ])
     const rawPersonalList = data?.dataReturn || []
+    const superAdminRole = realmRoles.find(
+        (r) => (r.name || "").toLowerCase().includes("superadmin") || (r.code || "").toLowerCase().includes("superadmin")
+    )
     const personalList = isSuperAdmin
         ? rawPersonalList
         : rawPersonalList.filter((u) => {
@@ -41,7 +44,7 @@ export default async function PersonalPage() {
                 !rName.includes("superadmin") &&
                 !rName.includes("super_admin") &&
                 !rName.includes("super-admin") &&
-                u.roles_id !== "855125b5-a3ea-48aa-a9e7-7e5abbecfaca"
+                (!superAdminRole?.id || u.roles_id !== superAdminRole.id)
             )
         })
     const roleList = (data?.roleList || []).filter((item) => {

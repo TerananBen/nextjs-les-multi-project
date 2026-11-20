@@ -49,9 +49,9 @@ export function DataTable<TData, TValue>({
     const table = useReactTable({
         data,
         columns,
-        getRowId: (row) => {
+        getRowId: (row, relativeIndex) => {
             const item = row as { groupCode?: string; scheduleName?: string }
-            return item?.groupCode || item?.scheduleName || ""
+            return item?.groupCode || item?.scheduleName || `schedule-${relativeIndex}`
         },
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),

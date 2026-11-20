@@ -3,7 +3,6 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { ScheduleItem } from "@/types/schedule-settings"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import {
@@ -115,12 +114,9 @@ export const useScheduleColumns = ({ onEdit, onDelete, onFeedback }: UseSchedule
                         <div className="flex justify-center">
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Badge
-                                        variant="outline"
-                                        className="text-xs font-normal max-w-[200px] truncate bg-muted/40 text-foreground cursor-default hover:bg-muted/70 transition-colors"
-                                    >
+                                    <span className="text-xs text-foreground font-medium max-w-[200px] truncate cursor-default">
                                         {groups[0]}
-                                    </Badge>
+                                    </span>
                                 </TooltipTrigger>
                                 <TooltipContent side="top" className="max-w-xs text-xs">
                                     <p>{groups[0]}</p>
@@ -133,12 +129,9 @@ export const useScheduleColumns = ({ onEdit, onDelete, onFeedback }: UseSchedule
                     <div className="flex items-center justify-center gap-1.5">
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Badge
-                                    variant="outline"
-                                    className="text-xs font-normal max-w-[150px] truncate bg-muted/40 text-foreground cursor-default hover:bg-muted/70 transition-colors"
-                                >
+                                <span className="text-xs text-foreground font-medium max-w-[150px] truncate cursor-default">
                                     {groups[0]}
-                                </Badge>
+                                </span>
                             </TooltipTrigger>
                             <TooltipContent side="top" className="max-w-xs text-xs">
                                 <p>{groups[0]}</p>

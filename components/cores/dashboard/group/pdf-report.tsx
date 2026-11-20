@@ -143,6 +143,7 @@ interface PdfTranslations {
     summaryOnlineTotal: string
     summaryLamp: string
     summaryLampFailure: string
+    summaryInternetFailure?: string
     summaryOnlineStatus: string
     summaryFailureCount: string
     summaryVoltage: string
@@ -212,7 +213,17 @@ export function IoTReportPDF({ data, reportTitle, dateRange, energyChartImage, f
                         </View>
                     </View>
 
-                    {/* Card 3 – Voltage */}
+                    {/* Card 3 – Disconnected Lamp */}
+                    <View style={styles.kpiCard}>
+                        <Text style={styles.kpiLabel}>{t.summaryInternetFailure || "โคมตัดการเชื่อมต่อ"}</Text>
+                        <Text style={styles.kpiValueRed}>{data.totalInternetLose || "0"}</Text>
+                        <Text style={styles.kpiUnit}>{t.summaryLamp}</Text>
+                        <View style={styles.kpiDivider}>
+                            <Text style={styles.kpiFooterLabel}>{t.summaryInternetFailure || "โคมตัดการเชื่อมต่อ"}</Text>
+                        </View>
+                    </View>
+
+                    {/* Card 4 – Voltage */}
                     <View style={styles.kpiCard}>
                         <Text style={styles.kpiLabel}>{t.summaryVoltage}</Text>
                         <Text style={styles.kpiValueGreen}>{voltageValue}</Text>

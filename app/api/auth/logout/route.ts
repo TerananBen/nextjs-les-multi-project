@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getKeycloakLogoutUrl, logoutKeycloak, isKeycloakTokenValid } from "@/lib/keycloak";
-import { resolveProjectSlug, isIpAddress } from "@/config/projects";
+import { getKeycloakLogoutUrl, logoutKeycloak, isKeycloakTokenValid, decodeJwtPayload } from "@/lib/keycloak";
+import { resolveProjectSlug, isIpAddress, DEFAULT_PROJECT } from "@/config/projects";
 
 export async function GET(request: NextRequest) {
   const refreshToken = request.cookies.get("refresh_token")?.value;
@@ -16,14 +16,26 @@ export async function GET(request: NextRequest) {
   const minParts = isLocalhost ? 1 : 2;
 
   let resolvedClientId: string | undefined;
-  if (!isIp && parts.length > minParts && parts[0] && parts[0] !== "www") {
+  if (refreshToken) {
+    const refreshPayload = decodeJwtPayload<{ azp?: string }>(refreshToken);
+    if (refreshPayload?.azp && typeof refreshPayload.azp === "string" && refreshPayload.azp.trim()) {
+      resolvedClientId = refreshPayload.azp.trim();
+    }
+  }
+  if (!resolvedClientId && idToken) {
+    const idPayload = decodeJwtPayload<{ azp?: string }>(idToken);
+    if (idPayload?.azp && typeof idPayload.azp === "string" && idPayload.azp.trim()) {
+      resolvedClientId = idPayload.azp.trim();
+    }
+  }
+  if (!resolvedClientId && !isIp && parts.length > minParts && parts[0] && parts[0] !== "www") {
     resolvedClientId = resolveProjectSlug(parts[0]);
   }
   if (!resolvedClientId && currentProject) {
     resolvedClientId = resolveProjectSlug(currentProject);
   }
   if (!resolvedClientId) {
-    resolvedClientId = process.env.KEYCLOAK_CLIENT_ID || "project-a";
+    resolvedClientId = process.env.KEYCLOAK_CLIENT_ID || DEFAULT_PROJECT;
   }
 
   const isLocal = host.includes("localhost") || host.includes("127.0.0.1");

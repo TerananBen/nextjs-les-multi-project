@@ -13,6 +13,18 @@
     "loginAnotherAccount": "เข้าสู่ระบบด้วยบัญชีอื่น",
     "backToLogin": "กลับไปหน้าเข้าสู่ระบบ"
   },
+  "StatusPage": {
+    "title": "สถานะระบบ",
+    "heading": "Next.js พร้อมทำงานปกติ",
+    "description": "หน้าทดสอบการทำงานนี้เปิดใช้งานได้สำเร็จโดยไม่ต้องยืนยันตัวตนผ่าน Keycloak",
+    "statusLabel": "สถานะ",
+    "statusValue": "ออนไลน์",
+    "environmentLabel": "สภาพแวดล้อม",
+    "hostLabel": "โฮสต์",
+    "protocolLabel": "โปรโตคอล",
+    "localeLabel": "ภาษา",
+    "timestampLabel": "เวลาเซิร์ฟเวอร์"
+  },
   "LanguageSwitcher": {
     "label": "เปลี่ยนภาษา"
   },
@@ -36,14 +48,18 @@
       "mapGlobal": "แผนที่ทั่วโลก",
       "personal": "จัดการบุคลากร",
       "menuSettings": "ตั้งค่าเมนู",
-      "projectPermissionsApi": "โปรเจกต์, สิทธิ์ และ API",
+      "permission": "สิทธิ์การเข้าถึง",
+      "projectPermissions": "สิทธิ์การเข้าถึง",
+      "superadmin": "ตั้งค่า SuperAdmin",
+      "projectPermissionsApi": "สิทธิ์การเข้าถึง",
       "apiSettings": "ตั้งค่า API",
       "scheduleSettings": "ตั้งค่าตารางเวลา",
       "streetLight": "โคมไฟถนน",
       "maintenanceDetail": "รายละเอียดการบำรุงรักษา",
       "mapChangeLamp": "แผนที่เปลี่ยนหลอดไฟ",
       "deviceSettings": "ตั้งค่าอุปกรณ์",
-      "projectSettings": "ตั้งค่าโปรเจค"
+      "projectSettings": "ตั้งค่าโปรเจค",
+      "pipelineSchedule": "ตั้งค่า SuperAdmin"
     }
   },
   "ThemeSwitcher": {
@@ -265,6 +281,11 @@
       "password": "รหัสผ่าน",
       "passwordPlaceholder": "รหัสผ่าน",
       "passwordHint": "(เว้นว่างไว้หากไม่ต้องการเปลี่ยน)",
+      "temporaryPasswordHint": "(รหัสผ่านชั่วคราว ระบบจะบังคับให้เปลี่ยนเมื่อล็อกอินครั้งแรก)",
+      "copyPassword": "คัดลอกรหัสผ่าน",
+      "passwordCopied": "คัดลอกรหัสผ่านแล้ว",
+      "regeneratePassword": "สุ่มรหัสผ่านใหม่",
+      "passwordRegenerated": "สุ่มรหัสผ่านใหม่เรียบร้อย",
       "newPassword": "รหัสผ่านใหม่",
       "confirmPassword": "ยืนยันรหัสผ่านใหม่",
       "role": "บทบาท",
@@ -341,12 +362,34 @@
       "weekOf": "สัปดาห์ที่",
       "dateRangeLimit": "เลือกได้ไม่เกิน 15 วัน",
       "invalidDateRange": "วันที่สิ้นสุดต้องไม่ก่อนวันที่เริ่มต้น",
-      "monthRangeLimit": "เลือกได้ไม่เกิน 12 เดือน"
+      "monthRangeLimit": "เลือกได้ไม่เกิน 12 เดือน",
+      "pickQuarter": "เลือกไตรมาส",
+      "quarterRangeLimit": "เลือกได้ไม่เกิน 8 ไตรมาส",
+      "pickYear": "เลือกปี",
+      "yearRangeLimit": "เลือกได้ไม่เกิน 10 ปี"
     },
     "summary": {
       "onlineTotal": "ออนไลน์/ทั้งหมด",
       "lamp": "โคม",
       "lampFailure": "โคมเสีย",
+      "internetFailure": "โคมตัดการเชื่อมต่อ",
+      "viewDeviceList": "คลิกเพื่อดูรายการอุปกรณ์",
+      "deviceDialogTitleRtu": "รายการอุปกรณ์ - โคมเสีย",
+      "deviceDialogTitleInternet": "รายการอุปกรณ์ - โคมตัดการเชื่อมต่อ",
+      "deviceTable": {
+        "sn": "หมายเลขซีเรียล (SN / IMEI)",
+        "streetName": "ชื่อโคมไฟ",
+        "group": "กลุ่ม",
+        "coordinates": "พิกัด (Lat, Lng)",
+        "voltage": "แรงดันไฟฟ้า (V)",
+        "wattage": "กำลังไฟฟ้า (W)",
+        "searchPlaceholder": "ค้นหาหมายเลขโคม, ชื่อ หรือกลุ่ม...",
+        "totalItems": "ทั้งหมด {count} รายการ",
+        "totalDevice": "อุปกรณ์ทั้งหมด",
+        "rowsPerPage": "แถวต่อหน้า :",
+        "noData": "ไม่พบข้อมูลอุปกรณ์",
+        "close": "ปิด"
+      },
       "onlineStatus": "สถานะออนไลน์",
       "failureCount": "จำนวนที่เสีย ",
       "voltage": "แรงดันไฟฟ้า",
@@ -959,8 +1002,8 @@
     "readable": "แสดงเมนู",
     "writable": "ตั้งค่า",
     "control": "ควบคุม",
-    "totalMenu": "เมนูทั้งหมด :",
-    "rowsPerPage": "แถวต่อหน้า :",
+    "totalMenu": "เมนูทั้งหมด",
+    "rowsPerPage": "แถวต่อหน้า",
     "loading": "กำลังโหลด...",
     "noData": "ไม่พบข้อมูล",
     "noAccess": "คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้",
@@ -1012,10 +1055,11 @@
   },
   "ApiSettings": {
     "title": "ตั้งค่า API",
+    "selectProject": "เลือกโปรเจกต์",
     "menuName": "ชื่อเมนู",
     "apiVersion": "API Version",
-    "totalMenu": "เมนูทั้งหมด :",
-    "rowsPerPage": "แถวต่อหน้า :",
+    "totalMenu": "เมนูทั้งหมด",
+    "rowsPerPage": "แถวต่อหน้า",
     "loading": "กำลังโหลด...",
     "noData": "ไม่พบข้อมูล",
     "searchPlaceholder": "ค้นหาด้วยชื่อเมนู...",
@@ -1025,10 +1069,15 @@
     "saveSuccess": "บันทึกการตั้งค่าสำเร็จ",
     "saveError": "บันทึกการตั้งค่าไม่สำเร็จ",
     "fetchError": "โหลดข้อมูลการตั้งค่า API ไม่สำเร็จ",
+    "loadError": "โหลดข้อมูลการตั้งค่า API ของโปรเจกต์ไม่สำเร็จ",
     "noPermission": "ไม่มีสิทธิ์แก้ไขการตั้งค่า",
     "noAccess": "คุณไม่มีสิทธิ์เข้าถึงหน้านี้",
     "unsavedChanges": "มีการแก้ไข {count} รายการ",
-    "modified": "แก้ไขแล้ว"
+    "modified": "แก้ไขแล้ว",
+    "statusConfigured": "ตั้งค่าแล้ว",
+    "statusNotConfigured": "ยังไม่ได้ตั้งค่า",
+    "notConfiguredAlertTitle": "โปรเจกต์นี้ยังไม่ได้ตั้งค่า API",
+    "notConfiguredAlertDesc": "ระบบกำลังแสดงค่าเริ่มต้น (เวอร์ชัน 1) กรุณากำหนดเวอร์ชันที่ต้องการและกด 'บันทึก' เพื่อเปิดใช้งานการตั้งค่าสำหรับโปรเจกต์นี้"
   },
   "ScheduleSettings": {
     "title": "ตั้งค่าตารางเวลา",
@@ -1284,8 +1333,8 @@
       "disabled": "ปิดใช้งาน",
       "reset": "ล้างตัวกรอง"
     },
-    "totalProjects": "โปรเจกต์ทั้งหมด :",
-    "rowsPerPage": "แถวต่อหน้า :",
+    "totalProjects": "โปรเจกต์ทั้งหมด",
+    "rowsPerPage": "แถวต่อหน้า",
     "table": {
       "id": "รหัสโปรเจค",
       "code": "รหัสโปรเจค",
@@ -1300,7 +1349,7 @@
       "actions": "ตัวเลือกเพิ่มเติม",
       "permissionDenied": "ไม่มีสิทธิ์ในการดำเนินการนี้",
       "loading": "กำลังโหลด...",
-      "rowsPerPage": "แถวต่อหน้า :"
+      "rowsPerPage": "แถวต่อหน้า"
     },
     "form": {
       "addTitle": "เพิ่มโปรเจกต์ใหม่",
@@ -1352,6 +1401,21 @@
       "permissionDenied": "ไม่มีสิทธิ์ในการดำเนินการนี้"
     }
   },
+  "Permission": {
+    "title": "สิทธิ์การเข้าถึง",
+    "description": "จัดการสิทธิ์การเข้าถึงเมนูของแต่ละบทบาทหน้าที่",
+    "noAccess": "คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้"
+  },
+  "MenuSuperadmin": {
+    "title": "ตั้งค่า SuperAdmin",
+    "description": "จัดการโปรเจกต์ ตารางการทำงาน Pipeline และตั้งค่า API สำหรับ SuperAdmin",
+    "tabs": {
+      "projects": "โปรเจกต์",
+      "pipeline": "ตั้งค่าการทำงาน Pipeline",
+      "apiSettings": "ตั้งค่า API"
+    },
+    "noAccess": "คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้"
+  },
   "ProjectPermissionsApi": {
     "title": "โปรเจกต์, สิทธิ์ และ API",
     "description": "จัดการข้อมูลโปรเจกต์ สิทธิ์การเข้าถึงเมนู และการเชื่อมต่อเวอร์ชัน API",
@@ -1361,5 +1425,143 @@
       "apiSettings": "ตั้งค่า API"
     },
     "noAccess": "คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้"
+  },
+  "PipelineSchedule": {
+    "title": "ตั้งค่าการทำงาน Pipeline",
+    "description": "จัดการตารางการทำงาน Pipeline, ประมวลผลข้อมูล Repair และ Restore",
+    "filter": {
+      "allProjects": "ทุกโปรเจกต์",
+      "allJobTypes": "ทุกประเภทงาน",
+      "searchPlaceholder": "ค้นหาชื่อการตั้งค่า...",
+      "addConfig": "เพิ่มการตั้งค่า",
+      "viewLogs": "ดู Log การทำงาน"
+    },
+    "table": {
+      "name": "ชื่อการตั้งค่า",
+      "jobType": "ประเภทงาน",
+      "projects": "โปรเจกต์",
+      "startTime": "เวลาเริ่มทำงาน",
+      "trigger": "Trigger",
+      "repair": "Repair",
+      "restore": "Restore",
+      "status": "สถานะ",
+      "actions": "ตัวเลือกเพิ่มเติม",
+      "edit": "แก้ไข",
+      "delete": "ลบ",
+      "active": "เปิดใช้งาน",
+      "disabled": "ปิดใช้งาน",
+      "totalDevice": "รายการทั้งหมด",
+      "rowsPerPage": "แถวต่อหน้า",
+      "noData": "ไม่พบข้อมูล",
+      "more": "เพิ่มเติม",
+      "projectsCount": "โปรเจกต์"
+    },
+    "dialog": {
+      "addTitle": "เพิ่มการตั้งค่า",
+      "editTitle": "แก้ไขการตั้งค่า",
+      "nameLabel": "ชื่อการตั้งค่า",
+      "namePlaceholder": "ระบุชื่อการตั้งค่า...",
+      "descriptionLabel": "คำอธิบาย",
+      "descriptionPlaceholder": "ระบุคำอธิบาย (ถ้ามี)...",
+      "jobTypeLabel": "ประเภทงาน",
+      "jobTypeDashboardPipeline": "Dashboard Pipeline",
+      "jobTypeDashboardNotification": "Dashboard Notification",
+      "typeLabel": "ประเภท",
+      "typeDaily": "รายวัน",
+      "dailyTimesLabel": "เวลาทำงาน",
+      "delayLabel": "ดีเลย์ (วินาที)",
+      "delayPlaceholder": "เช่น 10",
+      "seconds": "วินาที",
+      "projectsHeader": "โปรเจกต์",
+      "selectProject": "เลือกโปรเจกต์...",
+      "searchProjectPlaceholder": "ค้นหาโปรเจกต์...",
+      "noProjectFound": "ไม่พบโปรเจกต์",
+      "displayName": "ชื่อที่แสดง",
+      "projectDailyTimes": "เวลาทำงาน",
+      "customTime": "ตั้งค่าเวลา",
+      "notificationStatus": "สถานะการแจ้งเตือน",
+      "delete": "ลบ",
+      "cancel": "ยกเลิก",
+      "save": "บันทึก",
+      "saving": "กำลังบันทึก...",
+      "errors": {
+        "nameRequired": "กรุณากรอกชื่อการตั้งค่า",
+        "timeRequired": "กรุณาเลือกเวลาทำงาน",
+        "projectRequired": "กรุณาเลือกอย่างน้อย 1 โปรเจกต์"
+      }
+    },
+    "repairDialog": {
+      "title": "ประมวลผลข้อมูลย้อนหลัง (Repair)",
+      "dateLabel": "ช่วงเวลา (ระหว่างวันที่เริ่มต้นถึงล่าสุด)",
+      "startDate": "วันที่เริ่มต้น",
+      "latestDate": "วันที่ล่าสุด",
+      "pickDate": "เลือกช่วงวันที่",
+      "confirm": "เริ่ม Repair",
+      "processing": "กำลังประมวลผล...",
+      "success": "เริ่มประมวลผล Repair เรียบร้อยแล้ว",
+      "error": "เกิดข้อผิดพลาดในการประมวลผล Repair"
+    },
+    "restoreDialog": {
+      "title": "กู้คืนข้อมูล (Restore)",
+      "dateLabel": "ช่วงเวลา (ระหว่างวันที่เริ่มต้นถึงล่าสุด)",
+      "startDate": "วันที่เริ่มต้น",
+      "latestDate": "วันที่ล่าสุด",
+      "pickDate": "เลือกช่วงวันที่",
+      "reprocessDashboard": "ประมวลผลข้อมูลแดชบอร์ดซ้ำ (Reprocess Dashboard)",
+      "confirm": "เริ่ม Restore",
+      "processing": "กำลังประมวลผล...",
+      "success": "เริ่มประมวลผล Restore เรียบร้อยแล้ว",
+      "error": "เกิดข้อผิดพลาดในการประมวลผล Restore"
+    },
+    "form": {
+      "statusTitle": "เปลี่ยนสถานะ",
+      "statusDescription": "คุณแน่ใจหรือไม่ที่จะเปลี่ยนสถานะของ",
+      "triggerTitle": "ยืนยันการรัน Pipeline ทันที (Trigger)",
+      "triggerDescription": "คุณต้องการส่งคำสั่ง Trigger เพื่อให้ Pipeline เริ่มทำงานทันทีสำหรับการตั้งค่า",
+      "deleteTitle": "คุณแน่ใจหรือไม่?",
+      "deleteDescription": "การกระทำนี้ไม่สามารถย้อนกลับได้ จะเป็นการลบการตั้งค่าอย่างถาวรสำหรับ",
+      "cancel": "ยกเลิก",
+      "confirm": "ยืนยัน",
+      "changing": "กำลังเปลี่ยนสถานะ...",
+      "deleting": "กำลังลบ...",
+      "processing": "กำลังประมวลผล..."
+    },
+    "messages": {
+      "successAdd": "เพิ่มการตั้งค่าเรียบร้อยแล้ว",
+      "successUpdate": "อัปเดตการตั้งค่าเรียบร้อยแล้ว",
+      "successDelete": "ลบการตั้งค่าเรียบร้อยแล้ว",
+      "successDeleteProject": "ลบโปรเจกต์เรียบร้อยแล้ว",
+      "successEnable": "เปิดใช้งานการตั้งค่าแล้ว",
+      "successDisable": "ปิดใช้งานการตั้งค่าแล้ว",
+      "successTrigger": "ส่งคำสั่ง Trigger การทำงานเรียบร้อยแล้ว",
+      "errorTrigger": "เกิดข้อผิดพลาดในการ Trigger",
+      "errorGeneric": "เกิดข้อผิดพลาดในการดำเนินการ",
+      "errorSave": "บันทึกข้อมูลไม่สำเร็จ",
+      "errorDelete": "ลบข้อมูลไม่สำเร็จ"
+    },
+    "logsDialog": {
+      "title": "Log การทำงานของ Pipeline",
+      "description": "รายการประวัติการทำงานของ Pipeline Schedule ทั้งหมด",
+      "searchPlaceholder": "ค้นหาด้วยชื่อโปรเจกต์ หรือข้อความ...",
+      "totalLogs": "ประวัติการทำงานทั้งหมด",
+      "rowsPerPage": "แถวต่อหน้า",
+      "limit": "จำกัด :",
+      "noData": "ไม่พบประวัติการทำงาน",
+      "allProjects": "ทุกโปรเจกต์",
+      "colExecutedAt": "เวลาเริ่มทำงาน",
+      "colProject": "โปรเจกต์",
+      "colTargetDate": "วันที่เป้าหมาย",
+      "colStep1": "ขั้นตอน 1",
+      "colStep2": "ขั้นตอน 2",
+      "colStep3": "ขั้นตอน 3",
+      "colDuration": "ระยะเวลา (ms)",
+      "colOthers": "อื่นๆ",
+      "success": "สำเร็จ",
+      "failed": "ล้มเหลว",
+      "running": "กำลังทำงาน",
+      "pending": "รอดำเนินการ",
+      "skipped": "ข้าม"
+    },
+    "noAccess": "คุณไม่มีสิทธิ์ในการเข้าถึงหน้านี้ (เฉพาะ SuperAdmin เท่านั้น)"
   }
 }

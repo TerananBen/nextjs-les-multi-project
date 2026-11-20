@@ -49,9 +49,9 @@ export function DataTable<TData, TValue>({
     const table = useReactTable({
         data,
         columns,
-        getRowId: (row) => {
+        getRowId: (row, relativeIndex) => {
             const item = row as { detail?: string; list_name?: string }
-            return item?.detail || item?.list_name || ""
+            return item?.detail || item?.list_name || `maintenance-config-${relativeIndex}`
         },
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),

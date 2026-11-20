@@ -18,12 +18,19 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-interface PermissionsTabProps {
+const EXCLUDED_MENUS = new Set([
+    "system_api_setting",
+    "v_settingapi",
+    "system_project",
+    "v_projectsetting",
+])
+
+interface PermissionsClientProps {
     initialRoles?: KeycloakRoleItem[]
     isSuperAdmin?: boolean
 }
 
-export function PermissionsTab({ initialRoles = [], isSuperAdmin = false }: PermissionsTabProps) {
+export function PermissionsClient({ initialRoles = [], isSuperAdmin = false }: PermissionsClientProps) {
     const t = useTranslations("MenuSettings")
     const { getPermission, permissions } = usePermission()
 
@@ -44,8 +51,7 @@ export function PermissionsTab({ initialRoles = [], isSuperAdmin = false }: Perm
             name.includes("super-admin") ||
             code.includes("superadmin") ||
             code.includes("super_admin") ||
-            code.includes("super-admin") ||
-            role.id === "855125b5-a3ea-48aa-a9e7-7e5abbecfaca"
+            code.includes("super-admin")
         )
     }, [])
 
@@ -130,7 +136,11 @@ export function PermissionsTab({ initialRoles = [], isSuperAdmin = false }: Perm
             setLoading(true)
             try {
                 const result = await getDataMenuAction(selectedRole)
-                setData(result)
+                const filtered = result.filter((item) => {
+                    const raw = (item.menu_name || "").toLowerCase()
+                    return !EXCLUDED_MENUS.has(raw)
+                })
+                setData(filtered)
             } catch (error) {
                 console.error("Failed to fetch menu data", error)
                 toast.error(t("fetchError"))
@@ -144,9 +154,13 @@ export function PermissionsTab({ initialRoles = [], isSuperAdmin = false }: Perm
 
     // Filter Data (Searches both raw key name and translated display name)
     const filteredData = React.useMemo(() => {
-        if (!searchQuery.trim()) return data
+        const base = data.filter((item) => {
+            const raw = (item.menu_name || "").toLowerCase()
+            return !EXCLUDED_MENUS.has(raw)
+        })
+        if (!searchQuery.trim()) return base
         const lowerQuery = searchQuery.trim().toLowerCase()
-        return data.filter((item) => {
+        return base.filter((item) => {
             const rawName = item.menu_name?.toLowerCase() || ""
             const translationKey = `menuNames.txt_list_name_${item.menu_name}`
             let translatedName = ""
@@ -218,3 +232,5 @@ export function PermissionsTab({ initialRoles = [], isSuperAdmin = false }: Perm
         </div>
     )
 }
+
+export const PermissionsTab = PermissionsClient

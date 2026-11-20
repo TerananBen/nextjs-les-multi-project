@@ -107,8 +107,7 @@ export const getColumns = (
                 const isSuperAdminUser =
                     roleName.toLowerCase().includes("superadmin") ||
                     roleName.toLowerCase().includes("super_admin") ||
-                    roleName.toLowerCase().includes("super-admin") ||
-                    row.original.roles_id === "855125b5-a3ea-48aa-a9e7-7e5abbecfaca"
+                    roleName.toLowerCase().includes("super-admin")
 
                 if (isSuperAdminUser) {
                     return (
@@ -243,8 +242,7 @@ export const getColumns = (
                 const isSuperAdminUser =
                     roleName.includes("superadmin") ||
                     roleName.includes("super_admin") ||
-                    roleName.includes("super-admin") ||
-                    row.original.roles_id === "855125b5-a3ea-48aa-a9e7-7e5abbecfaca"
+                    roleName.includes("super-admin")
 
                 return (
                     <div className="flex justify-center">

@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Button } from "@/components/ui/button"
@@ -34,8 +34,38 @@ import type { ProjectConfig } from "@/config/projects/types"
 import type { KeycloakRoleItem } from "@/types/menu-settings"
 import { COLOR_PRESET_BG_CLASSES } from "@/components/cores/setting-system/project/columns"
 import { useTranslations } from "next-intl"
-import { ChevronsUpDown, X, Eye, EyeOff, ShieldCheck, Layers } from "lucide-react"
+import { ChevronsUpDown, X, Eye, EyeOff, ShieldCheck, Layers, Copy, Check, RefreshCw } from "lucide-react"
+import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+
+function generateRandomPassword(length = 12): string {
+    const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    const lowercase = "abcdefghijklmnopqrstuvwxyz"
+    const numbers = "0123456789"
+    const all = uppercase + lowercase + numbers
+
+    const getRandom = (chars: string) => chars[Math.floor(Math.random() * chars.length)]
+
+    const required = [
+        getRandom(uppercase),
+        getRandom(lowercase),
+        getRandom(numbers),
+    ]
+
+    const remainingLength = Math.max(0, length - required.length)
+    const rest: string[] = []
+    for (let i = 0; i < remainingLength; i++) {
+        rest.push(getRandom(all))
+    }
+
+    const combined = [...required, ...rest]
+    for (let i = combined.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[combined[i], combined[j]] = [combined[j], combined[i]]
+    }
+
+    return combined.join("")
+}
 
 const projectRoleSchema = z.object({
     project_id: z.string().min(1, "Project is required"),
@@ -100,7 +130,8 @@ export function PersonalForm({
 }: PersonalFormProps) {
     const t = useTranslations('Personal')
     const [isProjectPopoverOpen, setIsProjectPopoverOpen] = React.useState(false)
-    const [showPassword, setShowPassword] = React.useState(false)
+    const [showPassword, setShowPassword] = React.useState(!initialData)
+    const [copiedPassword, setCopiedPassword] = React.useState(false)
 
     const resolveToProjectId = React.useCallback((idOrCode: string) => {
         if (!idOrCode) return ""
@@ -116,15 +147,22 @@ export function PersonalForm({
         return found ? found.id : idOrCode
     }, [projects])
 
+    const superAdminRole = React.useMemo(() => {
+        return (
+            realmRoles.find((r) => (r.name || "").toLowerCase().includes("superadmin")) ||
+            realmRoles.find((r) => (r.code || "").toLowerCase().includes("superadmin"))
+        )
+    }, [realmRoles])
+
     const isSuperAdminRole = React.useCallback((name?: string, id?: string) => {
         const lower = (name || "").toLowerCase()
         return (
             lower.includes("superadmin") ||
             lower.includes("super_admin") ||
             lower.includes("super-admin") ||
-            id === "855125b5-a3ea-48aa-a9e7-7e5abbecfaca"
+            (Boolean(superAdminRole?.id) && Boolean(id) && id === superAdminRole?.id)
         )
-    }, [])
+    }, [superAdminRole])
 
     const getProjectCode = React.useCallback((p?: ProjectConfig, fallbackId?: string) => {
         if (!p) return fallbackId || ""
@@ -205,20 +243,11 @@ export function PersonalForm({
         const roleName = (initialData.roleName || "").toLowerCase()
         return (
             roleName.includes("superadmin") ||
-            initialData.roles_id === "855125b5-a3ea-48aa-a9e7-7e5abbecfaca"
+            roleName.includes("super_admin") ||
+            roleName.includes("super-admin") ||
+            (Boolean(superAdminRole?.id) && initialData.roles_id === superAdminRole?.id)
         )
-    }, [initialData])
-
-    const superAdminRole = React.useMemo(() => {
-        return (
-            realmRoles.find((r) => r.name.toLowerCase() === "superadmin") ||
-            realmRoles.find((r) => r.code?.toLowerCase() === "superadmin") || {
-                id: "855125b5-a3ea-48aa-a9e7-7e5abbecfaca",
-                name: "SuperAdmin",
-                code: "SuperAdmin",
-            }
-        )
-    }, [realmRoles])
+    }, [initialData, superAdminRole])
 
     const form = useForm<PersonalFormValues>({
         resolver: zodResolver(formSchema),
@@ -227,19 +256,41 @@ export function PersonalForm({
             personal_lastname: initialData?.last_name || "",
             personal_username: initialData?.personal_username || "",
             personal_email: initialData?.personal_email || initialData?.email || "",
-            personal_password: "",
+            personal_password: initialData ? "" : generateRandomPassword(),
             access_level: isInitialSuperAdmin ? "SUPER_ADMIN" : "PROJECT_SCOPED",
-            roles_id: isInitialSuperAdmin ? superAdminRole.id : (defaultProjectRoles[0]?.role_id || ""),
+            roles_id: isInitialSuperAdmin ? (superAdminRole?.id || "") : (defaultProjectRoles[0]?.role_id || ""),
             project_ids: isInitialSuperAdmin ? projects.map((p) => p.id) : defaultProjects,
             project_roles: isInitialSuperAdmin ? [] : defaultProjectRoles,
         },
     })
 
+    const accessLevel = useWatch({ control: form.control, name: "access_level" })
+    const watchedProjectRoles = useWatch({ control: form.control, name: "project_roles" })
+
+    const handleCopyPassword = React.useCallback(async () => {
+        const pwd = form.getValues("personal_password")
+        if (!pwd) return
+        try {
+            await navigator.clipboard.writeText(pwd)
+            setCopiedPassword(true)
+            toast.success(t("form.passwordCopied"))
+            setTimeout(() => setCopiedPassword(false), 2000)
+        } catch {
+            // Defensive clipboard fallback
+        }
+    }, [form, t])
+
+    const handleRegeneratePassword = React.useCallback(() => {
+        const newPwd = generateRandomPassword()
+        form.setValue("personal_password", newPwd, { shouldValidate: true })
+        toast.success(t("form.passwordRegenerated"))
+    }, [form, t])
+
     React.useEffect(() => {
         if (initialData) {
             const isSuper =
                 (initialData.roleName || "").toLowerCase().includes("superadmin") ||
-                initialData.roles_id === "855125b5-a3ea-48aa-a9e7-7e5abbecfaca"
+                (Boolean(superAdminRole?.id) && initialData.roles_id === superAdminRole?.id)
 
             const pRoles =
                 initialData.project_roles && initialData.project_roles.length > 0
@@ -274,11 +325,12 @@ export function PersonalForm({
                 personal_password: "",
                 access_level: isSuper ? "SUPER_ADMIN" : "PROJECT_SCOPED",
                 roles_id: isSuper
-                    ? superAdminRole.id
+                    ? (superAdminRole?.id || (initialData.roles_id ? String(initialData.roles_id) : ""))
                     : (pRoles[0]?.role_id || (initialData.roles_id ? String(initialData.roles_id) : "")),
                 project_ids: isSuper ? projects.map((p) => p.id) : initialProjects,
                 project_roles: isSuper ? [] : pRoles,
             })
+            setShowPassword(false)
         } else {
             const firstPid = projects.length > 0 ? projects[0].id : DEFAULT_PROJECT
             const availRoles = getRolesForProject(firstPid)
@@ -289,12 +341,13 @@ export function PersonalForm({
                 personal_lastname: "",
                 personal_username: "",
                 personal_email: "",
-                personal_password: "",
+                personal_password: generateRandomPassword(),
                 access_level: "PROJECT_SCOPED",
                 roles_id: defaultRole,
                 project_ids: [firstPid],
                 project_roles: [{ project_id: firstPid, role_id: defaultRole }],
             })
+            setShowPassword(true)
         }
     }, [initialData, form, projects, resolveToProjectId, getRolesForProject, flattenedRoles, superAdminRole])
 
@@ -358,7 +411,7 @@ export function PersonalForm({
         }
 
         if (values.access_level === "SUPER_ADMIN") {
-            values.roles_id = superAdminRole.id
+            values.roles_id = superAdminRole?.id || ""
             values.project_roles = []
             values.project_ids = []
         } else {
@@ -444,29 +497,70 @@ export function PersonalForm({
                     name="personal_password"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>{t('form.password')} <span className="text-destructive">*</span> {initialData && t('form.passwordHint')}</FormLabel>
+                            <FormLabel className="flex flex-wrap items-center gap-1.5">
+                                <span>{t('form.password')}</span>
+                                {!initialData && <span className="text-destructive">*</span>}
+                                {initialData ? (
+                                    <span className="text-xs text-muted-foreground font-normal">
+                                        {t('form.passwordHint')}
+                                    </span>
+                                ) : (
+                                    <span className="text-xs text-muted-foreground font-normal">
+                                        {t('form.temporaryPasswordHint')}
+                                    </span>
+                                )}
+                            </FormLabel>
                             <FormControl>
                                 <div className="relative">
                                     <Input
                                         type={showPassword ? "text" : "password"}
                                         placeholder={t('form.passwordPlaceholder')}
-                                        className="pr-10"
+                                        className={cn(!initialData ? "pr-24 font-mono text-sm" : "pr-10")}
                                         {...field}
                                     />
-                                    <button
-                                        type="button"
-                                        onClick={() => setShowPassword(!showPassword)}
-                                        className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
-                                    >
-                                        {showPassword ? (
-                                            <EyeOff className="h-4 w-4" />
-                                        ) : (
-                                            <Eye className="h-4 w-4" />
+                                    {/* Action buttons inside password input */}
+                                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-muted-foreground">
+                                        {!initialData && (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleCopyPassword}
+                                                    title={t("form.copyPassword")}
+                                                    className="p-1.5 hover:text-foreground cursor-pointer transition-colors rounded hover:bg-muted/80"
+                                                >
+                                                    {copiedPassword ? (
+                                                        <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                                    ) : (
+                                                        <Copy className="h-4 w-4" />
+                                                    )}
+                                                    <span className="sr-only">{t("form.copyPassword")}</span>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleRegeneratePassword}
+                                                    title={t("form.regeneratePassword")}
+                                                    className="p-1.5 hover:text-foreground cursor-pointer transition-colors rounded hover:bg-muted/80"
+                                                >
+                                                    <RefreshCw className="h-4 w-4" />
+                                                    <span className="sr-only">{t("form.regeneratePassword")}</span>
+                                                </button>
+                                            </>
                                         )}
-                                        <span className="sr-only">
-                                            {showPassword ? "Hide password" : "Show password"}
-                                        </span>
-                                    </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="p-1.5 hover:text-foreground cursor-pointer transition-colors rounded hover:bg-muted/80"
+                                        >
+                                            {showPassword ? (
+                                                <EyeOff className="h-4 w-4" />
+                                            ) : (
+                                                <Eye className="h-4 w-4" />
+                                            )}
+                                            <span className="sr-only">
+                                                {showPassword ? "Hide password" : "Show password"}
+                                            </span>
+                                        </button>
+                                    </div>
                                 </div>
                             </FormControl>
                             <FormMessage />
@@ -485,14 +579,14 @@ export function PersonalForm({
                                 onClick={() => form.setValue("access_level", "PROJECT_SCOPED", { shouldValidate: true })}
                                 className={cn(
                                     "flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all",
-                                    form.watch("access_level") === "PROJECT_SCOPED"
+                                    accessLevel === "PROJECT_SCOPED"
                                         ? "border-primary bg-primary/5 text-foreground ring-1 ring-primary/30"
                                         : "border-border bg-card hover:bg-muted/40 text-muted-foreground"
                                 )}
                             >
                                 <div className={cn(
                                     "p-1.5 rounded-md mt-0.5 shrink-0",
-                                    form.watch("access_level") === "PROJECT_SCOPED" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                                    accessLevel === "PROJECT_SCOPED" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                                 )}>
                                     <Layers className="h-4 w-4" />
                                 </div>
@@ -510,14 +604,14 @@ export function PersonalForm({
                                 onClick={() => form.setValue("access_level", "SUPER_ADMIN", { shouldValidate: true })}
                                 className={cn(
                                     "flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-all",
-                                    form.watch("access_level") === "SUPER_ADMIN"
+                                    accessLevel === "SUPER_ADMIN"
                                         ? "border-primary bg-primary/5 text-foreground ring-1 ring-primary/30"
                                         : "border-border bg-card hover:bg-muted/40 text-muted-foreground"
                                 )}
                             >
                                 <div className={cn(
                                     "p-1.5 rounded-md mt-0.5 shrink-0",
-                                    form.watch("access_level") === "SUPER_ADMIN" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                                    accessLevel === "SUPER_ADMIN" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                                 )}>
                                     <ShieldCheck className="h-4 w-4" />
                                 </div>
@@ -535,7 +629,7 @@ export function PersonalForm({
                 )}
 
                 {/* Conditional: SuperAdmin Banner vs. Project Roles Assignment */}
-                {form.watch("access_level") === "SUPER_ADMIN" ? (
+                {accessLevel === "SUPER_ADMIN" ? (
                     <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-2">
                         <div className="flex items-center gap-2 flex-wrap">
                             <ShieldCheck className="h-4 w-4 text-primary shrink-0" />
@@ -694,13 +788,13 @@ export function PersonalForm({
                             {t("form.rolePerProject")} <span className="text-destructive">*</span>
                         </FormLabel>
 
-                        {form.watch("project_roles")?.length === 0 ? (
+                        {watchedProjectRoles?.length === 0 ? (
                             <div className="rounded-md border border-dashed p-4 text-center text-xs text-muted-foreground">
                                 {t("form.projectsRequired")}
                             </div>
                         ) : (
                             <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
-                                {form.watch("project_roles")?.map((pr) => {
+                                {watchedProjectRoles?.map((pr) => {
                                     const project = projects.find(
                                         (p) =>
                                             p.id === pr.project_id ||

@@ -1,7 +1,7 @@
 "use server"
 
 import { cookies, headers } from "next/headers"
-import { getProjectById, getProjectByDomain, resolveProjectUuid, resolveProjectSlug, isIpAddress } from "@/config/projects"
+import { getProjectById, getProjectByDomain, resolveProjectUuid, resolveProjectSlug, isIpAddress, DEFAULT_PROJECT } from "@/config/projects"
 import { fetchDbProjects } from "@/lib/project"
 import { decodeJwtPayload, refreshKeycloakToken, updateUserActiveProject } from "@/lib/keycloak"
 
@@ -28,7 +28,7 @@ export async function switchProject(
     getProjectById(resolveProjectUuid(newProjectId));
 
   const targetCode = targetConfig?.code || targetConfig?.id || newProjectId;
-  const projectSlug = resolveProjectSlug(targetCode) || (targetCode && typeof targetCode === "string" && !targetCode.toLowerCase().includes("[object") ? targetCode : "project-a");
+  const projectSlug = resolveProjectSlug(targetCode) || (targetCode && typeof targetCode === "string" && !targetCode.toLowerCase().includes("[object") ? targetCode : DEFAULT_PROJECT);
 
   const headerList = await headers();
   const currentHost = (headerList.get("x-forwarded-host") || headerList.get("host") || "").split(",")[0].trim();

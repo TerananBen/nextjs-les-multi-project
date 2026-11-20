@@ -1,5 +1,6 @@
 import fs from "fs"
 import path from "path"
+import { headers, cookies } from "next/headers"
 import { getTranslations } from "next-intl/server"
 import { AlertTriangle, RefreshCw } from "lucide-react"
 
@@ -7,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { LanguageSwitcher } from "@/components/common/language-switcher"
 import { ThemeSwitcher } from "@/components/common/theme-switcher"
+import { resolveProjectSlug, normalizeHostWithProject, DEFAULT_PROJECT } from "@/config/projects"
 
 interface UnauthorizedPageProps {
   params: Promise<{ locale: string }>
@@ -56,7 +58,15 @@ export default async function UnauthorizedPage({
     logoSvg = ""
   }
 
-  const restartLoginUrl = `/api/auth/login?prompt=login&locale=${locale}`
+  const headerList = await headers()
+  const rawHost = (headerList.get("x-forwarded-host") || headerList.get("host") || "").split(",")[0].trim()
+  const cookieStore = await cookies()
+  const cookieProject = cookieStore.get("current_project")?.value
+  const slug = resolveProjectSlug(cookieProject) || DEFAULT_PROJECT || "nb32-nbiot"
+  const targetHost = normalizeHostWithProject(rawHost, slug)
+  const isLocal = rawHost.includes("localhost") || rawHost.includes("127.0.0.1")
+  const proto = isLocal ? "http" : "https"
+  const restartLoginUrl = targetHost ? `${proto}://${targetHost}/api/auth/login?prompt=login&locale=${locale}` : `/api/auth/login?prompt=login&locale=${locale}`
 
   return (
     <div className="min-h-svh w-full flex flex-col items-center justify-center p-4 md:p-8 relative transition-colors duration-500 bg-background text-foreground overflow-hidden select-none">

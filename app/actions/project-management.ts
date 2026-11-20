@@ -120,6 +120,21 @@ export async function saveProject(payload: SaveProjectPayload): Promise<{ result
             const finalId = (nestRes as { id?: string }).id || id
             const finalConfig = { ...config, id: finalId, uuid: finalId, code }
             registerProject(finalConfig)
+
+            // Auto-initialize default API settings (version 1) for newly added project
+            if (payload.actionData === "ADD") {
+                try {
+                    const { saveAllApiMenuSettingsAction } = await import("@/app/actions/api-settings")
+                    const { DEFAULT_SYSTEM_MENUS } = await import("@/config/menus")
+                    await saveAllApiMenuSettingsAction(
+                        DEFAULT_SYSTEM_MENUS.map((m) => ({ menu_id: m.menu_id, api_version: 1 })),
+                        code || finalId
+                    )
+                } catch (seedErr) {
+                    console.warn("[Project Management] Auto-seed API settings warning:", seedErr)
+                }
+            }
+
             return { result: true }
         }
     } catch (e) {

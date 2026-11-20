@@ -1,4 +1,4 @@
-import { registerProjectAlias } from "@/config/projects";
+import { registerProjectAlias, DEFAULT_PROJECT } from "@/config/projects";
 
 export interface KeycloakTokenResponse {
   access_token: string;
@@ -43,7 +43,7 @@ export const getKeycloakConfig = () => {
   return {
     baseUrl: (process.env.KEYCLOAK_BASE_URL || "").replace(/\/+$/, ""),
     realm: process.env.KEYCLOAK_REALM || "",
-    clientId: process.env.KEYCLOAK_CLIENT_ID || "project-a",
+    clientId: process.env.KEYCLOAK_CLIENT_ID || DEFAULT_PROJECT,
     clientSecret: process.env.KEYCLOAK_CLIENT_SECRET || "",
   };
 };

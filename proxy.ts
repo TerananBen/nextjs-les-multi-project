@@ -1,7 +1,7 @@
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { NextRequest, NextResponse } from "next/server";
-import { getProjectByDomain, getProjectById, DEFAULT_PROJECT, resolveProjectUuid, isIpAddress } from "@/config/projects";
+import { getProjectByDomain, getProjectById, DEFAULT_PROJECT, resolveProjectUuid, resolveProjectSlug, normalizeHostWithProject, isIpAddress } from "@/config/projects";
 import { decodeJwtPayload, extractAllProjectIdsFromPayload, extractProjectCodeFromPayload, extractRolesFromPayload, refreshKeycloakToken, updateUserActiveProject } from "@/lib/keycloak";
 
 export default async function proxy(request: NextRequest) {
@@ -30,7 +30,7 @@ export default async function proxy(request: NextRequest) {
   // 1. Subdomain resolution has TOP PRIORITY (e.g. project-a.localhost or project-a.les.io)
   const isIp = isIpAddress(hostWithoutPort);
   const parts = hostWithoutPort.split(".");
-  const isLocalhost = hostWithoutPort.endsWith("localhost");
+  const isLocalhost = hostWithoutPort.endsWith("localhost") || hostWithoutPort === "127.0.0.1";
   const minParts = isLocalhost ? 1 : 2;
 
   if (!isIp && parts.length > minParts) {
@@ -95,7 +95,7 @@ export default async function proxy(request: NextRequest) {
 
   // 4. Default fallback
   if (!projectId) {
-    projectId = DEFAULT_PROJECT;
+    projectId = DEFAULT_PROJECT || "nb32-nbiot";
   }
 
   // Determine if cookie needs to be set/updated
@@ -119,21 +119,36 @@ export default async function proxy(request: NextRequest) {
     return response;
   };
 
+  // In local development, if accessing via bare localhost / 127.0.0.1, redirect to the tenant subdomain
+  if (isLocalhost && (hostWithoutPort === "localhost" || hostWithoutPort === "127.0.0.1")) {
+    const targetSlug = resolveProjectSlug(projectId) || DEFAULT_PROJECT || "nb32-nbiot";
+    const targetHost = normalizeHostWithProject(rawHost, targetSlug);
+    const redirectUrl = new URL(
+      request.nextUrl.pathname + request.nextUrl.search,
+      `http://${targetHost}`
+    );
+    return applyProjectCookie(NextResponse.redirect(redirectUrl));
+  }
+
   // Helper for login redirect
   const makeLoginRedirect = () => {
     const locale = pathname.split("/")[1] || defaultLocale;
-    const loginUrl = new URL(`/${locale}/login`, request.url);
+    const targetSlug = resolveProjectSlug(projectId) || DEFAULT_PROJECT || "nb32-nbiot";
+    const targetHost = normalizeHostWithProject(rawHost, targetSlug);
+    const proto = isLocalhost ? "http" : (process.env.USING_HTTPS === "true" ? "https" : "http");
+    const loginUrl = new URL(`/${locale}/login`, `${proto}://${targetHost}`);
     if (pathname && !pathname.includes("/login")) {
       loginUrl.searchParams.set("returnUrl", pathname);
     }
     return applyProjectCookie(NextResponse.redirect(loginUrl));
   };
 
-  // ── Public pages check (Login & Unauthorized) ──────────
+  // ── Public pages check (Login, Unauthorized & Status) ──
   const isLoginPage = pathname.includes("/login");
   const isUnauthorizedPage = pathname.includes("/unauthorized");
+  const isStatusPage = pathname === "/status" || pathname.endsWith("/status");
 
-  if (isUnauthorizedPage) {
+  if (isUnauthorizedPage || isStatusPage) {
     return applyProjectCookie(intlMiddleware(request));
   }
 
@@ -166,7 +181,10 @@ export default async function proxy(request: NextRequest) {
 
         if (!isUnauthorized) {
           const locale = pathname.split("/")[1] || defaultLocale;
-          const groupUrl = new URL(`/${locale}/dashboard/group`, request.url);
+          const targetSlug = tokenProjectCode || resolveProjectSlug(projectId) || DEFAULT_PROJECT || "nb32-nbiot";
+          const targetHost = normalizeHostWithProject(rawHost, targetSlug);
+          const proto = isLocalhost ? "http" : (process.env.USING_HTTPS === "true" ? "https" : "http");
+          const groupUrl = new URL(`/${locale}/dashboard/group`, `${proto}://${targetHost}`);
           return applyProjectCookie(NextResponse.redirect(groupUrl));
         }
       }
@@ -183,15 +201,8 @@ export default async function proxy(request: NextRequest) {
   let refreshedTokens: { access_token: string; refresh_token?: string; id_token?: string } | null = null;
 
   // If access token is missing but refresh token exists, attempt immediate refresh
-  let clientForRefresh = "project-a";
-  if (!isIp && parts.length > minParts && parts[0] && parts[0] !== "www") {
-    clientForRefresh = parts[0];
-  } else if (projectId) {
-    clientForRefresh = projectId;
-  }
-
   if (!token && refreshToken) {
-    const newTokens = await refreshKeycloakToken(refreshToken, clientForRefresh);
+    const newTokens = await refreshKeycloakToken(refreshToken);
     if (newTokens) {
       token = newTokens.access_token;
       refreshedTokens = {
@@ -239,7 +250,10 @@ export default async function proxy(request: NextRequest) {
 
     if (isUnauthorized) {
       const locale = pathname.split("/")[1] || defaultLocale;
-      const unauthUrl = new URL(`/${locale}/unauthorized`, request.url);
+      const targetSlug = hostSub || resolveProjectSlug(projectId) || DEFAULT_PROJECT || "nb32-nbiot";
+      const targetHost = normalizeHostWithProject(rawHost, targetSlug);
+      const proto = isLocalhost ? "http" : (process.env.USING_HTTPS === "true" ? "https" : "http");
+      const unauthUrl = new URL(`/${locale}/unauthorized`, `${proto}://${targetHost}`);
       const redirectResponse = NextResponse.redirect(unauthUrl);
       redirectResponse.cookies.delete("jwt");
       redirectResponse.cookies.delete("refresh_token");
@@ -262,8 +276,7 @@ export default async function proxy(request: NextRequest) {
       if (isProjectMismatch && payload.sub) {
         await updateUserActiveProject(payload.sub, projectId);
       }
-      const targetClient = (payload.azp as string) || clientForRefresh;
-      const newTokens = await refreshKeycloakToken(refreshToken, targetClient);
+      const newTokens = await refreshKeycloakToken(refreshToken, payload.azp as string);
       if (newTokens) {
         token = newTokens.access_token;
         refreshedTokens = {
@@ -392,5 +405,5 @@ export default async function proxy(request: NextRequest) {
 
 export const config = {
   // Match internationalized pathnames and unlocalized entrypoints
-  matcher: ["/", "/(th|en)/:path*", "/login", "/unauthorized"],
+  matcher: ["/", "/(th|en)/:path*", "/login", "/unauthorized", "/status"],
 };

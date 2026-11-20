@@ -34,8 +34,7 @@ export default async function Page() {
                 !name.includes("super-admin") &&
                 !code.includes("superadmin") &&
                 !code.includes("super_admin") &&
-                !code.includes("super-admin") &&
-                r.id !== "855125b5-a3ea-48aa-a9e7-7e5abbecfaca"
+                !code.includes("super-admin")
             )
         })
 

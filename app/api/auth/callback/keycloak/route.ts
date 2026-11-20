@@ -10,7 +10,7 @@ import {
   refreshKeycloakToken,
   updateUserActiveProject,
 } from "@/lib/keycloak";
-import { resolveProjectUuid, resolveProjectSlug, isIpAddress } from "@/config/projects";
+import { resolveProjectUuid, resolveProjectSlug, isIpAddress, DEFAULT_PROJECT, normalizeHostWithProject } from "@/config/projects";
 import { markEmailVerified } from "@/lib/verify-email-store";
 
 export async function GET(request: NextRequest) {
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (!resolvedClientId) {
-    resolvedClientId = process.env.KEYCLOAK_CLIENT_ID || "project-a";
+    resolvedClientId = process.env.KEYCLOAK_CLIENT_ID || DEFAULT_PROJECT;
   }
 
   // Handle Keycloak error responses (e.g. user cancelled)
@@ -130,7 +130,13 @@ export async function GET(request: NextRequest) {
     if (tokenData.refresh_token) {
       await logoutKeycloak(tokenData.refresh_token, resolvedClientId);
     }
-    const unauthRedirect = new URL(`/${targetLocale}/unauthorized`, request.url);
+    const targetProjectSlug =
+      (resolvedClientId ? resolveProjectSlug(resolvedClientId) : undefined) ||
+      DEFAULT_PROJECT ||
+      "nb32-nbiot";
+    const targetHost = normalizeHostWithProject(host, targetProjectSlug);
+    const proto = request.headers.get("x-forwarded-proto") || (usingHttps ? "https" : "http");
+    const unauthRedirect = new URL(`/${targetLocale}/unauthorized`, `${proto}://${targetHost}`);
     const response = NextResponse.redirect(unauthRedirect);
     response.cookies.delete("jwt");
     response.cookies.delete("refresh_token");
@@ -174,10 +180,10 @@ export async function GET(request: NextRequest) {
     (allowedProjects.length > 0 && !allowedProjects[0].toLowerCase().includes("[object") ? allowedProjects[0] : undefined);
 
   if (!activeProjectId || activeProjectId.toLowerCase().includes("[object")) {
-    activeProjectId = process.env.DEFAULT_PROJECT_CODE || "project-a";
+    activeProjectId = process.env.DEFAULT_PROJECT_CODE || DEFAULT_PROJECT;
   }
 
-  const projectSlug = resolveProjectSlug(activeProjectId) || "project-a";
+  const projectSlug = resolveProjectSlug(activeProjectId) || DEFAULT_PROJECT;
 
   // Update active project in Keycloak user attributes and refresh token to get updated claims
   if (payload?.sub && projectSlug) {
@@ -328,7 +334,8 @@ export async function GET(request: NextRequest) {
   }
 
   // Redirect to target dashboard preserving the actual host / subdomain
+  const targetHost = normalizeHostWithProject(host, projectSlug);
   const proto = request.headers.get("x-forwarded-proto") || (usingHttps ? "https" : "http");
-  const destination = new URL(returnUrl, `${proto}://${host}`);
+  const destination = new URL(returnUrl, `${proto}://${targetHost}`);
   return NextResponse.redirect(destination);
 }

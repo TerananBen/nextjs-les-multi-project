@@ -15,7 +15,8 @@ import {
   IconTool,
   IconFolders,
   IconApi,
-  IconServerCog,
+  IconClockPlay,
+  IconShieldLock,
 } from "@tabler/icons-react"
 import { ChevronDown } from "lucide-react"
 import { useTranslations } from "next-intl"
@@ -89,7 +90,11 @@ const menuMapping: Record<string, { title: string; icon: React.ElementType; url:
   "maintenance_dashboard": { title: "menu.maintenanceDashboard", icon: IconBriefcase, url: "/maintenance/dashboard", color: "text-cyan-600 skyblue:text-cyan-200 dark:text-cyan-300" },
   "map_disconnect": { title: "menu.mapDisconnect", icon: IconMap2, url: "/map/disconnect", color: "text-rose-500 skyblue:text-rose-300 dark:text-rose-400" },
   "map_global": { title: "menu.mapGlobal", icon: IconMap2, url: "/map/global", color: "text-teal-600 skyblue:text-teal-300 dark:text-teal-400" },
-  "system_project_permissions_api": { title: "menu.projectPermissionsApi", icon: IconServerCog, url: "/setting-system/project-permissions-api", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
+  "system_permission": { title: "menu.permission", icon: IconShieldLock, url: "/setting-system/permission", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
+  "system_project_permissions": { title: "menu.permission", icon: IconShieldLock, url: "/setting-system/permission", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
+  "system_menu_superadmin": { title: "menu.superadmin", icon: IconClockPlay, url: "/setting-system/menu-superadmin", color: "text-indigo-600 skyblue:text-indigo-300 dark:text-indigo-400" },
+  "system_project_permissions_api": { title: "menu.permission", icon: IconShieldLock, url: "/setting-system/permission", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
+  "system_pipeline_schedule": { title: "menu.superadmin", icon: IconClockPlay, url: "/setting-system/menu-superadmin", color: "text-indigo-600 skyblue:text-indigo-300 dark:text-indigo-400" },
   "system_personal": { title: "menu.personal", icon: IconUser, url: "/setting-system/personal", color: "text-teal-600 skyblue:text-teal-300 dark:text-teal-400" },
   "system_menu_permission": { title: "menu.menuSettings", icon: IconSettings, url: "/setting-system/menu-settings", color: "text-amber-600 skyblue:text-amber-300 dark:text-amber-400" },
   "system_api_setting": { title: "menu.apiSettings", icon: IconApi, url: "/setting-system/api-settings", color: "text-emerald-600 skyblue:text-emerald-300 dark:text-emerald-400" },
@@ -140,7 +145,7 @@ const menuGroups = [
   },
   {
     title: "groups.systemSettings",
-    items: ["system_personal", "system_project_permissions_api", "system_alert"],
+    items: ["system_personal", "system_permission", "system_alert", "system_menu_superadmin"],
   },
 ]
 
@@ -255,13 +260,16 @@ export function AppSidebar({ menuItems = [], user, sidebarLogo, ...props }: AppS
       .map((group) => {
         const groupItems = group.items
           .filter((menuName) => {
+            if (menuName === "system_menu_superadmin" || menuName === "system_pipeline_schedule") {
+              return isSuperAdmin
+            }
             if (isSuperAdmin) return true
-            if (menuName === "system_project_permissions_api") {
-              return (
-                readableItems.has("system_project") ||
-                readableItems.has("system_menu_permission") ||
-                readableItems.has("system_api_setting")
-              )
+            if (
+              menuName === "system_permission" ||
+              menuName === "system_project_permissions" ||
+              menuName === "system_project_permissions_api"
+            ) {
+              return readableItems.has("system_menu_permission")
             }
             return readableItems.has(menuName)
           })

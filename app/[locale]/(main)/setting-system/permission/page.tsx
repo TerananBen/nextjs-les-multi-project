@@ -1,23 +1,19 @@
-import { getProjectsList } from "@/app/actions/project-management"
-import { getApiMenuSettingsAction } from "@/app/actions/api-settings"
 import { getKeycloakRolesAction } from "@/app/actions/menu-settings"
 import { getCurrentUser } from "@/app/actions/auth"
-import { ProjectPermissionsApiClient } from "@/components/cores/setting-system/project-permissions-api/client"
+import { PermissionsClient } from "@/components/cores/setting-system/permission/client"
 import { getTranslations } from "next-intl/server"
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params
     const t = await getTranslations({ locale, namespace: "Sidebar" })
     return {
-        title: t("menu.projectPermissionsApi"),
+        title: t("menu.permission", { defaultValue: "สิทธิ์การเข้าถึง" }),
     }
 }
 
-export default async function ProjectPermissionsApiPage() {
-    const [currentUser, projectList, apiSettings, initialRoles] = await Promise.all([
+export default async function PermissionPage() {
+    const [currentUser, initialRoles] = await Promise.all([
         getCurrentUser(),
-        getProjectsList(),
-        getApiMenuSettingsAction(),
         getKeycloakRolesAction(),
     ])
 
@@ -38,17 +34,14 @@ export default async function ProjectPermissionsApiPage() {
                 !name.includes("super-admin") &&
                 !code.includes("superadmin") &&
                 !code.includes("super_admin") &&
-                !code.includes("super-admin") &&
-                r.id !== "855125b5-a3ea-48aa-a9e7-7e5abbecfaca"
+                !code.includes("super-admin")
             )
         })
 
     return (
         <div className="flex flex-1 flex-col gap-3 p-3 md:p-3">
-            <ProjectPermissionsApiClient
-                initialProjects={projectList}
+            <PermissionsClient
                 initialRoles={filteredRoles}
-                initialApiSettings={apiSettings}
                 isSuperAdmin={isSuperAdmin}
             />
         </div>

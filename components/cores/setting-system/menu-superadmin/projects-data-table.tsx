@@ -151,10 +151,10 @@ export function DataTable<TData, TValue>({
             <div className="mt-auto flex flex-col sm:flex-row items-center justify-between gap-3 px-1 py-2 text-sm text-muted-foreground">
                 <div className="flex flex-wrap items-center gap-4">
                     <span>
-                        {t("totalProjects")}: {table.getFilteredRowModel().rows.length}
+                        {t("totalProjects")} {table.getFilteredRowModel().rows.length}
                     </span>
                     <div className="flex items-center space-x-2">
-                        <span className="text-sm font-medium">{t("table.rowsPerPage") || "Rows per page:"}</span>
+                        <span className="text-sm font-medium">{t("table.rowsPerPage") || "Rows per page"}</span>
                         <Select
                             value={`${table.getState().pagination.pageSize}`}
                             onValueChange={(value) => {

@@ -84,6 +84,13 @@ export function PersonalClient({
         return map
     }, [projects])
 
+    const superAdminRoleId = React.useMemo(() => {
+        const found = realmRoles.find(
+            (r) => (r.name || "").toLowerCase().includes("superadmin") || (r.code || "").toLowerCase().includes("superadmin")
+        )
+        return found?.id
+    }, [realmRoles])
+
     const initialProjectFilter = React.useMemo(() => {
         if (isSuperAdmin) return "ALL"
         if (!currentProjectId) return "ALL"
@@ -148,7 +155,7 @@ export function PersonalClient({
                     rName.includes("superadmin") ||
                     rName.includes("super_admin") ||
                     rName.includes("super-admin") ||
-                    item.roles_id === "855125b5-a3ea-48aa-a9e7-7e5abbecfaca"
+                    (Boolean(superAdminRoleId) && item.roles_id === superAdminRoleId)
                 ) {
                     return false
                 }

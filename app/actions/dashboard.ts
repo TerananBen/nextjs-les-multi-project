@@ -78,6 +78,8 @@ export async function getListDataGroupAll(): Promise<GroupItem[]> {
             {
                 method: "GET",
                 skipProject: true,
+                timeoutMs: 10000,
+                next: { revalidate: 300, tags: ["streetlights-groups"] },
             }
         )
 
@@ -101,7 +103,7 @@ export async function getListDataGroupAll(): Promise<GroupItem[]> {
         }
         return []
     } catch (error) {
-        console.error("Error fetching group list:", error)
+        console.error("Error fetching group list (fallback to empty list):", error)
         return []
     }
 }

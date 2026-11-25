@@ -5,6 +5,7 @@ const API_URL = process.env.API_URL || "http://localhost:5000"
 export interface LesApiRequestOptions extends RequestInit {
     skipAuth?: boolean
     skipProject?: boolean
+    timeoutMs?: number
 }
 
 export async function fetchLesApi<T>(
@@ -34,11 +35,28 @@ export async function fetchLesApi<T>(
         const normalizedEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`
         const url = `${API_URL}${normalizedEndpoint}`
 
-        const response = await fetch(url, {
-            cache: "no-store",
-            ...options,
+        const timeoutMs = options.timeoutMs ?? 15000
+        let signal = options.signal
+        if (timeoutMs > 0) {
+            const timeoutSignal = AbortSignal.timeout(timeoutMs)
+            signal = options.signal ? AbortSignal.any([options.signal, timeoutSignal]) : timeoutSignal
+        }
+
+        const fetchOptions = { ...options }
+        delete fetchOptions.timeoutMs
+        delete fetchOptions.skipAuth
+        delete fetchOptions.skipProject
+
+        const fetchInit: RequestInit = {
+            ...fetchOptions,
+            signal,
             headers,
-        })
+        }
+        if (!fetchOptions.next && !fetchOptions.cache) {
+            fetchInit.cache = "no-store"
+        }
+
+        const response = await fetch(url, fetchInit)
 
         if (!response.ok) {
             const errorText = await response.text().catch(() => "")
@@ -48,7 +66,11 @@ export async function fetchLesApi<T>(
 
         return (await response.json()) as T
     } catch (error) {
-        console.error(`LES API fetch exception (${endpoint}):`, error)
+        if (error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError")) {
+            console.warn(`[LES API] Request timed out (${endpoint}):`, error.message)
+        } else {
+            console.error(`LES API fetch exception (${endpoint}):`, error)
+        }
         return null
     }
 }

@@ -7,6 +7,13 @@ import { decodeJwtPayload, extractAllProjectIdsFromPayload, extractProjectCodeFr
 export default async function proxy(request: NextRequest) {
   const defaultLocale =
     (process.env.DEFAULT_LOCALE as "en" | "th") || "th";
+  const getValidLocale = (path: string): string => {
+    const firstSegment = path.split("/")[1]?.toLowerCase();
+    if (firstSegment && (routing.locales as readonly string[]).includes(firstSegment)) {
+      return firstSegment;
+    }
+    return defaultLocale;
+  };
   const intlMiddleware = createMiddleware({
     ...routing,
     defaultLocale,
@@ -132,7 +139,7 @@ export default async function proxy(request: NextRequest) {
 
   // Helper for login redirect
   const makeLoginRedirect = () => {
-    const locale = pathname.split("/")[1] || defaultLocale;
+    const locale = getValidLocale(pathname);
     const targetSlug = resolveProjectSlug(projectId) || DEFAULT_PROJECT || "nb32-nbiot";
     const targetHost = normalizeHostWithProject(rawHost, targetSlug);
     const proto = isLocalhost ? "http" : (process.env.USING_HTTPS === "true" ? "https" : "http");
@@ -180,7 +187,7 @@ export default async function proxy(request: NextRequest) {
           tokenProjectCode !== hostSub;
 
         if (!isUnauthorized) {
-          const locale = pathname.split("/")[1] || defaultLocale;
+          const locale = getValidLocale(pathname);
           const targetSlug = tokenProjectCode || resolveProjectSlug(projectId) || DEFAULT_PROJECT || "nb32-nbiot";
           const targetHost = normalizeHostWithProject(rawHost, targetSlug);
           const proto = isLocalhost ? "http" : (process.env.USING_HTTPS === "true" ? "https" : "http");
@@ -249,7 +256,7 @@ export default async function proxy(request: NextRequest) {
       tokenProjectCode !== hostSub;
 
     if (isUnauthorized) {
-      const locale = pathname.split("/")[1] || defaultLocale;
+      const locale = getValidLocale(pathname);
       const targetSlug = hostSub || resolveProjectSlug(projectId) || DEFAULT_PROJECT || "nb32-nbiot";
       const targetHost = normalizeHostWithProject(rawHost, targetSlug);
       const proto = isLocalhost ? "http" : (process.env.USING_HTTPS === "true" ? "https" : "http");
@@ -404,6 +411,10 @@ export default async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Match internationalized pathnames and unlocalized entrypoints
-  matcher: ["/", "/(th|en)/:path*", "/login", "/unauthorized", "/status"],
+  // Match all request paths except for:
+  // - API routes (/api/*)
+  // - Next.js internals (/_next/*)
+  // - Vercel internals (/_vercel/*)
+  // - Static files containing dots (e.g. favicon.ico, images, svg, css, js)
+  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
 };

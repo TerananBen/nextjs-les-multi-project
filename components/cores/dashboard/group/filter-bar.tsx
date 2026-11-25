@@ -35,13 +35,14 @@ import { toast } from "sonner"
 interface FilterBarProps {
     defaultGroupCode?: string
     groups: GroupItem[],
+    isLoadingGroups?: boolean,
     startDate?: string,
     onSearch: (groupCode: string, type: string, date: string) => void,
     onPrint?: () => void,
     isGeneratingPdf?: boolean
 }
 
-export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPrint, isGeneratingPdf }: FilterBarProps) {
+export function FilterBar({ defaultGroupCode, groups, isLoadingGroups, startDate, onSearch, onPrint, isGeneratingPdf }: FilterBarProps) {
     const t = useTranslations("GroupDashboard.filter")
     const locale = useLocale()
     const [selectedGroup, setSelectedGroup] = useState<string>(defaultGroupCode || "")
@@ -701,14 +702,23 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                 >
                     <ComboboxInput className="cursor-pointer h-9 w-full rounded-md bg-background border-input shadow-xs text-sm" placeholder={t("selectGroupPlaceholder")} />
                     <ComboboxContent searchPlaceholder={t("searchGroupPlaceholder")}>
-                        <ComboboxEmpty>{t("noGroupFound")}</ComboboxEmpty>
-                        <ComboboxList>
-                            {groupOptions.map((group, index) => (
-                                <ComboboxItem key={`${group.group_code || "grp"}-${group.group_name}-${index}`} value={group.group_name}>
-                                    {group.group_name}
-                                </ComboboxItem>
-                            ))}
-                        </ComboboxList>
+                        {isLoadingGroups ? (
+                            <div className="flex items-center justify-center py-4 text-xs text-muted-foreground gap-2">
+                                <Loader2 className="size-3.5 animate-spin" />
+                                <span>{t("selectGroupPlaceholder")}</span>
+                            </div>
+                        ) : (
+                            <>
+                                <ComboboxEmpty>{t("noGroupFound")}</ComboboxEmpty>
+                                <ComboboxList>
+                                    {groupOptions.map((group, index) => (
+                                        <ComboboxItem key={`${group.group_code || "grp"}-${group.group_name}-${index}`} value={group.group_name}>
+                                            {group.group_name}
+                                        </ComboboxItem>
+                                    ))}
+                                </ComboboxList>
+                            </>
+                        )}
                     </ComboboxContent>
                 </Combobox>
             </div>

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { FilterBar } from "./filter-bar"
 import { SummaryCards } from "./summary-cards"
 import { ChartsSection } from "./charts-section"
-import { GroupItem, DashboardData, getDataDashBoard } from "@/app/actions/dashboard"
+import { GroupItem, DashboardData, getDataDashBoard, getListDataGroupAll } from "@/app/actions/dashboard"
 import { toPng } from "html-to-image"
 import { toast } from "sonner"
 import { IoTReportPDF } from "./pdf-report"
@@ -12,7 +12,7 @@ import { pdf } from "@react-pdf/renderer"
 import { useTranslations, useLocale } from "next-intl"
 
 interface GroupDashboardClientProps {
-    groups: GroupItem[],
+    groups?: GroupItem[],
     startDate?: string,
     defaultGroupCode?: string
 }
@@ -58,8 +58,39 @@ function aggregateDashboardResponses(
 }
 
 export function GroupDashboardClient({ groups, startDate, defaultGroupCode }: GroupDashboardClientProps) {
+    const [groupsList, setGroupsList] = useState<GroupItem[]>(groups || [])
+    const [isLoadingGroups, setIsLoadingGroups] = useState(!groups || groups.length === 0)
     const [data, setData] = useState<DashboardData | null>(null)
     const [loading, setLoading] = useState(false)
+
+    useEffect(() => {
+        if (groups && groups.length > 0) {
+            setGroupsList(groups)
+            setIsLoadingGroups(false)
+            return
+        }
+
+        let isMounted = true
+        setIsLoadingGroups(true)
+        getListDataGroupAll()
+            .then((res) => {
+                if (isMounted && res && res.length > 0) {
+                    setGroupsList(res)
+                }
+            })
+            .catch((err) => {
+                console.error("Failed to load group list on client:", err)
+            })
+            .finally(() => {
+                if (isMounted) {
+                    setIsLoadingGroups(false)
+                }
+            })
+
+        return () => {
+            isMounted = false
+        }
+    }, [groups])
 
     // Initial state
     const currentDate = new Date()
@@ -325,7 +356,7 @@ export function GroupDashboardClient({ groups, startDate, defaultGroupCode }: Gr
                 failureChartImage = await toPng(failureNode, { pixelRatio: 2 })
             }
 
-            const activeGroupProps = groups.find(g => g.group_code === currentGroupCode)
+            const activeGroupProps = groupsList.find(g => g.group_code === currentGroupCode)
             const isAllProject = !currentGroupCode || currentGroupCode === defaultGroupCode
             const title = isAllProject
                 ? t("pdf.titleAll")
@@ -382,7 +413,8 @@ export function GroupDashboardClient({ groups, startDate, defaultGroupCode }: Gr
         <div className="flex flex-col gap-3.5 w-full">
             <FilterBar
                 defaultGroupCode={defaultGroupCode}
-                groups={groups}
+                groups={groupsList}
+                isLoadingGroups={isLoadingGroups}
                 startDate={startDate}
                 onSearch={handleSearch}
                 onPrint={handlePrint}

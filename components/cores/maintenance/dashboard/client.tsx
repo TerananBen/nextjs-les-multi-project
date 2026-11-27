@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { DataTable } from "./data-table"
 import { useMaintenanceColumns } from "./columns"
 import { DetailDialog } from "@/components/cores/maintenance/detail/detail-dialog"
-import { Search, RotateCcw, AlertCircle, Clock, CheckCircle2, Lightbulb, CalendarIcon, X, ShieldAlert } from "lucide-react"
+import { Search, AlertCircle, Clock, CheckCircle2, Lightbulb, CalendarIcon, X, ShieldAlert } from "lucide-react"
 import { usePermission } from "@/components/providers/permission-provider"
 import { format } from "date-fns"
 import { th, enUS } from "date-fns/locale"
@@ -107,15 +107,6 @@ export default function MaintenanceDashboardClient({
     React.useEffect(() => {
         executeFetch(dateRange, technician, supervisor)
     }, [executeFetch, dateRange, technician, supervisor])
-
-    const handleReset = () => {
-        setDateRange(undefined)
-        setTechnician("ALL")
-        setSupervisor("ALL")
-        setSearchQuery("")
-    }
-
-    const isFiltered = Boolean(dateRange?.from || technician !== "ALL" || supervisor !== "ALL" || searchQuery.trim())
 
     // Filter table records by search query
     const filteredRecords = React.useMemo(() => {

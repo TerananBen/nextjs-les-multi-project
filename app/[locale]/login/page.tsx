@@ -5,9 +5,10 @@ import { LanguageSwitcher } from "@/components/common/language-switcher"
 import { ThemeSwitcher } from "@/components/common/theme-switcher"
 import { getTranslations } from "next-intl/server"
 
-import { cookies, headers } from "next/headers"
+import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 import { isKeycloakConfigured, decodeJwtPayload, extractAllProjectIdsFromPayload, extractRolesFromPayload } from "@/lib/keycloak"
+import { getAuthToken } from "@/lib/auth-cookies"
 import { resolveProjectUuid } from "@/config/projects"
 
 interface LoginPageProps {
@@ -33,8 +34,7 @@ export default async function LoginPage({ params, searchParams }: LoginPageProps
     const resolvedSearchParams = searchParams ? await searchParams : {}
 
     // 1. Check if user already has an active session -> redirect to /dashboard/group (if authorized for this project)
-    const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken()
     if (token && isTokenValid(token)) {
         const headerList = await headers()
         const host = (headerList.get("x-forwarded-host") || headerList.get("host") || "").split(",")[0].trim()

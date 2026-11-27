@@ -1,6 +1,7 @@
 "use server"
 
 import { cookies } from "next/headers"
+import { getAuthToken } from "@/lib/auth-cookies"
 
 const API_URL = process.env.API_URL
 
@@ -70,7 +71,7 @@ export interface MaintenanceConfigRecord {
 
 export async function getListDataOperatorAndAdmin(): Promise<OperatorAndAdminData | null> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     if (!API_URL || !token) return null
 
@@ -99,7 +100,7 @@ export async function getListDataOperatorAndAdmin(): Promise<OperatorAndAdminDat
 
 export async function getListDataOperator(): Promise<UserOption[]> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     if (!API_URL || !token) return []
 
@@ -137,7 +138,7 @@ export async function getListDataOperator(): Promise<UserOption[]> {
 
 export async function getDataListAllMaintenanceDashboard(params: MaintenanceDashboardParams): Promise<MaintenanceDashboardData | null> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     if (!API_URL || !token) return null
 
@@ -166,7 +167,7 @@ export async function getDataListAllMaintenanceDashboard(params: MaintenanceDash
 
 export async function getDetailDataMaintenance(id: string): Promise<MaintenanceDetailRecord[] | null> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     if (!API_URL || !token) return null
 
@@ -195,7 +196,7 @@ export async function getDetailDataMaintenance(id: string): Promise<MaintenanceD
 
 export async function getLoadImage(id: string): Promise<MaintenanceImageRecord[] | null> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     if (!API_URL || !token) return null
 
@@ -224,7 +225,7 @@ export async function getLoadImage(id: string): Promise<MaintenanceImageRecord[]
 
 export async function getDataListMaintenanceTotal(): Promise<MaintenanceConfigRecord[] | null> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     if (!API_URL || !token) return null
 
@@ -263,7 +264,7 @@ export interface MaintenanceDetailListRecord {
 
 export async function getDataListMaintenanceDetail(): Promise<MaintenanceDetailListRecord[] | null> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     if (!API_URL || !token) return null
 
@@ -299,7 +300,7 @@ export interface SaveDataMaintenancePayload {
 
 export async function saveAddDataMaintenanceAction(payload: SaveDataMaintenancePayload): Promise<{ success: boolean; message?: string }> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     if (!API_URL || !token) return { success: false, message: "Authentication required" }
 
@@ -328,7 +329,7 @@ export async function saveAddDataMaintenanceAction(payload: SaveDataMaintenanceP
 
 export async function deleteDetailDataMaintenanceAction(id: string): Promise<{ success: boolean; message?: string }> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     if (!API_URL || !token) return { success: false, message: "Authentication required" }
 
@@ -362,7 +363,7 @@ export interface ConfirmDataMaintenancePayload {
 
 export async function confirmDataMaintenanceAction(payload: ConfirmDataMaintenancePayload): Promise<{ success: boolean; message?: string }> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     if (!API_URL || !token) return { success: false, message: "Authentication required" }
 
@@ -407,7 +408,7 @@ export interface UploadImageRes {
 
 export async function uploadImageAction(payload: UploadImageReq): Promise<{ success: boolean; data?: UploadImageRes["dataReturn"]; message?: string }> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     if (!API_URL || !token) return { success: false, message: "Authentication required" }
 
@@ -448,7 +449,7 @@ export interface DeleteImageRes {
 
 export async function deleteImageAction(payload: DeleteImageReq): Promise<{ success: boolean; message?: string }> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     if (!API_URL || !token) return { success: false, message: "Authentication required" }
 
@@ -484,7 +485,7 @@ export interface ConfirmDataMaintenanceDetailPayload {
 
 export async function confirmDataMaintenanceDetailAction(payload: ConfirmDataMaintenanceDetailPayload): Promise<{ success: boolean; message?: string }> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     if (!API_URL || !token) return { success: false, message: "Authentication required" }
 
@@ -519,7 +520,7 @@ export interface MaintenanceCaseSavePayload {
 
 export async function maintenanceCaseSaveAction(payload: MaintenanceCaseSavePayload): Promise<{ success: boolean; message?: string }> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     if (!API_URL || !token) return { success: false, message: "Authentication required" }
 

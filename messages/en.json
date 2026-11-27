@@ -13,6 +13,18 @@
     "loginAnotherAccount": "Log in with another account",
     "backToLogin": "Back to login"
   },
+  "StatusPage": {
+    "title": "System Status",
+    "heading": "Next.js Server is Running",
+    "description": "This public diagnostic page is active and accessible without Keycloak authentication.",
+    "statusLabel": "Status",
+    "statusValue": "Online",
+    "environmentLabel": "Environment",
+    "hostLabel": "Host",
+    "protocolLabel": "Protocol",
+    "localeLabel": "Locale",
+    "timestampLabel": "Server Time"
+  },
   "LanguageSwitcher": {
     "label": "Switch Language"
   },
@@ -36,14 +48,18 @@
       "mapGlobal": "Map Global",
       "personal": "Personal",
       "menuSettings": "Menu Settings",
-      "projectPermissionsApi": "Projects, Permissions & API",
+      "permission": "Permissions",
+      "projectPermissions": "Permissions",
+      "superadmin": "SuperAdmin Settings",
+      "projectPermissionsApi": "Permissions",
       "apiSettings": "API Settings",
       "scheduleSettings": "Schedule Settings",
       "streetLight": "Street Light",
       "maintenanceDetail": "Maintenance Detail",
       "mapChangeLamp": "Map Change Lamp",
       "deviceSettings": "Device Settings",
-      "projectSettings": "Project Settings"
+      "projectSettings": "Project Settings",
+      "pipelineSchedule": "SuperAdmin Settings"
     }
   },
   "ThemeSwitcher": {
@@ -265,6 +281,17 @@
       "password": "Password",
       "passwordPlaceholder": "Password",
       "passwordHint": "(Leave blank to keep current)",
+      "temporaryPasswordHint": "(Temporary password, user will be required to change it upon first login)",
+      "copyPassword": "Copy password",
+      "passwordCopied": "Password copied to clipboard",
+      "regeneratePassword": "Generate new password",
+      "passwordRegenerated": "New password generated",
+      "resetPassword": "Reset Password",
+      "resettingPassword": "Resetting...",
+      "resetPasswordTitle": "Confirm Password Reset",
+      "resetPasswordDescription": "This will generate a new temporary password, update Keycloak, and require the user to update their password on next login for",
+      "resetPasswordSuccessHint": "(Temporary password set; user will be required to change it on next login)",
+      "resetPasswordPlaceholder": "Click Reset Password to generate a temporary password",
       "newPassword": "New Password",
       "confirmPassword": "Confirm Password",
       "role": "Role",
@@ -293,8 +320,19 @@
       "securityTab": "Security",
       "accountDetails": "Account Details",
       "reloginWarning": "If you change your password, you will be automatically logged out to sign in again.",
-      "passwordMismatch": "Passwords do not match",
-      "passwordMinLength": "Password must be at least 6 characters",
+      "passwordMismatch": "New passwords do not match",
+      "passwordMinLength": "Password must be at least 8 characters",
+      "passwordUppercase": "Password must contain at least 1 uppercase letter (A-Z)",
+      "passwordLowercase": "Password must contain at least 1 lowercase letter (a-z)",
+      "passwordNumber": "Password must contain at least 1 number (0-9)",
+      "passwordRequiredWhenConfirm": "Please enter a new password",
+      "passwordBlacklisted": "This password is in the common/blacklisted passwords list. Please choose a different password.",
+      "passwordPolicyTitle": "Password must meet the following requirements:",
+      "policyMinLength": "At least 8 characters",
+      "policyUppercase": "At least 1 uppercase letter (A-Z)",
+      "policyLowercase": "At least 1 lowercase letter (a-z)",
+      "policyNumber": "At least 1 number (0-9)",
+      "policyMatch": "Passwords match",
       "currentPasswordRequired": "Current password is required to save changes",
       "firstNameRequired": "First name is required",
       "lastNameRequired": "Last name is required",
@@ -313,6 +351,8 @@
       "errorSave": "Failed to save user",
       "errorDelete": "Failed to delete user",
       "errorStatus": "Failed to update status",
+      "successResetPassword": "Temporary password reset successfully (user will be required to update password on next login)",
+      "errorResetPassword": "Failed to reset password",
       "errorGeneric": "An error occurred"
     }
   },
@@ -341,12 +381,34 @@
       "weekOf": "Week of",
       "dateRangeLimit": "Selection limited to 15 days.",
       "invalidDateRange": "End date must be after start date.",
-      "monthRangeLimit": "Selection limited to 12 months."
+      "monthRangeLimit": "Selection limited to 12 months.",
+      "pickQuarter": "Pick Quarter",
+      "quarterRangeLimit": "Selection limited to 8 quarters.",
+      "pickYear": "Pick Year",
+      "yearRangeLimit": "Selection limited to 10 years."
     },
     "summary": {
       "onlineTotal": "Online/Total",
       "lamp": "Lamp",
       "lampFailure": "Lamp failure",
+      "internetFailure": "Connection Lost",
+      "viewDeviceList": "Click to view devices",
+      "deviceDialogTitleRtu": "Device List - Lamp Failure",
+      "deviceDialogTitleInternet": "Device List - Connection Lost",
+      "deviceTable": {
+        "sn": "Serial Number (SN / IMEI)",
+        "streetName": "Lamp Name",
+        "group": "Group",
+        "coordinates": "Coordinates (Lat, Lng)",
+        "voltage": "Voltage (V)",
+        "wattage": "Power (W)",
+        "searchPlaceholder": "Search by device number, name, or group...",
+        "totalItems": "Total {count} items",
+        "totalDevice": "Total Device",
+        "rowsPerPage": "Rows per page :",
+        "noData": "No devices found",
+        "close": "Close"
+      },
       "onlineStatus": "Online Status",
       "failureCount": "Failure Count",
       "voltage": "Voltage",
@@ -958,8 +1020,8 @@
     "readable": "Readable",
     "writable": "Writable",
     "control": "Control",
-    "totalMenu": "Total Menu :",
-    "rowsPerPage": "Rows per page :",
+    "totalMenu": "Total Menu",
+    "rowsPerPage": "Rows per page",
     "loading": "Loading...",
     "noData": "No Data",
     "noAccess": "You do not have permission to access this page",
@@ -1010,10 +1072,11 @@
   },
   "ApiSettings": {
     "title": "API Settings",
+    "selectProject": "Select Project",
     "menuName": "Menu Name",
     "apiVersion": "API Version",
-    "totalMenu": "Total Menu :",
-    "rowsPerPage": "Rows per page :",
+    "totalMenu": "Total Menu",
+    "rowsPerPage": "Rows per page",
     "loading": "Loading...",
     "noData": "No Data",
     "searchPlaceholder": "Search by menu name...",
@@ -1023,10 +1086,15 @@
     "saveSuccess": "Settings updated successfully",
     "saveError": "Failed to update settings",
     "fetchError": "Failed to fetch API settings",
+    "loadError": "Failed to load project API settings",
     "noPermission": "No permission to edit settings",
     "noAccess": "You do not have permission to access this page",
     "unsavedChanges": "{count} unsaved changes",
-    "modified": "Modified"
+    "modified": "Modified",
+    "statusConfigured": "Configured",
+    "statusNotConfigured": "Not Configured",
+    "notConfiguredAlertTitle": "This project has not been configured for API",
+    "notConfiguredAlertDesc": "Displaying default settings (Version 1). Please select the desired API versions and click 'Save' to activate this project's configuration."
   },
   "ScheduleSettings": {
     "title": "Schedule Settings",
@@ -1280,8 +1348,8 @@
       "disabled": "Disabled",
       "reset": "Reset Filters"
     },
-    "totalProjects": "Total Projects :",
-    "rowsPerPage": "Rows per page :",
+    "totalProjects": "Total Projects",
+    "rowsPerPage": "Rows per page",
     "table": {
       "id": "Project ID",
       "code": "Project Code",
@@ -1296,7 +1364,7 @@
       "actions": "Actions",
       "permissionDenied": "Permission denied",
       "loading": "Loading...",
-      "rowsPerPage": "Rows per page :"
+      "rowsPerPage": "Rows per page"
     },
     "form": {
       "addTitle": "Add New Project",
@@ -1348,6 +1416,21 @@
       "permissionDenied": "Permission denied"
     }
   },
+  "Permission": {
+    "title": "Permissions",
+    "description": "Manage menu access permissions for each role",
+    "noAccess": "You do not have permission to access this page"
+  },
+  "MenuSuperadmin": {
+    "title": "SuperAdmin Settings",
+    "description": "Manage project configurations, pipeline schedules and API settings for SuperAdmin",
+    "tabs": {
+      "projects": "Projects",
+      "pipeline": "Pipeline Schedule",
+      "apiSettings": "API Settings"
+    },
+    "noAccess": "You do not have permission to access this page"
+  },
   "ProjectPermissionsApi": {
     "title": "Projects, Permissions & API",
     "description": "Manage project configurations, menu permissions, and API menu versions",
@@ -1357,5 +1440,143 @@
       "apiSettings": "API Settings"
     },
     "noAccess": "You do not have permission to access this page"
+  },
+  "PipelineSchedule": {
+    "title": "Pipeline Schedule",
+    "description": "Manage pipeline schedules, trigger repair and restore operations",
+    "filter": {
+      "allProjects": "All Projects",
+      "allJobTypes": "All Job Types",
+      "searchPlaceholder": "Search configuration name...",
+      "addConfig": "Add Configuration",
+      "viewLogs": "Execution Logs"
+    },
+    "table": {
+      "name": "Configuration Name",
+      "jobType": "Job Type",
+      "projects": "Projects",
+      "startTime": "Start Time",
+      "trigger": "Trigger",
+      "repair": "Repair",
+      "restore": "Restore",
+      "status": "Status",
+      "actions": "Actions",
+      "edit": "Edit",
+      "delete": "Delete",
+      "active": "Active",
+      "disabled": "Disabled",
+      "totalDevice": "Total Items",
+      "rowsPerPage": "Rows per page",
+      "noData": "No data found",
+      "more": "more",
+      "projectsCount": "projects"
+    },
+    "dialog": {
+      "addTitle": "Add Configuration",
+      "editTitle": "Edit Configuration",
+      "nameLabel": "Configuration Name",
+      "namePlaceholder": "Enter configuration name...",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Enter description (optional)...",
+      "jobTypeLabel": "Job Type",
+      "jobTypeDashboardPipeline": "Dashboard Pipeline",
+      "jobTypeDashboardNotification": "Dashboard Notification",
+      "typeLabel": "Schedule Type",
+      "typeDaily": "Daily",
+      "dailyTimesLabel": "Working Time",
+      "delayLabel": "Delay (seconds)",
+      "delayPlaceholder": "e.g. 10",
+      "seconds": "seconds",
+      "projectsHeader": "Projects",
+      "selectProject": "Select project...",
+      "searchProjectPlaceholder": "Search project...",
+      "noProjectFound": "No project found",
+      "displayName": "Display Name",
+      "projectDailyTimes": "Working Time",
+      "customTime": "Custom Time",
+      "notificationStatus": "Notification Status",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "errors": {
+        "nameRequired": "Configuration name is required",
+        "timeRequired": "Working time is required",
+        "projectRequired": "At least one project is required"
+      }
+    },
+    "repairDialog": {
+      "title": "Process Repair Data",
+      "dateLabel": "Date Range (between start date and latest date)",
+      "startDate": "Start Date",
+      "latestDate": "Latest Date",
+      "pickDate": "Pick a date range",
+      "confirm": "Start Repair",
+      "processing": "Processing...",
+      "success": "Repair processing initiated successfully",
+      "error": "Failed to process repair"
+    },
+    "restoreDialog": {
+      "title": "Restore Data",
+      "dateLabel": "Date Range (between start date and latest date)",
+      "startDate": "Start Date",
+      "latestDate": "Latest Date",
+      "pickDate": "Pick a date range",
+      "reprocessDashboard": "Reprocess Dashboard Data",
+      "confirm": "Start Restore",
+      "processing": "Processing...",
+      "success": "Restore processing initiated successfully",
+      "error": "Failed to process restore"
+    },
+    "form": {
+      "statusTitle": "Change Status",
+      "statusDescription": "Are you sure you want to change the status of",
+      "triggerTitle": "Trigger Pipeline Execution",
+      "triggerDescription": "Are you sure you want to trigger immediate pipeline execution for",
+      "deleteTitle": "Are you sure?",
+      "deleteDescription": "This action cannot be undone. This will permanently delete configuration for",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "changing": "Changing...",
+      "deleting": "Deleting...",
+      "processing": "Processing..."
+    },
+    "messages": {
+      "successAdd": "Configuration added successfully",
+      "successUpdate": "Configuration updated successfully",
+      "successDelete": "Configuration deleted successfully",
+      "successDeleteProject": "Project removed successfully",
+      "successEnable": "Configuration enabled",
+      "successDisable": "Configuration disabled",
+      "successTrigger": "Trigger command sent successfully",
+      "errorTrigger": "Failed to trigger pipeline execution",
+      "errorGeneric": "An unexpected error occurred",
+      "errorSave": "Failed to save configuration",
+      "errorDelete": "Failed to delete configuration"
+    },
+    "logsDialog": {
+      "title": "Pipeline Execution Logs",
+      "description": "History and execution logs of pipeline schedules",
+      "searchPlaceholder": "Search by project name or message...",
+      "totalLogs": "Total Logs",
+      "rowsPerPage": "Rows per page",
+      "limit": "Limit:",
+      "noData": "No execution logs found",
+      "allProjects": "All Projects",
+      "colExecutedAt": "Start Time",
+      "colProject": "Project",
+      "colTargetDate": "Target Date",
+      "colStep1": "Step 1",
+      "colStep2": "Step 2",
+      "colStep3": "Step 3",
+      "colDuration": "Duration (ms)",
+      "colOthers": "Others",
+      "success": "Success",
+      "failed": "Failed",
+      "running": "Running",
+      "pending": "Pending",
+      "skipped": "Skipped"
+    },
+    "noAccess": "You do not have permission to access this page (SuperAdmin only)"
   }
 }

@@ -49,9 +49,9 @@ export function DataTable<TData, TValue>({
     const table = useReactTable({
         data,
         columns,
-        getRowId: (row) => {
-            const item = row as { SN?: string; streetLightSerial?: string; imeI_Name?: string }
-            return item?.SN || item?.streetLightSerial || item?.imeI_Name || ""
+        getRowId: (row, relativeIndex) => {
+            const item = row as { SN?: string; imeI_Name?: string }
+            return item?.SN || item?.imeI_Name || `street-light-${relativeIndex}`
         },
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),

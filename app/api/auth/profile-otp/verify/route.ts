@@ -38,7 +38,8 @@ export async function POST(request: NextRequest) {
         await fetchNestJs("/api/users/verify-email", {
           method: "POST",
           body: JSON.stringify({ userId, username, email }),
-          skipAuth: true,
+          useServiceToken: true,
+          skipProject: true,
         });
       } catch (kcErr) {
         console.warn("[Profile OTP Verify] Warning: Failed to update email verification on backend:", kcErr);

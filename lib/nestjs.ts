@@ -1,32 +1,47 @@
-import { cookies } from "next/headers"
 import { getActiveProjectCode } from "@/lib/project"
+import { getBffServiceToken, invalidateBffServiceToken } from "@/lib/keycloak"
+import { getAuthToken } from "@/lib/auth-cookies"
 
 const BACKEND_BASE_URL = process.env.API_URL || "http://localhost:5000"
 
 export interface NestJsRequestOptions extends RequestInit {
     skipAuth?: boolean
     skipProject?: boolean
+    useServiceToken?: boolean
 }
 
-export async function fetchNestJs<T>(
+export interface NestJsDetailedResult<T> {
+    ok: boolean
+    status: number
+    data: T | null
+    errorText?: string
+    message?: string
+}
+
+export async function fetchNestJsDetailed<T>(
     endpoint: string,
     options: NestJsRequestOptions = {}
-): Promise<T | null> {
+): Promise<NestJsDetailedResult<T>> {
     try {
-        const cookieStore = await cookies()
-        const token = cookieStore.get("jwt")?.value
+        const { skipAuth, skipProject, useServiceToken, ...fetchInit } = options
+        const token = await getAuthToken()
 
         const headers: Record<string, string> = {
             "Content-Type": "application/json",
-            ...(options.headers as Record<string, string> || {}),
+            ...(fetchInit.headers as Record<string, string> || {}),
         }
 
-        if (!options.skipAuth && token) {
+        if (useServiceToken) {
+            const serviceToken = await getBffServiceToken()
+            if (serviceToken) {
+                headers["Authorization"] = `Bearer ${serviceToken}`
+            }
+        } else if (!skipAuth && token) {
             headers["Authorization"] = `Bearer ${token}`
         }
 
-        if (!options.skipProject) {
-            const projectCode = (options.headers as Record<string, string>)?.[
+        if (!skipProject) {
+            const projectCode = (fetchInit.headers as Record<string, string>)?.[
                 "X-Project-Name"
             ] || (await getActiveProjectCode())
             if (projectCode) {
@@ -44,23 +59,72 @@ export async function fetchNestJs<T>(
         }
         const url = `${BACKEND_BASE_URL}${cleanEndpoint}`
 
-        const response = await fetch(url, {
+        let response = await fetch(url, {
             cache: "no-store",
-            ...options,
+            ...fetchInit,
             headers,
         })
+
+        // Retry once with a fresh BFF service token if cached token was rejected
+        if (response.status === 401 && useServiceToken) {
+            invalidateBffServiceToken()
+            const freshToken = await getBffServiceToken()
+            if (freshToken) {
+                headers["Authorization"] = `Bearer ${freshToken}`
+                response = await fetch(url, {
+                    cache: "no-store",
+                    ...fetchInit,
+                    headers,
+                })
+            }
+        }
 
         if (!response.ok) {
             const errorText = await response.text().catch(() => "")
             console.error(`NestJS API error [${response.status}]: ${response.statusText} (${url}) -> ${errorText}`)
-            return null
+            let parsedMessage: string | undefined
+            try {
+                const parsed = JSON.parse(errorText)
+                parsedMessage = parsed.message || parsed.errorMessage || parsed.error_description || parsed.error
+                if (Array.isArray(parsedMessage)) {
+                    parsedMessage = parsedMessage.join(", ")
+                }
+            } catch {
+                parsedMessage = errorText
+            }
+            return {
+                ok: false,
+                status: response.status,
+                data: null,
+                errorText,
+                message: parsedMessage,
+            }
         }
 
-        return (await response.json()) as T
+        const data = (await response.json().catch(() => null)) as T
+        return {
+            ok: true,
+            status: response.status,
+            data,
+        }
     } catch (error) {
         console.error(`NestJS API fetch exception (${endpoint}):`, error)
-        return null
+        return {
+            ok: false,
+            status: 500,
+            data: null,
+            errorText: String(error),
+            message: "Network or server connection failed",
+        }
     }
+}
+
+export async function fetchNestJs<T>(
+    endpoint: string,
+    options: NestJsRequestOptions = {}
+): Promise<T | null> {
+    const res = await fetchNestJsDetailed<T>(endpoint, options)
+    return res.ok ? res.data : null
 }
 
 export async function fetchMenuNestJs<T>(

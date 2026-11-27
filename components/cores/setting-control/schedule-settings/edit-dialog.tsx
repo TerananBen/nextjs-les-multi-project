@@ -309,7 +309,7 @@ export function EditScheduleDialog({
                         data.groupCode ||
                         ""
                     ).trim() || "new"
-                  )
+                )
                 : "new"
 
             // Construct Payload

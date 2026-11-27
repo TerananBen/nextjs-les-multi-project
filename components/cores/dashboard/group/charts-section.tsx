@@ -83,6 +83,65 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
         fontSize: "12px",
     }
 
+    const formatAxisTick = (value: string) => {
+        if (isHourly) return value
+        if (typeof value === "string" && value.includes("-Q")) {
+            const [, q] = value.split("-")
+            const qNum = q.replace("Q", "")
+            if (locale === "th") {
+                return `ไตรมาส ${qNum}`
+            }
+            return `Q${qNum}`
+        }
+        if (typeof value === "string" && /^\d{4}$/.test(value)) {
+            return locale === "th" ? String(Number(value) + 543) : value
+        }
+        if (typeof value === "string" && /^\d{4}-\d{2}$/.test(value)) {
+            const [y, m] = value.split("-").map(Number)
+            const date = new Date(y, m - 1, 1)
+            if (locale === "th") {
+                const monthStr = date.toLocaleDateString("th-TH", { month: "short" })
+                return `${monthStr} '${(y + 543).toString().slice(-2)}`
+            }
+            return `${date.toLocaleDateString("en-US", { month: "short" })} '${Number(y).toString().slice(-2)}`
+        }
+        const date = new Date(value)
+        if (isNaN(date.getTime())) return value
+        return date.toLocaleDateString(locale === "th" ? "th-TH" : "en-US", {
+            day: "numeric",
+            month: "short",
+        })
+    }
+
+    const formatTooltipLabel = (value: string) => {
+        if (isHourly) return `${t("time")}: ${value}`
+        if (typeof value === "string" && value.includes("-Q")) {
+            const [y, q] = value.split("-")
+            const qNum = q.replace("Q", "")
+            if (locale === "th") {
+                return `ไตรมาส ${qNum} ${Number(y) + 543}`
+            }
+            return `Q${qNum} ${y}`
+        }
+        if (typeof value === "string" && /^\d{4}$/.test(value)) {
+            return locale === "th" ? `ปี ${Number(value) + 543}` : `Year ${value}`
+        }
+        if (typeof value === "string" && /^\d{4}-\d{2}$/.test(value)) {
+            const [y, m] = value.split("-").map(Number)
+            const date = new Date(y, m - 1, 1)
+            if (locale === "th") {
+                return `${date.toLocaleDateString("th-TH", { month: "long" })} ${y + 543}`
+            }
+            return `${date.toLocaleDateString("en-US", { month: "long", year: "numeric" })}`
+        }
+        const date = new Date(value)
+        if (isNaN(date.getTime())) return value
+        if (locale === "th") {
+            return date.toLocaleDateString("th-TH", { day: "numeric", month: "long", year: "numeric" })
+        }
+        return date.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })
+    }
+
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5 w-full">
             {/* Chart 1: Energy Consumption */}
@@ -112,14 +171,7 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
                                 tickLine={false}
                                 axisLine={false}
                                 tickMargin={10}
-                                tickFormatter={(value) => {
-                                    if (isHourly) return value
-                                    const date = new Date(value)
-                                    return date.toLocaleDateString(locale, {
-                                        day: "numeric",
-                                        month: "short",
-                                    })
-                                }}
+                                tickFormatter={formatAxisTick}
                                 fontSize={12}
                                 tick={{ fill: "var(--muted-foreground)" }}
                             />
@@ -135,14 +187,7 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
                                 labelStyle={{ color: "var(--popover-foreground)", fontWeight: 600, marginBottom: "4px" }}
                                 separator=""
                                 formatter={(value: unknown) => [t("energyTooltip", { value: Number(value) }), ""]}
-                                labelFormatter={(value) => {
-                                    if (isHourly) return `${t("time")}: ${value}`
-                                    return new Date(value).toLocaleDateString(locale, {
-                                        day: "numeric",
-                                        month: "short",
-                                        year: "numeric"
-                                    })
-                                }}
+                                labelFormatter={formatTooltipLabel}
                             />
                             <Area
                                 type="monotone"
@@ -179,13 +224,7 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
                                 tickLine={false}
                                 axisLine={false}
                                 tickMargin={10}
-                                tickFormatter={(value) => {
-                                    const date = new Date(value)
-                                    return date.toLocaleDateString(locale, {
-                                        day: "numeric",
-                                        month: "short",
-                                    })
-                                }}
+                                tickFormatter={formatAxisTick}
                                 fontSize={12}
                                 tick={{ fill: "var(--muted-foreground)" }}
                             />
@@ -203,13 +242,7 @@ export function ChartsSection({ data, loading }: ChartsSectionProps) {
                                 labelStyle={{ color: "var(--popover-foreground)", fontWeight: 600, marginBottom: "4px" }}
                                 separator=""
                                 formatter={(value: unknown) => [t("lampFailureTooltip", { value: Number(value) }), ""]}
-                                labelFormatter={(value) => {
-                                    return new Date(value).toLocaleDateString(locale, {
-                                        day: "numeric",
-                                        month: "short",
-                                        year: "numeric"
-                                    })
-                                }}
+                                labelFormatter={formatTooltipLabel}
                             />
                             <Bar
                                 dataKey="value"

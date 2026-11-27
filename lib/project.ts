@@ -18,8 +18,27 @@ import {
   extractProjectCodeFromPayload,
   extractProjectsMapFromPayload,
 } from "@/lib/keycloak";
+import { getAuthToken } from "@/lib/auth-cookies";
 
 const BACKEND_BASE_URL = process.env.API_URL || "http://localhost:5000";
+
+const fetchIamWithUserToken = async (
+  url: string,
+  accessTokenOverride?: string
+): Promise<Response | null> => {
+  const token = accessTokenOverride ?? (await getAuthToken());
+
+  if (!token) {
+    return null;
+  }
+
+  return fetch(url, {
+    cache: "no-store",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
 
 /**
  * Resolve project ID from request Host / x-forwarded-host header (e.g. project-b.localhost)
@@ -62,11 +81,12 @@ export const resolveProjectFromHost = async (hostHeader?: string): Promise<strin
 /**
  * Fetch all projects via Backend API and sync to memory registry
  */
-export const fetchDbProjects = async (): Promise<ProjectConfig[]> => {
+export const fetchDbProjects = async (accessTokenOverride?: string): Promise<ProjectConfig[]> => {
   try {
-    const res = await fetch(`${BACKEND_BASE_URL}/api/iam/projects`, {
-      cache: "no-store",
-    });
+    const res = await fetchIamWithUserToken(`${BACKEND_BASE_URL}/api/iam/projects`, accessTokenOverride);
+    if (!res) {
+      return getAllProjects();
+    }
     if (res.ok) {
       const data = (await res.json()) as NestProjectRaw[];
       if (Array.isArray(data) && data.length > 0) {
@@ -84,7 +104,7 @@ export const fetchDbProjects = async (): Promise<ProjectConfig[]> => {
 
 export const getUserProjectIds = async (): Promise<string[]> => {
   const cookieStore = await cookies();
-  const token = cookieStore.get("jwt")?.value;
+  const token = await getAuthToken(cookieStore);
 
   // Load live DB projects into registry
   const dbProjects = await fetchDbProjects();
@@ -133,7 +153,7 @@ export const getProjectId = async (): Promise<string> => {
   let activeProject = defaultId;
 
   // 1. Authenticated Keycloak session (User's project code / tenant in JWT claims)
-  const token = cookieStore.get("jwt")?.value;
+  const token = await getAuthToken(cookieStore);
   if (token) {
     const payload = decodeJwtPayload(token);
     const tokenProjectCode = extractProjectCodeFromPayload(payload);
@@ -201,10 +221,8 @@ export const getProjectConfig = async (): Promise<ProjectConfig> => {
 
   // 2. Fetch live project config from database via NestJS
   try {
-    const res = await fetch(`${BACKEND_BASE_URL}/api/iam/projects/${encodeURIComponent(activeProject)}`, {
-      cache: "no-store",
-    });
-    if (res.ok) {
+    const res = await fetchIamWithUserToken(`${BACKEND_BASE_URL}/api/iam/projects/${encodeURIComponent(activeProject)}`);
+    if (res && res.ok) {
       const data = (await res.json()) as NestProjectRaw;
       if (data?.id) {
         const config = normalizeNestProject(data);
@@ -222,7 +240,7 @@ export const getProjectConfig = async (): Promise<ProjectConfig> => {
 export const getActiveProjectCode = async (): Promise<string> => {
   const cookieStore = await cookies();
   const cookieProject = cookieStore.get("current_project")?.value;
-  const token = cookieStore.get("jwt")?.value;
+  const token = await getAuthToken(cookieStore);
 
   // Ensure DB projects are loaded into registry
   const dbProjects = await fetchDbProjects();
@@ -253,6 +271,6 @@ export const getActiveProjectCode = async (): Promise<string> => {
       p.uuid?.toLowerCase() === defaultId.toLowerCase() ||
       p.code?.toLowerCase() === defaultId.toLowerCase()
   );
-  return foundDefault?.code || defaultId || "project-a";
+  return foundDefault?.code || defaultId || DEFAULT_PROJECT;
 };
 

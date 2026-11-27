@@ -35,13 +35,14 @@ import { toast } from "sonner"
 interface FilterBarProps {
     defaultGroupCode?: string
     groups: GroupItem[],
+    isLoadingGroups?: boolean,
     startDate?: string,
     onSearch: (groupCode: string, type: string, date: string) => void,
     onPrint?: () => void,
     isGeneratingPdf?: boolean
 }
 
-export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPrint, isGeneratingPdf }: FilterBarProps) {
+export function FilterBar({ defaultGroupCode, groups, isLoadingGroups, startDate, onSearch, onPrint, isGeneratingPdf }: FilterBarProps) {
     const t = useTranslations("GroupDashboard.filter")
     const locale = useLocale()
     const [selectedGroup, setSelectedGroup] = useState<string>(defaultGroupCode || "")
@@ -98,14 +99,23 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
     const years = Array.from({ length: yearCount }, (_, i) => currentYear - i)
 
     // We'll use separate states for complex pickers to make UI handling easier
-    const [selectedYear, setSelectedYear] = useState<string>(String(currentYear))
     // State for Month picker (month range as {from, to} with 1st of month dates)
     const [monthRange, setMonthRange] = useState<{ from?: Date; to?: Date }>({
         from: new Date(new Date().getFullYear(), new Date().getMonth(), 1)
     })
     const [monthPickerYear, setMonthPickerYear] = useState(currentYear)
 
-    const [selectedQuarter, setSelectedQuarter] = useState<string>("1")
+    // State for Quarter picker (quarter range as {from, to} with {year, quarter})
+    const currentQuarter = Math.floor(new Date().getMonth() / 3) + 1
+    const [quarterRange, setQuarterRange] = useState<{ from?: { year: number; quarter: number }; to?: { year: number; quarter: number } }>({
+        from: { year: currentYear, quarter: currentQuarter }
+    })
+    const [quarterPickerYear, setQuarterPickerYear] = useState(currentYear)
+
+    // State for Year picker (year range as {from, to})
+    const [yearRange, setYearRange] = useState<{ from?: number; to?: number }>({
+        from: currentYear
+    })
 
     const handleSearch = () => {
         if (selectedGroup && selectedType) {
@@ -137,10 +147,22 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                 } else {
                     searchDate = startStr
                 }
-            } else if (selectedType === "Quarter") {
-                searchDate = `${selectedYear}-Q${selectedQuarter}`
-            } else if (selectedType === "Year") {
-                searchDate = selectedYear
+            } else if (selectedType === "Quarter" && quarterRange.from) {
+                const fromStr = `${quarterRange.from.year}-Q${quarterRange.from.quarter}`
+                if (quarterRange.to) {
+                    const toStr = `${quarterRange.to.year}-Q${quarterRange.to.quarter}`
+                    searchDate = fromStr === toStr ? fromStr : `${fromStr}_${toStr}`
+                } else {
+                    searchDate = fromStr
+                }
+            } else if (selectedType === "Year" && yearRange.from) {
+                const fromStr = String(yearRange.from)
+                if (yearRange.to) {
+                    const toStr = String(yearRange.to)
+                    searchDate = fromStr === toStr ? fromStr : `${fromStr}_${toStr}`
+                } else {
+                    searchDate = fromStr
+                }
             } else if (selectedType === "Week" && singleDate) {
                 const start = startOfWeek(singleDate, { weekStartsOn: 1 })
                 const end = endOfWeek(singleDate, { weekStartsOn: 1 })
@@ -154,6 +176,21 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
     }
 
 
+
+    const formatDayDisplay = (d: Date) => {
+        if (locale === "th") {
+            return d.toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" })
+        }
+        return d.toLocaleDateString("en-US", { day: "numeric", month: "short", year: "numeric" })
+    }
+
+    const formatMonthDisplay = (d: Date) => {
+        if (locale === "th") {
+            const m = d.toLocaleDateString("th-TH", { month: "short" })
+            return `${m} ${d.getFullYear() + 543}`
+        }
+        return d.toLocaleDateString("en-US", { month: "short", year: "numeric" })
+    }
 
     const renderDateInput = () => {
         if (selectedType === "Day") {
@@ -175,11 +212,11 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                                     {dateRange?.from ? (
                                         dateRange.to ? (
                                             <>
-                                                {format(dateRange.from, "PPP", { locale: locale === "th" ? th : enUS })} -{" "}
-                                                {format(dateRange.to, "PPP", { locale: locale === "th" ? th : enUS })}
+                                                {formatDayDisplay(dateRange.from)} -{" "}
+                                                {formatDayDisplay(dateRange.to)}
                                             </>
                                         ) : (
-                                            format(dateRange.from, "PPP", { locale: locale === "th" ? th : enUS })
+                                            formatDayDisplay(dateRange.from)
                                         )
                                     ) : (
                                         t("pickDate")
@@ -241,7 +278,7 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                             >
                                 <span className="truncate mr-2">
                                     {singleDate ? (
-                                        `${t("weekOf")} ${format(singleDate, "PPP", { locale: locale === "th" ? th : enUS })}`
+                                        `${t("weekOf")} ${formatDayDisplay(singleDate)}`
                                     ) : (
                                         t("pickWeek")
                                     )}
@@ -345,11 +382,11 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                                     {monthRange.from ? (
                                         monthRange.to ? (
                                             <>
-                                                {format(monthRange.from, "MMM yyyy", { locale: locale === "th" ? th : enUS })} -{" "}
-                                                {format(monthRange.to, "MMM yyyy", { locale: locale === "th" ? th : enUS })}
+                                                {formatMonthDisplay(monthRange.from)} -{" "}
+                                                {formatMonthDisplay(monthRange.to)}
                                             </>
                                         ) : (
-                                            format(monthRange.from, "MMM yyyy", { locale: locale === "th" ? th : enUS })
+                                            formatMonthDisplay(monthRange.from)
                                         )
                                     ) : (
                                         t("pickDate")
@@ -420,62 +457,225 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
             const currentMonthIdx = new Date().getMonth()
             const currentQuarter = Math.floor(currentMonthIdx / 3) + 1
 
-            return (
-                <div className="flex gap-2 w-full sm:w-auto">
-                    <div className="flex-1 sm:flex-initial">
-                        <Select value={selectedQuarter} onValueChange={setSelectedQuarter}>
-                            <SelectTrigger className="cursor-pointer h-9 w-full sm:w-[130px] bg-background shadow-xs text-sm">
-                                <SelectValue placeholder="Quarter" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {[1, 2, 3, 4].map(q => {
-                                    // Disable future quarters in current year
-                                    const isFuture = Number(selectedYear) === currentYear && q > currentQuarter
-                                    // Disable quarters before start date in start year
-                                    const isBeforeStart = Number(selectedYear) === startYear && q < startQuarter
+            const handleQuarterClick = (q: number) => {
+                const clickedIdx = quarterPickerYear * 4 + q
+                const currentIdx = currentYear * 4 + currentQuarter
+                const startIdx = startYear * 4 + startQuarter
+                if (clickedIdx > currentIdx || clickedIdx < startIdx) return
 
-                                    return (
-                                        <SelectItem className="cursor-pointer" key={q} value={String(q)} disabled={isFuture || isBeforeStart}>
-                                            {t("quarter")} {q}
-                                        </SelectItem>
-                                    )
-                                })}
-                            </SelectContent>
-                        </Select>
-                    </div>
-                    <div className="flex-1 sm:flex-initial">
-                        <Select value={selectedYear} onValueChange={setSelectedYear}>
-                            <SelectTrigger className="cursor-pointer h-9 w-full sm:w-[130px] bg-background shadow-xs text-sm">
-                                <SelectValue placeholder="Year" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {years.map(y => (
-                                    <SelectItem className="cursor-pointer" key={y} value={String(y)}>
-                                        {locale === "th" ? (y + 543) : y}
-                                    </SelectItem>
+                if (!quarterRange.from || (quarterRange.from && quarterRange.to)) {
+                    setQuarterRange({ from: { year: quarterPickerYear, quarter: q } })
+                } else {
+                    let from = quarterRange.from
+                    let to = { year: quarterPickerYear, quarter: q }
+                    const fIdx = from.year * 4 + from.quarter
+                    const tIdx = to.year * 4 + to.quarter
+                    if (tIdx < fIdx) {
+                        ;[from, to] = [to, from]
+                    }
+                    const diff = (to.year * 4 + to.quarter) - (from.year * 4 + from.quarter)
+                    if (diff >= 8) {
+                        toast.error(t("quarterRangeLimit"))
+                        return
+                    }
+                    setQuarterRange({ from, to })
+                }
+            }
+
+            const isQuarterSelected = (q: number) => {
+                if (quarterRange.from && quarterRange.from.year === quarterPickerYear && quarterRange.from.quarter === q) return true
+                if (quarterRange.to && quarterRange.to.year === quarterPickerYear && quarterRange.to.quarter === q) return true
+                return false
+            }
+
+            const isQuarterInRange = (q: number) => {
+                if (!quarterRange.from || !quarterRange.to) return false
+                const idx = quarterPickerYear * 4 + q
+                const fromIdx = quarterRange.from.year * 4 + quarterRange.from.quarter
+                const toIdx = quarterRange.to.year * 4 + quarterRange.to.quarter
+                return idx > fromIdx && idx < toIdx
+            }
+
+            const isQuarterDisabled = (q: number) => {
+                const idx = quarterPickerYear * 4 + q
+                const currentIdx = currentYear * 4 + currentQuarter
+                const startIdx = startYear * 4 + startQuarter
+                return idx > currentIdx || idx < startIdx
+            }
+
+            const getQuarterLabel = () => {
+                if (!quarterRange.from) return t("pickQuarter")
+                const fromYearDisplay = locale === "th" ? quarterRange.from.year + 543 : quarterRange.from.year
+                const fromPrefix = locale === "th" ? "ไตรมาส " : "Q"
+                const fromText = `${fromPrefix}${quarterRange.from.quarter} ${fromYearDisplay}`
+                if (quarterRange.to) {
+                    const toYearDisplay = locale === "th" ? quarterRange.to.year + 543 : quarterRange.to.year
+                    const toPrefix = locale === "th" ? "ไตรมาส " : "Q"
+                    const toText = `${toPrefix}${quarterRange.to.quarter} ${toYearDisplay}`
+                    return fromText === toText ? fromText : `${fromText} - ${toText}`
+                }
+                return fromText
+            }
+
+            return (
+                <div className="flex items-center gap-2 w-full min-w-0">
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant="outline"
+                                className={cn(
+                                    "cursor-pointer h-9 flex-1 min-w-0 sm:w-auto sm:min-w-[200px] pl-3 pr-2 text-left font-normal bg-background shadow-xs text-sm flex items-center justify-between",
+                                    !quarterRange.from && "text-muted-foreground"
+                                )}
+                            >
+                                <span className="truncate mr-2">{getQuarterLabel()}</span>
+                                <CalendarIcon className="h-4 w-4 opacity-50 shrink-0" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[280px] p-3" align="start">
+                            <div className="flex items-center justify-between mb-3">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="cursor-pointer h-7 w-7"
+                                    onClick={() => setQuarterPickerYear(y => y - 1)}
+                                    disabled={quarterPickerYear <= startYear}
+                                >
+                                    <ChevronLeft className="h-4 w-4" />
+                                </Button>
+                                <span className="text-sm font-medium">
+                                    {locale === "th" ? quarterPickerYear + 543 : quarterPickerYear}
+                                </span>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="cursor-pointer h-7 w-7"
+                                    onClick={() => setQuarterPickerYear(y => y + 1)}
+                                    disabled={quarterPickerYear >= currentYear}
+                                >
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                                {[1, 2, 3, 4].map(q => (
+                                    <Button
+                                        key={q}
+                                        variant={isQuarterSelected(q) ? "default" : "ghost"}
+                                        size="sm"
+                                        disabled={isQuarterDisabled(q)}
+                                        className={cn(
+                                            "cursor-pointer h-10 text-sm font-medium",
+                                            isQuarterInRange(q) && "bg-accent text-accent-foreground",
+                                            isQuarterSelected(q) && "bg-primary text-primary-foreground hover:bg-primary/90"
+                                        )}
+                                        onClick={() => handleQuarterClick(q)}
+                                    >
+                                        {locale === "th" ? `ไตรมาส ${q}` : `Q${q}`}
+                                    </Button>
                                 ))}
-                            </SelectContent>
-                        </Select>
-                    </div>
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+                    {quarterRange.from && (
+                        <Button
+                            variant="outline"
+                            onClick={() => setQuarterRange({})}
+                            className="cursor-pointer h-9 px-3 sm:px-4 shrink-0 shadow-xs bg-background text-muted-foreground hover:text-foreground"
+                        >
+                            <X className="w-4 h-4 mr-1.5" />
+                            {t("clearButton")}
+                        </Button>
+                    )}
                 </div>
             )
         }
 
         if (selectedType === "Year") {
+            const handleYearClick = (y: number) => {
+                if (y > currentYear || y < startYear) return
+
+                if (!yearRange.from || (yearRange.from && yearRange.to)) {
+                    setYearRange({ from: y })
+                } else {
+                    let from = yearRange.from
+                    let to = y
+                    if (to < from) {
+                        ;[from, to] = [to, from]
+                    }
+                    if (to - from >= 10) {
+                        toast.error(t("yearRangeLimit"))
+                        return
+                    }
+                    setYearRange({ from, to })
+                }
+            }
+
+            const isYearSelected = (y: number) => {
+                if (yearRange.from === y) return true
+                if (yearRange.to === y) return true
+                return false
+            }
+
+            const isYearInRange = (y: number) => {
+                if (!yearRange.from || !yearRange.to) return false
+                return y > yearRange.from && y < yearRange.to
+            }
+
+            const getYearLabel = () => {
+                if (!yearRange.from) return t("pickYear")
+                const fromDisplay = locale === "th" ? yearRange.from + 543 : yearRange.from
+                if (yearRange.to) {
+                    const toDisplay = locale === "th" ? yearRange.to + 543 : yearRange.to
+                    return fromDisplay === toDisplay ? String(fromDisplay) : `${fromDisplay} - ${toDisplay}`
+                }
+                return String(fromDisplay)
+            }
+
             return (
-                <div className="w-full sm:w-auto">
-                    <Select value={selectedYear} onValueChange={setSelectedYear}>
-                        <SelectTrigger className="cursor-pointer h-9 w-full sm:w-[130px] bg-background shadow-xs text-sm">
-                            <SelectValue placeholder="Year" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {years.map(y => (
-                                <SelectItem className="cursor-pointer" key={y} value={String(y)}>
-                                    {locale === "th" ? (y + 543) : y}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                <div className="flex items-center gap-2 w-full min-w-0">
+                    <Popover>
+                        <PopoverTrigger asChild>
+                            <Button
+                                variant="outline"
+                                className={cn(
+                                    "cursor-pointer h-9 flex-1 min-w-0 sm:w-auto sm:min-w-[200px] pl-3 pr-2 text-left font-normal bg-background shadow-xs text-sm flex items-center justify-between",
+                                    !yearRange.from && "text-muted-foreground"
+                                )}
+                            >
+                                <span className="truncate mr-2">{getYearLabel()}</span>
+                                <CalendarIcon className="h-4 w-4 opacity-50 shrink-0" />
+                            </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[280px] p-3 max-h-[300px] overflow-y-auto" align="start">
+                            <div className="grid grid-cols-3 gap-1.5">
+                                {years.map(y => (
+                                    <Button
+                                        key={y}
+                                        variant={isYearSelected(y) ? "default" : "ghost"}
+                                        size="sm"
+                                        className={cn(
+                                            "cursor-pointer h-9 text-sm",
+                                            isYearInRange(y) && "bg-accent text-accent-foreground",
+                                            isYearSelected(y) && "bg-primary text-primary-foreground hover:bg-primary/90"
+                                        )}
+                                        onClick={() => handleYearClick(y)}
+                                    >
+                                        {locale === "th" ? y + 543 : y}
+                                    </Button>
+                                ))}
+                            </div>
+                        </PopoverContent>
+                    </Popover>
+                    {yearRange.from && (
+                        <Button
+                            variant="outline"
+                            onClick={() => setYearRange({})}
+                            className="cursor-pointer h-9 px-3 sm:px-4 shrink-0 shadow-xs bg-background text-muted-foreground hover:text-foreground"
+                        >
+                            <X className="w-4 h-4 mr-1.5" />
+                            {t("clearButton")}
+                        </Button>
+                    )}
                 </div>
             )
         }
@@ -502,14 +702,23 @@ export function FilterBar({ defaultGroupCode, groups, startDate, onSearch, onPri
                 >
                     <ComboboxInput className="cursor-pointer h-9 w-full rounded-md bg-background border-input shadow-xs text-sm" placeholder={t("selectGroupPlaceholder")} />
                     <ComboboxContent searchPlaceholder={t("searchGroupPlaceholder")}>
-                        <ComboboxEmpty>{t("noGroupFound")}</ComboboxEmpty>
-                        <ComboboxList>
-                            {groupOptions.map((group, index) => (
-                                <ComboboxItem key={`${group.group_code || "grp"}-${group.group_name}-${index}`} value={group.group_name}>
-                                    {group.group_name}
-                                </ComboboxItem>
-                            ))}
-                        </ComboboxList>
+                        {isLoadingGroups ? (
+                            <div className="flex items-center justify-center py-4 text-xs text-muted-foreground gap-2">
+                                <Loader2 className="size-3.5 animate-spin" />
+                                <span>{t("selectGroupPlaceholder")}</span>
+                            </div>
+                        ) : (
+                            <>
+                                <ComboboxEmpty>{t("noGroupFound")}</ComboboxEmpty>
+                                <ComboboxList>
+                                    {groupOptions.map((group, index) => (
+                                        <ComboboxItem key={`${group.group_code || "grp"}-${group.group_name}-${index}`} value={group.group_name}>
+                                            {group.group_name}
+                                        </ComboboxItem>
+                                    ))}
+                                </ComboboxList>
+                            </>
+                        )}
                     </ComboboxContent>
                 </Combobox>
             </div>

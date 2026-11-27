@@ -49,9 +49,9 @@ export function DataTable<TData, TValue>({
     const table = useReactTable({
         data,
         columns,
-        getRowId: (row) => {
+        getRowId: (row, relativeIndex) => {
             const item = row as { group_code?: string; group_name?: string }
-            return item?.group_code || item?.group_name || ""
+            return item?.group_code || item?.group_name || `group-${relativeIndex}`
         },
         getCoreRowModel: getCoreRowModel(),
         getPaginationRowModel: getPaginationRowModel(),

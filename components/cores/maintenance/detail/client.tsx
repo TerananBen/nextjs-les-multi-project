@@ -7,10 +7,8 @@ import { useMaintenanceDetailColumns } from "./columns"
 import { DataTable } from "./data-table"
 import { DetailDialog } from "./detail-dialog"
 import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, RotateCcw, X, Wrench, Lightbulb, CheckCircle2, Clock, ShieldAlert } from "lucide-react"
+import { Search, X, Wrench, Lightbulb, CheckCircle2, Clock, ShieldAlert } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { usePermission } from "@/components/providers/permission-provider"
 
@@ -98,12 +96,6 @@ export function MaintenanceDetailClient({
     }, [data, statusFilter, operatorFilter, searchQuery])
 
     const isFiltered = searchQuery !== "" || statusFilter !== "ALL" || operatorFilter !== "ALL"
-
-    const handleResetFilters = () => {
-        setSearchQuery("")
-        setStatusFilter("ALL")
-        setOperatorFilter("ALL")
-    }
 
     if (!isReadable) {
         return (

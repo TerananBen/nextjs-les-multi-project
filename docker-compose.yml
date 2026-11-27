@@ -1,13 +1,20 @@
-version: '3'
-
 services:
   app:
-    container_name: nextjs-chadcn-dashboard
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: frontend-nextjs-multi-project:0.0.1
+    container_name: les_frontend_next
     restart: always
+    environment:
+      NODE_ENV: production
+      NEXTAUTH_URL: "https://nb32-nbiot.lesplatform.com"
+      NEXTAUTH_SECRET: "SjQ1hlsYdfLj3hY4LB76mFwdElzJB4"
+      AUTH_TRUST_HOST: true
     ports:
-      - 3000:3000
+      - "127.0.0.1:3000:3000"
     env_file:
       - .env
+    networks:
+      - LES_NETWORK
+
+networks:
+  LES_NETWORK:
+    external: true

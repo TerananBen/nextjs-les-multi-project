@@ -22,9 +22,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
-import { Link } from "@/i18n/routing"
 import { toast } from "sonner"
 import { useTranslations } from "next-intl"
+import { ProfileDialog } from "@/components/cores/profile/profile-dialog"
 
 export interface NavUserProps {
   user?: {
@@ -32,11 +32,16 @@ export interface NavUserProps {
     email?: string
     avatar?: string
     role?: string
+    userId?: string
+    firstName?: string
+    lastName?: string
+    userName?: string
   }
 }
 
 export function NavUser({ user }: NavUserProps) {
   const t = useTranslations("UserMenu")
+  const [isProfileOpen, setIsProfileOpen] = React.useState(false)
 
   if (!user) return null
 
@@ -49,7 +54,8 @@ export function NavUser({ user }: NavUserProps) {
   }
 
   return (
-    <DropdownMenu>
+    <>
+      <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
@@ -95,11 +101,12 @@ export function NavUser({ user }: NavUserProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem asChild>
-            <Link href="/profile" className="cursor-pointer flex items-center gap-2 w-full">
-              <IconUserCircle className="size-4" />
-              <span>{t("account")}</span>
-            </Link>
+          <DropdownMenuItem
+            className="cursor-pointer flex items-center gap-2 w-full"
+            onClick={() => setIsProfileOpen(true)}
+          >
+            <IconUserCircle className="size-4" />
+            <span>{t("account")}</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
@@ -115,5 +122,12 @@ export function NavUser({ user }: NavUserProps) {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+
+    <ProfileDialog
+      open={isProfileOpen}
+      onOpenChange={setIsProfileOpen}
+      user={user}
+    />
+  </>
   )
 }

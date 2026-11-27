@@ -25,7 +25,6 @@ import { refreshStreetLightPowerAction, sendStreetLightCommandAction } from "@/a
 import * as React from "react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
 import { Slider } from "@/components/ui/slider"
 import { Send } from "lucide-react"
 import {
@@ -367,7 +366,7 @@ export const useStreetLightColumns = (onCommandSuccess?: (imei: string, command:
                     <ArrowUpDown className="ml-1.5 h-3.5 w-3.5 text-muted-foreground" />
                 </Button>
             ),
-            cell: ({ row }) => <span className="font-mono text-sm text-foreground">{row.original.imeI_Name || "-"}</span>,
+            cell: ({ row }) => <span className="font-mono text-sm text-foreground">{row.original.SN || row.original.imeI_Name || "-"}</span>,
         },
         {
             accessorKey: "streetLightName", // Name + Serial/Gov
@@ -404,12 +403,9 @@ export const useStreetLightColumns = (onCommandSuccess?: (imei: string, command:
                         <div className="flex justify-center">
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Badge
-                                        variant="outline"
-                                        className="text-xs font-normal max-w-[200px] truncate bg-muted/40 text-foreground cursor-default hover:bg-muted/70 transition-colors"
-                                    >
+                                    <span className="text-xs text-foreground font-medium max-w-[200px] truncate cursor-default">
                                         {groups[0]}
-                                    </Badge>
+                                    </span>
                                 </TooltipTrigger>
                                 <TooltipContent side="top" className="max-w-xs text-xs">
                                     <p>{groups[0]}</p>
@@ -422,12 +418,9 @@ export const useStreetLightColumns = (onCommandSuccess?: (imei: string, command:
                     <div className="flex items-center justify-center gap-1.5">
                         <Tooltip>
                             <TooltipTrigger asChild>
-                                <Badge
-                                    variant="outline"
-                                    className="text-xs font-normal max-w-[150px] truncate bg-muted/40 text-foreground cursor-default hover:bg-muted/70 transition-colors"
-                                >
+                                <span className="text-xs text-foreground font-medium max-w-[150px] truncate cursor-default">
                                     {groups[0]}
-                                </Badge>
+                                </span>
                             </TooltipTrigger>
                             <TooltipContent side="top" className="max-w-xs text-xs">
                                 <p>{groups[0]}</p>

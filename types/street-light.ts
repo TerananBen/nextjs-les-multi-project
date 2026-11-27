@@ -11,6 +11,7 @@ export interface GetListDataGroupResponse {
 }
 
 export interface StreetLightDevice {
+    SN: string;
     imeI_Name: string;
     streetLightName: string;
     streetLightSerial: string;

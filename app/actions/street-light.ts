@@ -38,6 +38,7 @@ function mapToStreetLightDevice(item: unknown): StreetLightDevice {
     }
 
     return {
+        SN: String(d.SN ?? d.sn ?? imei),
         imeI_Name: imei,
         streetLightName: String(d.streetLightName ?? d.street_light_name ?? d.StreetLightName ?? "ไม่มีข้อมูล"),
         streetLightSerial: String(d.streetLightSerial ?? d.gov_name ?? d.GOV_No ?? d.govName ?? "ไม่มีข้อมูล"),

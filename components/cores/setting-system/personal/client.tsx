@@ -18,7 +18,6 @@ import { cn } from "@/lib/utils"
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
@@ -84,6 +83,13 @@ export function PersonalClient({
         return map
     }, [projects])
 
+    const superAdminRoleId = React.useMemo(() => {
+        const found = realmRoles.find(
+            (r) => (r.name || "").toLowerCase().includes("superadmin") || (r.code || "").toLowerCase().includes("superadmin")
+        )
+        return found?.id
+    }, [realmRoles])
+
     const initialProjectFilter = React.useMemo(() => {
         if (isSuperAdmin) return "ALL"
         if (!currentProjectId) return "ALL"
@@ -148,7 +154,7 @@ export function PersonalClient({
                     rName.includes("superadmin") ||
                     rName.includes("super_admin") ||
                     rName.includes("super-admin") ||
-                    item.roles_id === "855125b5-a3ea-48aa-a9e7-7e5abbecfaca"
+                    (Boolean(superAdminRoleId) && item.roles_id === superAdminRoleId)
                 ) {
                     return false
                 }
@@ -240,7 +246,7 @@ export function PersonalClient({
 
             return true
         })
-    }, [data, searchQuery, projectFilter, roleFilter, statusFilter, selectedDate, isSuperAdmin, currentProjectId, projects])
+    }, [data, searchQuery, projectFilter, roleFilter, statusFilter, selectedDate, isSuperAdmin, currentProjectId, projects, superAdminRoleId])
 
     const handleEdit = React.useCallback((personal: PersonalItem) => {
         if (!isWritable) {
@@ -539,11 +545,6 @@ export function PersonalClient({
                 <DialogContent className="sm:max-w-[550px] max-h-[85vh] p-0 gap-0 overflow-hidden flex flex-col">
                     <DialogHeader className="px-6 pt-5 pb-3 border-b border-border/40 shrink-0">
                         <DialogTitle>{editingPersonal ? t('form.editTitle') : t('form.addTitle')}</DialogTitle>
-                        <DialogDescription>
-                            {editingPersonal
-                                ? t('form.editDescription')
-                                : t('form.addDescription')}
-                        </DialogDescription>
                     </DialogHeader>
                     <PersonalForm
                         initialData={editingPersonal}

@@ -13,6 +13,17 @@ export interface DashboardParams {
     select_date: string
 }
 
+export interface DashboardDeviceItem {
+    SN: string
+    imei: string
+    group: string
+    street_name: string
+    lat: string
+    lng: string
+    volt: string
+    watt: string
+}
+
 export interface DashboardData {
     listUnitWattDay: string[]
     groupName: string
@@ -43,8 +54,8 @@ export interface DashboardData {
     totalImeiVoltOver: string
     totalImeiVoltLess: string
     listTotalLampLose: unknown[]
-    listTotalRTULose: unknown[]
-    listTotalInternetLose: unknown[]
+    listTotalRTULose: DashboardDeviceItem[]
+    listTotalInternetLose: DashboardDeviceItem[]
     totalLampLose: string
     totalVoltageWattLose: string
     totalRTULose: string
@@ -67,6 +78,8 @@ export async function getListDataGroupAll(): Promise<GroupItem[]> {
             {
                 method: "GET",
                 skipProject: true,
+                timeoutMs: 10000,
+                next: { revalidate: 300, tags: ["streetlights-groups"] },
             }
         )
 
@@ -90,7 +103,7 @@ export async function getListDataGroupAll(): Promise<GroupItem[]> {
         }
         return []
     } catch (error) {
-        console.error("Error fetching group list:", error)
+        console.error("Error fetching group list (fallback to empty list):", error)
         return []
     }
 }
@@ -111,6 +124,36 @@ function toStrArray(val: unknown): string[] {
 
 function toUnknownArray(val: unknown): unknown[] {
     return Array.isArray(val) ? val : []
+}
+
+function toDeviceArray(val: unknown): DashboardDeviceItem[] {
+    if (!Array.isArray(val)) return []
+    return val.map((item) => {
+        const d = (item && typeof item === "object") ? (item as Record<string, unknown>) : {}
+        const imei = String(d.IMEI ?? d.imei ?? d.imeI_Name ?? d.SN ?? "")
+        let groupStr = ""
+        const rawGroup = d.GRUOP ?? d.group ?? d.groups
+        if (Array.isArray(rawGroup)) {
+            groupStr = rawGroup.map(String).join(", ")
+        } else if (typeof rawGroup === "string") {
+            try {
+                const parsed = JSON.parse(rawGroup)
+                groupStr = Array.isArray(parsed) ? parsed.join(", ") : String(parsed)
+            } catch {
+                groupStr = rawGroup
+            }
+        }
+        return {
+            SN: imei,
+            imei,
+            group: groupStr || "-",
+            street_name: String(d.STREET_NAME ?? d.street_name ?? d.streetLightName ?? "-"),
+            lat: String(d.LAT ?? d.lat ?? "-"),
+            lng: String(d.LNG ?? d.lng ?? "-"),
+            volt: String(d.VOLT ?? d.volt ?? "0"),
+            watt: String(d.WATT ?? d.watt ?? "0"),
+        }
+    })
 }
 
 function normalizeDashboardData(raw: Record<string, unknown>): DashboardData {
@@ -144,8 +187,8 @@ function normalizeDashboardData(raw: Record<string, unknown>): DashboardData {
         totalImeiVoltOver: String(raw.totalImeiVoltOver ?? raw.TotalImeiVoltOver ?? "0"),
         totalImeiVoltLess: String(raw.totalImeiVoltLess ?? raw.TotalImeiVoltLess ?? "0"),
         listTotalLampLose: toUnknownArray(raw.listTotalLampLose ?? raw.ListTotalLampLose),
-        listTotalRTULose: toUnknownArray(raw.listTotalRTULose ?? raw.ListTotalRTULose),
-        listTotalInternetLose: toUnknownArray(raw.listTotalInternetLose ?? raw.ListTotalInternetLose),
+        listTotalRTULose: toDeviceArray(raw.listTotalRTULose ?? raw.ListTotalRTULose),
+        listTotalInternetLose: toDeviceArray(raw.listTotalInternetLose ?? raw.ListTotalInternetLose),
         totalLampLose: String(raw.totalLampLose ?? raw.TotalLampLose ?? "0"),
         totalVoltageWattLose: String(raw.totalVoltageWattLose ?? raw.TotalVoltageWattLose ?? "0"),
         totalRTULose: String(raw.totalRTULose ?? raw.TotalRTULose ?? "0"),

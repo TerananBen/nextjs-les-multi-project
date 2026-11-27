@@ -12,6 +12,7 @@ import {
 } from "@/lib/keycloak";
 import { resolveProjectUuid, resolveProjectSlug, isIpAddress, DEFAULT_PROJECT, normalizeHostWithProject } from "@/config/projects";
 import { markEmailVerified } from "@/lib/verify-email-store";
+import { encryptCookieValue } from "@/lib/cookie-crypto";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
@@ -187,7 +188,7 @@ export async function GET(request: NextRequest) {
 
   // Update active project in Keycloak user attributes and refresh token to get updated claims
   if (payload?.sub && projectSlug) {
-    await updateUserActiveProject(payload.sub, projectSlug);
+    await updateUserActiveProject(payload.sub, projectSlug, tokenData.access_token);
     if (tokenData.refresh_token) {
       const refreshed = await refreshKeycloakToken(tokenData.refresh_token);
       if (refreshed?.access_token) {
@@ -199,17 +200,26 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  // Encrypt tokens before storing in cookies
+  const encryptedAccessToken = await encryptCookieValue(tokenData.access_token);
+  const encryptedRefreshToken = tokenData.refresh_token
+    ? await encryptCookieValue(tokenData.refresh_token)
+    : undefined;
+  const encryptedIdToken = tokenData.id_token
+    ? await encryptCookieValue(tokenData.id_token)
+    : undefined;
+
   // Set JWT access token cookie
-  cookieStore.set("jwt", tokenData.access_token, cookieOptions);
+  cookieStore.set("jwt", encryptedAccessToken, cookieOptions);
 
   // Set Refresh token cookie
-  if (tokenData.refresh_token) {
-    cookieStore.set("refresh_token", tokenData.refresh_token, cookieOptions);
+  if (encryptedRefreshToken) {
+    cookieStore.set("refresh_token", encryptedRefreshToken, cookieOptions);
   }
 
   // Set ID token cookie (used for Keycloak logout hint)
-  if (tokenData.id_token) {
-    cookieStore.set("id_token", tokenData.id_token, cookieOptions);
+  if (encryptedIdToken) {
+    cookieStore.set("id_token", encryptedIdToken, cookieOptions);
   }
 
   if (activeProjectId) {
@@ -239,9 +249,12 @@ export async function GET(request: NextRequest) {
   });
 
   // Record user last login timestamp in NestJS (Keycloak user_attribute)
-  if (payload?.sub) {
+  if (payload?.sub && tokenData.access_token) {
     fetch(`${process.env.API_URL || "http://localhost:5000"}/api/iam/users/${encodeURIComponent(payload.sub)}/login`, {
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${tokenData.access_token}`,
+      },
     }).catch((err) => console.error("[Keycloak Callback] Failed to record login:", err));
   }
 
@@ -299,12 +312,12 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    closeResponse.cookies.set("jwt", tokenData.access_token, cookieOptions);
-    if (tokenData.refresh_token) {
-      closeResponse.cookies.set("refresh_token", tokenData.refresh_token, cookieOptions);
+    closeResponse.cookies.set("jwt", encryptedAccessToken, cookieOptions);
+    if (encryptedRefreshToken) {
+      closeResponse.cookies.set("refresh_token", encryptedRefreshToken, cookieOptions);
     }
-    if (tokenData.id_token) {
-      closeResponse.cookies.set("id_token", tokenData.id_token, cookieOptions);
+    if (encryptedIdToken) {
+      closeResponse.cookies.set("id_token", encryptedIdToken, cookieOptions);
     }
     if (activeProjectId) {
       closeResponse.cookies.set("current_project", activeProjectId, clientCookieOptions);

@@ -103,7 +103,7 @@ const menuMapping: Record<string, { title: string; icon: React.ElementType; url:
   "maintenance_list": { title: "menu.maintenanceDetail", icon: IconListDetails, url: "/maintenance/detail", color: "text-pink-600 skyblue:text-pink-300 dark:text-pink-400" },
   "map_changelamp": { title: "menu.mapChangeLamp", icon: IconReplace, url: "/map/change-lamp", color: "text-lime-600 skyblue:text-lime-300 dark:text-lime-400" },
   "system_device": { title: "menu.deviceSettings", icon: IconDeviceAnalytics, url: "/dashboard/settings-device", color: "text-fuchsia-600 skyblue:text-fuchsia-300 dark:text-fuchsia-400" },
-  "system_project": { title: "menu.projectSettings", icon: IconFolders, url: "/setting-system/project", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
+  "system_project": { title: "menu.projectSettings", icon: IconFolders, url: "/setting-system/menu-superadmin", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
 
   // Legacy aliases for backward compatibility
   "V_Dashboard": { title: "menu.overview", icon: IconBriefcase, url: "/dashboard/overview", color: "text-emerald-600 skyblue:text-emerald-300 dark:text-emerald-400" },
@@ -122,7 +122,7 @@ const menuMapping: Record<string, { title: string; icon: React.ElementType; url:
   "V_MaintenanceDetail": { title: "menu.maintenanceDetail", icon: IconListDetails, url: "/maintenance/detail", color: "text-pink-600 skyblue:text-pink-300 dark:text-pink-400" },
   "V_MapChangeLamp": { title: "menu.mapChangeLamp", icon: IconReplace, url: "/map/change-lamp", color: "text-lime-600 skyblue:text-lime-300 dark:text-lime-400" },
   "V_SettingDevice": { title: "menu.deviceSettings", icon: IconDeviceAnalytics, url: "/dashboard/settings-device", color: "text-fuchsia-600 skyblue:text-fuchsia-300 dark:text-fuchsia-400" },
-  "V_ProjectSetting": { title: "menu.projectSettings", icon: IconFolders, url: "/setting-system/project", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
+  "V_ProjectSetting": { title: "menu.projectSettings", icon: IconFolders, url: "/setting-system/menu-superadmin", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
 }
 
 // Define menu groups

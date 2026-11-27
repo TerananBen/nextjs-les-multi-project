@@ -4,7 +4,7 @@ import * as React from "react"
 import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Trash2, Plus, Edit, Loader2 } from "lucide-react"
+import { Trash2, Loader2 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import { toast } from "sonner"
 
@@ -22,7 +22,6 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogDescription,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -150,8 +149,8 @@ export function EditScheduleDialog({
                 typeof p.dailyTimes === "string"
                     ? p.dailyTimes
                     : Array.isArray(p.dailyTimes)
-                    ? p.dailyTimes[0]
-                    : p.startTime || "01:00"
+                        ? p.dailyTimes[0]
+                        : p.startTime || "01:00"
 
             const realId = p.id ? String(p.id) : undefined
             const rawStartTime = p.startTime
@@ -240,8 +239,8 @@ export function EditScheduleDialog({
                 item.projects && item.projects.length > 0
                     ? item.projects
                     : pipelineProjects && pipelineProjects.length > 0
-                    ? pipelineProjects
-                    : []
+                        ? pipelineProjects
+                        : []
 
             let initialProjects = initialProjSource.map(mapProjectItem)
             if (isNotification && projects.length > 0) {
@@ -257,8 +256,8 @@ export function EditScheduleDialog({
                     typeof item.dailyTimes === "string"
                         ? item.dailyTimes
                         : Array.isArray(item.dailyTimes)
-                        ? item.dailyTimes[0]
-                        : "01:00",
+                            ? item.dailyTimes[0]
+                            : "01:00",
                 staggerDelaySeconds: item.staggerDelaySeconds || 0,
                 timeZoneId: item.timeZoneId || "SE Asia Standard Time",
                 isEnabled: item.isEnabled ?? true,
@@ -413,16 +412,8 @@ export function EditScheduleDialog({
             <DialogContent className="w-[95vw] sm:max-w-4xl lg:max-w-5xl max-h-[90vh] overflow-hidden flex flex-col p-0 rounded-xl">
                 <DialogHeader className="px-6 py-4 border-b border-border/40 shrink-0 text-left">
                     <DialogTitle className="text-lg font-semibold flex items-center justify-start gap-2">
-                        {item ? (
-                            <Edit className="h-5 w-5 text-primary shrink-0" />
-                        ) : (
-                            <Plus className="h-5 w-5 text-primary shrink-0" />
-                        )}
                         {item ? t("editTitle") : t("addTitle")}
                     </DialogTitle>
-                    <DialogDescription className="sr-only">
-                        {item ? t("editTitle") : t("addTitle")}
-                    </DialogDescription>
                 </DialogHeader>
 
                 <Form {...form}>

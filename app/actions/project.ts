@@ -4,6 +4,7 @@ import { cookies, headers } from "next/headers"
 import { getProjectById, getProjectByDomain, resolveProjectUuid, resolveProjectSlug, isIpAddress, DEFAULT_PROJECT } from "@/config/projects"
 import { fetchDbProjects } from "@/lib/project"
 import { decodeJwtPayload, refreshKeycloakToken, updateUserActiveProject } from "@/lib/keycloak"
+import { getAuthToken, getRefreshToken, encryptCookieValue } from "@/lib/auth-cookies"
 
 export interface SwitchProjectResult {
   success: boolean;
@@ -42,18 +43,18 @@ export async function switchProject(
   const sessionMaxAge = 30 * 24 * 60 * 60;
 
   // 1. Update user active project in Keycloak and refresh token so claims have the new project
-  const token = cookieStore.get("jwt")?.value;
-  const refreshToken = cookieStore.get("refresh_token")?.value;
+  const token = await getAuthToken(cookieStore);
+  const refreshToken = await getRefreshToken(cookieStore);
   if (token) {
     const payload = decodeJwtPayload(token);
     const userId = payload?.sub;
     if (userId && projectSlug) {
-      await updateUserActiveProject(userId, projectSlug);
+      await updateUserActiveProject(userId, projectSlug, token);
       if (refreshToken) {
         const targetClient = (payload?.azp as string) || undefined;
         const newTokens = await refreshKeycloakToken(refreshToken, targetClient);
         if (newTokens?.access_token) {
-          cookieStore.set("jwt", newTokens.access_token, {
+          cookieStore.set("jwt", await encryptCookieValue(newTokens.access_token), {
             path: "/",
             httpOnly: true,
             secure: usingHttps,
@@ -61,7 +62,7 @@ export async function switchProject(
             maxAge: sessionMaxAge,
           });
           if (newTokens.refresh_token) {
-            cookieStore.set("refresh_token", newTokens.refresh_token, {
+            cookieStore.set("refresh_token", await encryptCookieValue(newTokens.refresh_token), {
               path: "/",
               httpOnly: true,
               secure: usingHttps,

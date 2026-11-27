@@ -1,8 +1,8 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import type { ProjectConfig, ColorPreset } from "@/config/projects/types"
-import { DEFAULT_PROJECT } from "@/config/projects"
+import type { ProjectConfig } from "@/config/projects/types"
+import { DEFAULT_PROJECT, COLOR_PRESET_BG_CLASSES } from "@/config/projects"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -15,25 +15,7 @@ import { ArrowUpDown, MoreHorizontal, Edit, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { toast } from "sonner"
 
-export const COLOR_PRESET_BG_CLASSES: Record<ColorPreset, string> = {
-    blue: "bg-[#3072f1]",
-    skyblue: "bg-[#0895d8]",
-    green: "bg-[#45a976]",
-    purple: "bg-[#9e44f1]",
-    amber: "bg-[#e78b08]",
-    rose: "bg-[#b95387]",
-    indigo: "bg-[#5956eb]",
-    emerald: "bg-[#10a697]",
-    slate: "bg-[#56647a]",
-    red: "bg-[#a32828]",
-    orange: "bg-[#bf5800]",
-    teal: "bg-[#45a976]",
-    cyan: "bg-[#429ec1]",
-    pink: "bg-[#b95387]",
-    navy: "bg-[#001941]",
-    charcoal: "bg-[#4b4b4b]",
-    gray: "bg-[#4b4b4b]",
-}
+export { COLOR_PRESET_BG_CLASSES }
 
 export type ProjectColumnActions = {
     onEdit: (project: ProjectConfig) => void

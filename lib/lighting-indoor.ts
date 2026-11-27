@@ -1,4 +1,4 @@
-import { cookies } from "next/headers"
+import { getAuthToken } from "@/lib/auth-cookies"
 
 const LIGHTING_INDOOR_BASE_URL = process.env.LIGHTING_INDOOR_API_URL || "http://localhost:4002"
 
@@ -12,8 +12,7 @@ export async function fetchLightingIndoor<T>(
     options: LightingIndoorRequestOptions = {}
 ): Promise<T | null> {
     try {
-        const cookieStore = await cookies()
-        const token = cookieStore.get("jwt")?.value
+        const token = await getAuthToken()
 
         const headers: Record<string, string> = {
             "Content-Type": "application/json",

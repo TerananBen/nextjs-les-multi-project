@@ -26,7 +26,7 @@ import {
 import type { ProjectConfig, ColorPreset } from "@/config/projects/types"
 import { SaveProjectPayload, uploadProjectAsset, checkProjectId } from "@/app/actions/project-management"
 import { useTranslations } from "next-intl"
-import { COLOR_PRESET_BG_CLASSES } from "./projects-columns"
+import { COLOR_PRESET_BG_CLASSES } from "@/config/projects/helper"
 import { cn } from "@/lib/utils"
 import { Upload, Loader2, Image as ImageIcon } from "lucide-react"
 import { toast } from "sonner"

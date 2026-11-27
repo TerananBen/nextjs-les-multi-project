@@ -62,6 +62,6 @@ export const SUPERADMIN_FULL_MENUS: NavigationMenuItem[] = [
     { menu_id: "15", menu_name: "user_management", label: "User Management", path: "/user-management", readable: "1", writable: "1", control: "1", api_version: 1 },
     { menu_id: "16", menu_name: "setting_system", label: "Setting System", path: "/setting-system", readable: "1", writable: "1", control: "1", api_version: 1 },
     { menu_id: "17", menu_name: "system_api_setting", label: "API Settings", path: "/setting-system/api-settings", readable: "1", writable: "1", control: "1", api_version: 1 },
-    { menu_id: "18", menu_name: "system_project", label: "Project Settings", path: "/setting-system/project", readable: "1", writable: "1", control: "1", api_version: 1 },
+    { menu_id: "18", menu_name: "system_project", label: "Project Settings", path: "/setting-system/menu-superadmin", readable: "1", writable: "1", control: "1", api_version: 1 },
     { menu_id: "19", menu_name: "system_menu_superadmin", label: "SuperAdmin Settings", path: "/setting-system/menu-superadmin", readable: "1", writable: "1", control: "1", api_version: 1 },
 ]

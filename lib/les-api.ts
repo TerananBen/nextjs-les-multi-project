@@ -1,4 +1,5 @@
 import { cookies } from "next/headers"
+import { getAuthToken } from "@/lib/auth-cookies"
 
 const API_URL = process.env.API_URL || "http://localhost:5000"
 
@@ -14,7 +15,7 @@ export async function fetchLesApi<T>(
 ): Promise<T | null> {
     try {
         const cookieStore = await cookies()
-        const token = cookieStore.get("jwt")?.value
+        const token = await getAuthToken(cookieStore)
 
         const headers: Record<string, string> = {
             "Content-Type": "application/json",

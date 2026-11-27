@@ -61,6 +61,10 @@ export default async function MainLayout({
         })
 
     const sidebarUser = {
+        userId: user?.userId || "",
+        firstName: user?.firstName || "",
+        lastName: user?.lastName || "",
+        userName: user?.userName || "",
         name: user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}` : (user?.userName || "User"),
         email: user?.userName || "",
         role: user?.userRole,

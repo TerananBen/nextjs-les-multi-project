@@ -2,11 +2,12 @@
 
 import { cookies } from "next/headers"
 
-import { fetchNestJs } from "@/lib/nestjs"
+import { fetchNestJs, fetchNestJsDetailed } from "@/lib/nestjs"
 import { getKeycloakRolesAction, getRealmRolesAction } from "@/app/actions/menu-settings"
 import { getProjectsList } from "@/app/actions/project-management"
 import { getProjectById, resolveProjectUuid } from "@/config/projects"
 import { decodeJwtPayload, refreshKeycloakToken, isKeycloakConfigured } from "@/lib/keycloak"
+import { getAuthToken, getRefreshToken, encryptCookieValue } from "@/lib/auth-cookies"
 
 const API_URL = process.env.API_URL
 
@@ -83,8 +84,7 @@ export interface PersonalDetailResponse {
 
 export async function getPersonalList(projectIdOverride?: string): Promise<PersonalListResponse | null> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
-    const activeProjectId = projectIdOverride === "ALL" ? undefined : (projectIdOverride || cookieStore.get("current_project")?.value)
+    const token = await getAuthToken(cookieStore)
 
     // 1. Fetch from NestJS (Keycloak Realm les) if token is present
     if (token) {
@@ -209,7 +209,7 @@ export async function getPersonalList(projectIdOverride?: string): Promise<Perso
 
 export async function getPersonalDetail(personal_id: string): Promise<PersonalDetailResponse | null> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     if (token) {
         try {
@@ -313,7 +313,7 @@ export interface SavePersonalParams {
 
 export async function savePersonal(data: SavePersonalParams): Promise<{ result: boolean; message?: string }> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     // 1. Save in NestJS (Keycloak)
     if (token) {
@@ -472,7 +472,7 @@ export async function savePersonal(data: SavePersonalParams): Promise<{ result: 
 
 export async function setPersonalUsable(personal_id: string, status: "Y" | "N"): Promise<{ result: boolean; message?: string }> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     // 1. Update in NestJS (Keycloak)
     if (token) {
@@ -512,7 +512,7 @@ export async function setPersonalUsable(personal_id: string, status: "Y" | "N"):
 
 export async function deletePersonal(personal_id: string): Promise<{ result: boolean; message?: string }> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     // 1. Delete in NestJS (Keycloak)
     if (token) {
@@ -549,9 +549,113 @@ export async function deletePersonal(personal_id: string): Promise<{ result: boo
     }
 }
 
+export interface ResetPersonalPasswordParams {
+    personal_id: string
+    password: string
+    firstName?: string
+    lastName?: string
+    email?: string
+}
+
+export interface ResetPersonalPasswordResponse {
+    result: boolean
+    message?: string
+    usedFallbackEndpoint?: boolean
+}
+
+export async function resetPersonalPassword(data: ResetPersonalPasswordParams): Promise<ResetPersonalPasswordResponse> {
+    const cookieStore = await cookies()
+    const token = await getAuthToken(cookieStore)
+
+    if (!token) return { result: false, message: "Unauthorized" }
+    if (!data.personal_id || !data.password) {
+        return { result: false, message: "Missing user ID or password" }
+    }
+
+    const pwd = data.password.trim()
+    if (pwd.length < 8 || !/[A-Z]/.test(pwd) || !/[a-z]/.test(pwd) || !/[0-9]/.test(pwd)) {
+        return {
+            result: false,
+            message: "รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 8 ตัวอักษร และประกอบด้วยตัวอักษรพิมพ์ใหญ่ (A-Z) พิมพ์เล็ก (a-z) และตัวเลข (0-9) อย่างน้อยอย่างละ 1 ตัว",
+        }
+    }
+
+    const encodedId = encodeURIComponent(data.personal_id)
+
+    try {
+        // 1. Call dedicated reset-password endpoint on Backend IAM (sets temporary password + UPDATE_PASSWORD required action in Keycloak)
+        const resetRes = await fetchNestJsDetailed<boolean | { success?: boolean; message?: string }>(
+            `/api/users/${encodedId}/reset-password`,
+            {
+                method: "POST",
+                body: JSON.stringify({
+                    password: pwd,
+                    temporary: true,
+                    requiredActions: ["UPDATE_PASSWORD"],
+                }),
+            }
+        )
+
+        if (resetRes.ok) {
+            return { result: true, usedFallbackEndpoint: false }
+        }
+
+        // 2. Fallback to PUT /api/users/{id} with temporary/requiredActions flags if dedicated endpoint returns 404
+        let finalRes = resetRes
+        let usedFallbackEndpoint = false
+
+        if (resetRes.status === 404) {
+            usedFallbackEndpoint = true
+            finalRes = await fetchNestJsDetailed<boolean | { success?: boolean; message?: string }>(
+                `/api/users/${encodedId}`,
+                {
+                    method: "PUT",
+                    body: JSON.stringify({
+                        firstName: data.firstName,
+                        lastName: data.lastName,
+                        email: data.email,
+                        password: pwd,
+                        temporary: true,
+                        temporaryPassword: true,
+                        requirePasswordUpdate: true,
+                        requiredActions: ["UPDATE_PASSWORD"],
+                    }),
+                }
+            )
+
+            if (finalRes.ok) {
+                return { result: true, usedFallbackEndpoint: true }
+            }
+        }
+
+        const errMsg = (finalRes.message || finalRes.errorText || "").toLowerCase()
+        if (
+            errMsg.includes("blacklist") ||
+            errMsg.includes("common-passwords") ||
+            errMsg.includes("invalidpasswordblacklistedmessage") ||
+            errMsg.includes("blacklisted")
+        ) {
+            return {
+                result: false,
+                usedFallbackEndpoint,
+                message: "รหัสผ่านนี้อยู่ในรายการรหัสผ่านที่พบบ่อยหรือไม่ปลอดภัย (Password Blacklist) กรุณาสุ่มรหัสผ่านใหม่อีกครั้ง",
+            }
+        }
+
+        return {
+            result: false,
+            usedFallbackEndpoint,
+            message: finalRes.message || "เกิดข้อผิดพลาดในการรีเซ็ตรหัสผ่านบนระบบ Keycloak",
+        }
+    } catch (error) {
+        console.error("Error resetting user password in Backend IAM:", error)
+        return { result: false, message: "เกิดข้อผิดพลาดในการเชื่อมต่อระบบจัดการผู้ใช้" }
+    }
+}
+
 export async function checkPersonalUsername(personal_username: string): Promise<{ result: boolean; dataReturn?: string }> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     // 1. Check in NestJS (Keycloak)
     if (token) {
@@ -609,7 +713,7 @@ export interface EditPersonalResponse {
 
 export async function updatePersonalProfile(data: UpdatePersonalProfileParams): Promise<EditPersonalResponse | { result: false, message: string }> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
 
     if (!token) return { result: false, message: "Unauthorized" }
 
@@ -630,7 +734,6 @@ export async function updatePersonalProfile(data: UpdatePersonalProfileParams): 
                 username,
                 password: data.password_confirm,
             }),
-            skipAuth: true,
             skipProject: true,
         })
         if (!verifyResult?.success) {
@@ -642,8 +745,24 @@ export async function updatePersonalProfile(data: UpdatePersonalProfileParams): 
             }
         }
 
-        // 1.2 Update First Name, Last Name, and optional New Password via Backend IAM Service
-        const updateResult = await fetchNestJs<boolean | { success?: boolean }>(`/api/users/${encodeURIComponent(userId)}`, {
+        // 1.2 Validate new password policy if provided
+        if (data.password_new) {
+            const pwd = data.password_new.trim()
+            if (
+                pwd.length < 8 ||
+                !/[A-Z]/.test(pwd) ||
+                !/[a-z]/.test(pwd) ||
+                !/[0-9]/.test(pwd)
+            ) {
+                return {
+                    result: false,
+                    message: "รหัสผ่านใหม่ต้องมีความยาวอย่างน้อย 8 ตัวอักษร และประกอบด้วยตัวอักษรพิมพ์ใหญ่ (A-Z) พิมพ์เล็ก (a-z) และตัวเลข (0-9) อย่างน้อยอย่างละ 1 ตัว",
+                }
+            }
+        }
+
+        // 1.3 Update First Name, Last Name, and optional New Password via Backend IAM Service
+        const updateResult = await fetchNestJsDetailed<boolean | { success?: boolean }>(`/api/users/${encodeURIComponent(userId)}`, {
             method: "PUT",
             body: JSON.stringify({
                 firstName: data.firstname,
@@ -652,10 +771,59 @@ export async function updatePersonalProfile(data: UpdatePersonalProfileParams): 
             }),
         })
 
-        if (!updateResult) {
+        if (!updateResult.ok) {
+            const errMsg = (updateResult.message || updateResult.errorText || "").toLowerCase()
+
+            // 1.3.1 Keycloak Password Blacklist Check
+            if (
+                errMsg.includes("blacklist") ||
+                errMsg.includes("common-passwords") ||
+                errMsg.includes("invalidpasswordblacklistedmessage") ||
+                errMsg.includes("blacklisted")
+            ) {
+                return {
+                    result: false,
+                    message: "รหัสผ่านนี้อยู่ในรายการรหัสผ่านที่พบบ่อยหรือไม่ปลอดภัย (Password Blacklist) กรุณาใช้รหัสผ่านอื่น",
+                }
+            }
+
+            // 1.3.2 Other Keycloak Password Policy Checks
+            if (errMsg.includes("password")) {
+                if (errMsg.includes("history")) {
+                    return {
+                        result: false,
+                        message: "ไม่สามารถใช้รหัสผ่านเดิมที่เคยใช้งานแล้วได้ (Password History)",
+                    }
+                }
+                if (errMsg.includes("username") || errMsg.includes("user name")) {
+                    return {
+                        result: false,
+                        message: "รหัสผ่านต้องไม่ตรงกับชื่อผู้ใช้",
+                    }
+                }
+                if (errMsg.includes("length") || errMsg.includes("characters")) {
+                    return {
+                        result: false,
+                        message: "รหัสผ่านต้องมีความยาวอย่างน้อย 8 ตัวอักษร",
+                    }
+                }
+                return {
+                    result: false,
+                    message: updateResult.message || "รหัสผ่านใหม่ไม่ตรงตามเงื่อนไขความปลอดภัยของระบบ",
+                }
+            }
+
+            // 1.3.3 When changing password and Backend returned 500 (Keycloak rejected password policy / blacklist with unhandled exception)
+            if (data.password_new && (updateResult.status === 500 || !updateResult.message)) {
+                return {
+                    result: false,
+                    message: "รหัสผ่านใหม่ไม่ผ่านเงื่อนไขความปลอดภัย หรืออยู่ในรายการรหัสผ่านที่พบบ่อย (Password Blacklist) กรุณาใช้รหัสผ่านอื่น",
+                }
+            }
+
             return {
                 result: false,
-                message: "เกิดข้อผิดพลาดในการอัปเดตข้อมูลผู้ใช้บนระบบจัดการ",
+                message: updateResult.message || "เกิดข้อผิดพลาดในการอัปเดตข้อมูลผู้ใช้บนระบบจัดการ",
             }
         }
 
@@ -678,7 +846,7 @@ export async function updatePersonalProfile(data: UpdatePersonalProfileParams): 
         // 1.5 Refresh session token with client ID if password was NOT changed
         const requireRelogin = Boolean(data.password_new)
         if (!data.password_new) {
-            const refreshToken = cookieStore.get("refresh_token")?.value
+            const refreshToken = await getRefreshToken(cookieStore)
             if (refreshToken) {
                 const currentProject = cookieStore.get("current_project")?.value
                 let fallbackClientId: string | undefined
@@ -693,14 +861,14 @@ export async function updatePersonalProfile(data: UpdatePersonalProfileParams): 
                 const newTokens = await refreshKeycloakToken(refreshToken, targetClientId)
                 if (newTokens?.access_token) {
                     const usingHttps = process.env.USING_HTTPS === "true"
-                    cookieStore.set("jwt", newTokens.access_token, {
+                    cookieStore.set("jwt", await encryptCookieValue(newTokens.access_token), {
                         httpOnly: true,
                         secure: usingHttps,
                         sameSite: "lax",
                         path: "/",
                     })
                     if (newTokens.refresh_token) {
-                        cookieStore.set("refresh_token", newTokens.refresh_token, {
+                        cookieStore.set("refresh_token", await encryptCookieValue(newTokens.refresh_token), {
                             httpOnly: true,
                             secure: usingHttps,
                             sameSite: "lax",

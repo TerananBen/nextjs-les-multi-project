@@ -18,7 +18,6 @@ import {
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
@@ -36,7 +35,8 @@ import {
 import type { ProjectConfig, ColorPreset } from "@/config/projects/types"
 import { saveProject, deleteProject, SaveProjectPayload } from "@/app/actions/project-management"
 import { DataTable } from "./projects-data-table"
-import { getColumns, COLOR_PRESET_BG_CLASSES } from "./projects-columns"
+import { getColumns } from "./projects-columns"
+import { COLOR_PRESET_BG_CLASSES } from "@/config/projects/helper"
 import { ProjectForm } from "./projects-form"
 import { usePermission } from "@/components/providers/permission-provider"
 import { cn } from "@/lib/utils"
@@ -314,9 +314,6 @@ export function ProjectsTab({ initialData }: ProjectsTabProps) {
                 <DialogContent className="sm:max-w-[550px] max-h-[85vh] p-0 gap-0 overflow-hidden flex flex-col">
                     <DialogHeader className="px-6 pt-5 pb-3 border-b border-border/40 shrink-0">
                         <DialogTitle>{editingProject ? t("form.editTitle") : t("form.addTitle")}</DialogTitle>
-                        <DialogDescription>
-                            {editingProject ? t("form.editDescription") : t("form.addDescription")}
-                        </DialogDescription>
                     </DialogHeader>
                     <ProjectForm
                         initialData={editingProject}

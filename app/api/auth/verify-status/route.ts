@@ -3,6 +3,8 @@ import {
   registerPendingEmail,
   getVerificationRecord,
 } from "@/lib/verify-email-store";
+import { getBffServiceToken, invalidateBffServiceToken } from "@/lib/keycloak";
+import { encryptCookieValue } from "@/lib/cookie-crypto";
 
 const getCorsHeaders = (request: NextRequest) => {
   const origin = request.headers.get("origin") || "*";
@@ -141,27 +143,37 @@ export async function GET(request: NextRequest) {
       ? rawRedirect
       : new URL(rawRedirect, `${proto}://${host}`).toString();
 
+    const encryptedAccessToken = record.tokens?.accessToken
+      ? await encryptCookieValue(record.tokens.accessToken)
+      : undefined;
+    const encryptedRefreshToken = record.tokens?.refreshToken
+      ? await encryptCookieValue(record.tokens.refreshToken)
+      : undefined;
+    const encryptedIdToken = record.tokens?.idToken
+      ? await encryptCookieValue(record.tokens.idToken)
+      : undefined;
+
     const response = respond(
       { verified: true, action: "redirect", redirectUrl: fullRedirectUrl },
       (res) => {
-        if (record.tokens?.accessToken) {
-          res.cookies.set("jwt", record.tokens.accessToken, {
+        if (encryptedAccessToken) {
+          res.cookies.set("jwt", encryptedAccessToken, {
             httpOnly: true,
             secure: usingHttps,
             sameSite: "lax",
             path: "/",
           });
         }
-        if (record.tokens?.refreshToken) {
-          res.cookies.set("refresh_token", record.tokens.refreshToken, {
+        if (encryptedRefreshToken) {
+          res.cookies.set("refresh_token", encryptedRefreshToken, {
             httpOnly: true,
             secure: usingHttps,
             sameSite: "lax",
             path: "/",
           });
         }
-        if (record.tokens?.idToken) {
-          res.cookies.set("id_token", record.tokens.idToken, {
+        if (encryptedIdToken) {
+          res.cookies.set("id_token", encryptedIdToken, {
             httpOnly: true,
             secure: usingHttps,
             sameSite: "lax",
@@ -194,7 +206,20 @@ export async function GET(request: NextRequest) {
   if (emailParam || userParam) {
     try {
       const nestJsUrl = `${process.env.API_URL || "http://localhost:5000"}/api/iam/users/verify-status?email=${encodeURIComponent(emailParam || "")}&username=${encodeURIComponent(userParam || "")}`;
-      const nestRes = await fetch(nestJsUrl, { cache: "no-store" });
+      const bffHeaders: Record<string, string> = {};
+      const serviceToken = await getBffServiceToken();
+      if (serviceToken) {
+        bffHeaders["Authorization"] = `Bearer ${serviceToken}`;
+      }
+      let nestRes = await fetch(nestJsUrl, { cache: "no-store", headers: bffHeaders });
+      if (nestRes.status === 401) {
+        invalidateBffServiceToken();
+        const freshToken = await getBffServiceToken();
+        if (freshToken) {
+          bffHeaders["Authorization"] = `Bearer ${freshToken}`;
+          nestRes = await fetch(nestJsUrl, { cache: "no-store", headers: bffHeaders });
+        }
+      }
       if (nestRes.ok) {
         const nestData = (await nestRes.json()) as { verified?: boolean };
         if (nestData?.verified) {

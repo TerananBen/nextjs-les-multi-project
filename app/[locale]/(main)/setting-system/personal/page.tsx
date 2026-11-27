@@ -56,13 +56,23 @@ export default async function PersonalPage() {
     const rolesByProject: Record<string, KeycloakRoleItem[]> = {}
     await Promise.all(
         projectList.map(async (p) => {
-            const r = await getKeycloakRolesAction(p.id)
+            const targetParam = p.uuid || (p.code ? p.code.replace(/_/g, "-") : undefined) || p.id
+            const r = await getKeycloakRolesAction(targetParam)
             const filtered = isSuperAdmin
                 ? r
                 : r.filter((role) => !role.name.toLowerCase().includes("superadmin"))
             rolesByProject[p.id] = filtered
-            if (p.uuid) rolesByProject[p.uuid] = filtered
-            if (p.code) rolesByProject[p.code.toLowerCase()] = filtered
+            rolesByProject[p.id.toLowerCase()] = filtered
+            rolesByProject[p.id.replace(/-/g, "_")] = filtered
+            if (p.uuid) {
+                rolesByProject[p.uuid] = filtered
+                rolesByProject[p.uuid.toLowerCase()] = filtered
+            }
+            if (p.code) {
+                rolesByProject[p.code] = filtered
+                rolesByProject[p.code.toLowerCase()] = filtered
+                rolesByProject[p.code.replace(/_/g, "-").toLowerCase()] = filtered
+            }
         })
     )
 

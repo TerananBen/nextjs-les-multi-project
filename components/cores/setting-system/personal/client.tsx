@@ -18,7 +18,6 @@ import { cn } from "@/lib/utils"
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog"
@@ -247,7 +246,7 @@ export function PersonalClient({
 
             return true
         })
-    }, [data, searchQuery, projectFilter, roleFilter, statusFilter, selectedDate, isSuperAdmin, currentProjectId, projects])
+    }, [data, searchQuery, projectFilter, roleFilter, statusFilter, selectedDate, isSuperAdmin, currentProjectId, projects, superAdminRoleId])
 
     const handleEdit = React.useCallback((personal: PersonalItem) => {
         if (!isWritable) {
@@ -546,11 +545,6 @@ export function PersonalClient({
                 <DialogContent className="sm:max-w-[550px] max-h-[85vh] p-0 gap-0 overflow-hidden flex flex-col">
                     <DialogHeader className="px-6 pt-5 pb-3 border-b border-border/40 shrink-0">
                         <DialogTitle>{editingPersonal ? t('form.editTitle') : t('form.addTitle')}</DialogTitle>
-                        <DialogDescription>
-                            {editingPersonal
-                                ? t('form.editDescription')
-                                : t('form.addDescription')}
-                        </DialogDescription>
                     </DialogHeader>
                     <PersonalForm
                         initialData={editingPersonal}

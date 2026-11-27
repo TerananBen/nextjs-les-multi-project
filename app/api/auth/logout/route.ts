@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getKeycloakLogoutUrl, logoutKeycloak, isKeycloakTokenValid, decodeJwtPayload } from "@/lib/keycloak";
 import { resolveProjectSlug, isIpAddress, DEFAULT_PROJECT } from "@/config/projects";
+import { decryptCookieValue } from "@/lib/cookie-crypto";
 
 export async function GET(request: NextRequest) {
-  const refreshToken = request.cookies.get("refresh_token")?.value;
-  const idToken = request.cookies.get("id_token")?.value;
+  const refreshToken = await decryptCookieValue(request.cookies.get("refresh_token")?.value);
+  const idToken = await decryptCookieValue(request.cookies.get("id_token")?.value);
   const currentProject = request.cookies.get("current_project")?.value;
 
   // Determine host and protocol

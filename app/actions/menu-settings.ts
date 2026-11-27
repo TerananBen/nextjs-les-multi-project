@@ -4,6 +4,7 @@ import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
 import { GetMenuResponse, KeycloakRoleItem, MenuData, SettingMenuResponse } from "@/types/menu-settings"
 import { fetchNestJs } from "@/lib/nestjs"
+import { getAuthToken } from "@/lib/auth-cookies"
 import { DEFAULT_PROJECT } from "@/config/projects"
 import { DEFAULT_SYSTEM_MENUS } from "@/config/menus"
 
@@ -34,9 +35,17 @@ const DEFAULT_MENU_LIST: Omit<MenuData, "role_id" | "project_id">[] = DEFAULT_SY
     control: item.control ?? "1",
 }))
 
-export async function getKeycloakRolesAction(_projectCodeOverride?: string): Promise<KeycloakRoleItem[]> {
+export async function getKeycloakRolesAction(projectCodeOverride?: string): Promise<KeycloakRoleItem[]> {
     try {
-        const roles = await fetchNestJs<KeycloakRoleItem[]>("/api/permissions/roles")
+        const query = projectCodeOverride ? `?project_id=${encodeURIComponent(projectCodeOverride)}` : ""
+        const headers: Record<string, string> = {}
+        if (projectCodeOverride) {
+            headers["X-Project-Name"] = projectCodeOverride
+        }
+        const roles = await fetchNestJs<KeycloakRoleItem[]>(`/api/permissions/roles${query}`, {
+            headers,
+            skipProject: !projectCodeOverride,
+        })
         if (roles && Array.isArray(roles) && roles.length > 0) {
             return roles
         }
@@ -49,7 +58,9 @@ export async function getKeycloakRolesAction(_projectCodeOverride?: string): Pro
 
 export async function getRealmRolesAction(): Promise<KeycloakRoleItem[]> {
     try {
-        const roles = await fetchNestJs<KeycloakRoleItem[]>("/api/permissions/roles")
+        const roles = await fetchNestJs<KeycloakRoleItem[]>("/api/permissions/roles", {
+            headers: { "X-Project-Name": "default" },
+        })
         if (roles && Array.isArray(roles) && roles.length > 0) {
             return roles
         }
@@ -62,7 +73,7 @@ export async function getRealmRolesAction(): Promise<KeycloakRoleItem[]> {
 
 export async function getDataMenuAction(roleId: string): Promise<MenuData[]> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
     const targetRoleId = roleId
     const activeProjectId = cookieStore.get("current_project")?.value || DEFAULT_PROJECT
 
@@ -173,7 +184,7 @@ export async function getDataMenuAction(roleId: string): Promise<MenuData[]> {
 
 export async function settingMenuAction(roleId: string, jsonValue: string): Promise<SettingMenuResponse | null> {
     const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken(cookieStore)
     const targetRoleId = roleId
     const activeProjectId = cookieStore.get("current_project")?.value || DEFAULT_PROJECT
 

@@ -3,6 +3,7 @@ import { routing } from "./i18n/routing";
 import { NextRequest, NextResponse } from "next/server";
 import { getProjectByDomain, getProjectById, DEFAULT_PROJECT, resolveProjectUuid, resolveProjectSlug, normalizeHostWithProject, isIpAddress } from "@/config/projects";
 import { decodeJwtPayload, extractAllProjectIdsFromPayload, extractProjectCodeFromPayload, extractRolesFromPayload, refreshKeycloakToken, updateUserActiveProject } from "@/lib/keycloak";
+import { decryptCookieValue, encryptCookieValue } from "@/lib/cookie-crypto";
 
 export default async function proxy(request: NextRequest) {
   const defaultLocale =
@@ -31,7 +32,7 @@ export default async function proxy(request: NextRequest) {
   // ── Project Resolution ──────────────────────────────────
   let projectId: string | undefined;
 
-  const rawToken = request.cookies.get("jwt")?.value;
+  const rawToken = await decryptCookieValue(request.cookies.get("jwt")?.value);
   const existingCookieProject = request.cookies.get("current_project")?.value;
 
   // 1. Subdomain resolution has TOP PRIORITY (e.g. project-a.localhost or project-a.les.io)
@@ -160,7 +161,7 @@ export default async function proxy(request: NextRequest) {
   }
 
   if (isLoginPage) {
-    const existingToken = request.cookies.get("jwt")?.value;
+    const existingToken = rawToken;
     if (existingToken) {
       const payload = decodeJwtPayload(existingToken);
       const isValid = payload?.exp ? payload.exp * 1000 > Date.now() : true;
@@ -200,30 +201,48 @@ export default async function proxy(request: NextRequest) {
   }
 
   // ── JWT Auth check ─────────────────────────────────────
-  let token = request.cookies.get("jwt")?.value;
-  const refreshToken = request.cookies.get("refresh_token")?.value;
+  let token = rawToken;
+  const refreshToken = await decryptCookieValue(request.cookies.get("refresh_token")?.value);
   const apiUrl = process.env.API_URL;
   const keycloakUrl = (process.env.KEYCLOAK_BASE_URL || "").replace(/\/+$/, "");
   const keycloakRealm = process.env.KEYCLOAK_REALM;
-  let refreshedTokens: { access_token: string; refresh_token?: string; id_token?: string } | null = null;
+  type EncryptedTokenBundle = { access_token: string; refresh_token?: string; id_token?: string };
+  let refreshedTokens: EncryptedTokenBundle | null = null;
+
+  const storeRefreshedRequestTokens = async (newTokens: {
+    access_token: string;
+    refresh_token?: string;
+    id_token?: string;
+  }): Promise<EncryptedTokenBundle> => {
+    const encryptedAccess = await encryptCookieValue(newTokens.access_token);
+    const encryptedRefresh = newTokens.refresh_token
+      ? await encryptCookieValue(newTokens.refresh_token)
+      : undefined;
+    const encryptedId = newTokens.id_token
+      ? await encryptCookieValue(newTokens.id_token)
+      : undefined;
+
+    request.cookies.set("jwt", encryptedAccess);
+    if (encryptedRefresh) {
+      request.cookies.set("refresh_token", encryptedRefresh);
+    }
+    if (encryptedId) {
+      request.cookies.set("id_token", encryptedId);
+    }
+
+    return {
+      access_token: encryptedAccess,
+      refresh_token: encryptedRefresh,
+      id_token: encryptedId,
+    };
+  };
 
   // If access token is missing but refresh token exists, attempt immediate refresh
   if (!token && refreshToken) {
     const newTokens = await refreshKeycloakToken(refreshToken);
     if (newTokens) {
       token = newTokens.access_token;
-      refreshedTokens = {
-        access_token: newTokens.access_token,
-        refresh_token: newTokens.refresh_token,
-        id_token: newTokens.id_token,
-      };
-      request.cookies.set("jwt", token);
-      if (newTokens.refresh_token) {
-        request.cookies.set("refresh_token", newTokens.refresh_token);
-      }
-      if (newTokens.id_token) {
-        request.cookies.set("id_token", newTokens.id_token);
-      }
+      refreshedTokens = await storeRefreshedRequestTokens(newTokens);
     }
   }
 
@@ -280,24 +299,25 @@ export default async function proxy(request: NextRequest) {
     );
 
     if ((isExpiringSoon || isProjectMismatch) && refreshToken && !refreshedTokens) {
+      let currentRefreshToken = refreshToken;
       if (isProjectMismatch && payload.sub) {
-        await updateUserActiveProject(payload.sub, projectId);
+        let activeAccessToken = token;
+        const isAlreadyExpired = payload.exp ? payload.exp * 1000 <= Date.now() : false;
+        if (isAlreadyExpired) {
+          const preRefreshed = await refreshKeycloakToken(currentRefreshToken, payload.azp as string);
+          if (preRefreshed?.access_token) {
+            activeAccessToken = preRefreshed.access_token;
+            if (preRefreshed.refresh_token) {
+              currentRefreshToken = preRefreshed.refresh_token;
+            }
+          }
+        }
+        await updateUserActiveProject(payload.sub, projectId, activeAccessToken);
       }
-      const newTokens = await refreshKeycloakToken(refreshToken, payload.azp as string);
+      const newTokens = await refreshKeycloakToken(currentRefreshToken, payload.azp as string);
       if (newTokens) {
         token = newTokens.access_token;
-        refreshedTokens = {
-          access_token: newTokens.access_token,
-          refresh_token: newTokens.refresh_token,
-          id_token: newTokens.id_token,
-        };
-        request.cookies.set("jwt", token);
-        if (newTokens.refresh_token) {
-          request.cookies.set("refresh_token", newTokens.refresh_token);
-        }
-        if (newTokens.id_token) {
-          request.cookies.set("id_token", newTokens.id_token);
-        }
+        refreshedTokens = await storeRefreshedRequestTokens(newTokens);
       } else if (payload.exp && payload.exp * 1000 < Date.now()) {
         const redirectResponse = makeLoginRedirect();
         redirectResponse.cookies.delete("jwt");
@@ -329,18 +349,7 @@ export default async function proxy(request: NextRequest) {
           const newTokens = await refreshKeycloakToken(refreshToken);
           if (newTokens) {
             token = newTokens.access_token;
-            refreshedTokens = {
-              access_token: newTokens.access_token,
-              refresh_token: newTokens.refresh_token,
-              id_token: newTokens.id_token,
-            };
-            request.cookies.set("jwt", token);
-            if (newTokens.refresh_token) {
-              request.cookies.set("refresh_token", newTokens.refresh_token);
-            }
-            if (newTokens.id_token) {
-              request.cookies.set("id_token", newTokens.id_token);
-            }
+            refreshedTokens = await storeRefreshedRequestTokens(newTokens);
             keycloakRes = await fetch(userInfoUrl, {
               headers: {
                 Authorization: `Bearer ${token}`,

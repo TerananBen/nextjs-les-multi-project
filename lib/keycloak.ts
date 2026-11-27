@@ -556,18 +556,23 @@ export const refreshKeycloakToken = async (
 
 export const updateUserActiveProject = async (
   userId: string,
-  activeProject: string
+  activeProject: string,
+  accessToken?: string
 ): Promise<boolean> => {
   if (!userId || !activeProject || typeof activeProject !== "string" || activeProject.toLowerCase().includes("[object")) return false;
   try {
     const cleanProject = activeProject.trim();
     if (!cleanProject || cleanProject.toLowerCase().includes("[object")) return false;
     const apiUrl = process.env.API_URL || "http://localhost:5000";
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (accessToken) {
+      headers["Authorization"] = `Bearer ${accessToken}`;
+    }
     const res = await fetch(`${apiUrl}/api/iam/users/${encodeURIComponent(userId)}/active-project`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify({ activeProject: cleanProject }),
       cache: "no-store",
     });
@@ -799,4 +804,79 @@ export const getKeycloakLogoutUrl = (
   logoutUrl.searchParams.set("post_logout_redirect_uri", postLogoutRedirectUri);
   logoutUrl.searchParams.set("id_token_hint", idToken);
   return logoutUrl.toString();
+};
+
+// ── BFF Service Account M2M Token (client_credentials) ──────────────────
+let bffTokenCache: { token: string; expiresAt: number } | null = null;
+let bffTokenInFlight: Promise<string | null> | null = null;
+
+export const invalidateBffServiceToken = (): void => {
+  bffTokenCache = null;
+};
+
+export const getBffServiceToken = async (): Promise<string | null> => {
+  const now = Date.now();
+  if (bffTokenCache && bffTokenCache.expiresAt > now) {
+    return bffTokenCache.token;
+  }
+
+  if (bffTokenInFlight) {
+    return bffTokenInFlight;
+  }
+
+  const { baseUrl, realm } = getKeycloakConfig();
+  const clientId = (process.env.KEYCLOAK_BFF_CLIENT_ID || "").trim();
+  const clientSecret = (process.env.KEYCLOAK_BFF_CLIENT_SECRET || "").trim();
+
+  if (!baseUrl || !realm || !clientId || !clientSecret) {
+    console.warn("[Keycloak BFF] Missing KEYCLOAK_BASE_URL, KEYCLOAK_REALM, KEYCLOAK_BFF_CLIENT_ID, or KEYCLOAK_BFF_CLIENT_SECRET.");
+    return null;
+  }
+
+  bffTokenInFlight = (async (): Promise<string | null> => {
+    try {
+      const tokenUrl = `${baseUrl}/realms/${realm}/protocol/openid-connect/token`;
+      const params = new URLSearchParams();
+      params.append("grant_type", "client_credentials");
+      params.append("client_id", clientId);
+      params.append("client_secret", clientSecret);
+
+      const res = await fetch(tokenUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: params.toString(),
+        cache: "no-store",
+        signal: AbortSignal.timeout(10000),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text().catch(() => "");
+        console.error(`[Keycloak BFF] Failed to obtain service token [${res.status}]: ${errText}`);
+        return null;
+      }
+
+      const data = (await res.json()) as { access_token?: string; expires_in?: number };
+      if (!data?.access_token) {
+        console.error("[Keycloak BFF] Token response did not contain access_token.");
+        return null;
+      }
+
+      const expiresInSec = typeof data.expires_in === "number" && data.expires_in > 0 ? data.expires_in : 60;
+      const ttlMs = Math.max(5, expiresInSec - 30) * 1000;
+      bffTokenCache = {
+        token: data.access_token,
+        expiresAt: Date.now() + ttlMs,
+      };
+      return data.access_token;
+    } catch (error) {
+      console.error("[Keycloak BFF] Exception while obtaining service token:", error);
+      return null;
+    } finally {
+      bffTokenInFlight = null;
+    }
+  })();
+
+  return bffTokenInFlight;
 };

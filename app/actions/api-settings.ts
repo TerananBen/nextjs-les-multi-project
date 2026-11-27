@@ -1,15 +1,14 @@
 "use server"
 
-import { cookies } from "next/headers"
 import { revalidatePath } from "next/cache"
 import { fetchNestJs } from "@/lib/nestjs"
 import { getActiveProjectCode } from "@/lib/project"
+import { getAuthToken } from "@/lib/auth-cookies"
 import { DEFAULT_SYSTEM_MENUS } from "@/config/menus"
 import type { ApiMenuSetting, SaveApiSettingResponse } from "@/types/api-settings"
 
 export async function getApiMenuSettingsAction(projectId?: string): Promise<ApiMenuSetting[]> {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken()
     const activeProject = (projectId && projectId.trim()) ? projectId.trim() : (await getActiveProjectCode())
 
     if (token) {
@@ -47,8 +46,7 @@ export async function saveApiMenuSettingAction(
     apiVersion: number,
     projectId?: string
 ): Promise<SaveApiSettingResponse> {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken()
     const activeProject = (projectId && projectId.trim()) ? projectId.trim() : (await getActiveProjectCode())
 
     if (!token) {
@@ -87,8 +85,7 @@ export async function saveAllApiMenuSettingsAction(
     items: { menu_id: string; api_version: number }[],
     projectId?: string
 ): Promise<SaveApiSettingResponse> {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("jwt")?.value
+    const token = await getAuthToken()
     const activeProject = (projectId && projectId.trim()) ? projectId.trim() : (await getActiveProjectCode())
 
     if (!token) {

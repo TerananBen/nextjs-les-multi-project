@@ -26,15 +26,24 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import { DEFAULT_PROJECT } from "@/config/projects"
-import { PersonalItem, RoleItem, checkPersonalUsername } from "@/app/actions/personal"
+import { DEFAULT_PROJECT, COLOR_PRESET_BG_CLASSES } from "@/config/projects"
+import { PersonalItem, RoleItem, checkPersonalUsername, resetPersonalPassword } from "@/app/actions/personal"
 import type { ProjectConfig } from "@/config/projects/types"
 import type { KeycloakRoleItem } from "@/types/menu-settings"
-import { COLOR_PRESET_BG_CLASSES } from "@/components/cores/setting-system/project/columns"
 import { useTranslations } from "next-intl"
-import { ChevronsUpDown, X, Eye, EyeOff, ShieldCheck, Layers, Copy, Check, RefreshCw } from "lucide-react"
+import { ChevronsUpDown, X, ShieldCheck, Layers, Copy, Check, RefreshCw, KeyRound, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
@@ -130,8 +139,10 @@ export function PersonalForm({
 }: PersonalFormProps) {
     const t = useTranslations('Personal')
     const [isProjectPopoverOpen, setIsProjectPopoverOpen] = React.useState(false)
-    const [showPassword, setShowPassword] = React.useState(!initialData)
     const [copiedPassword, setCopiedPassword] = React.useState(false)
+    const [isResetConfirmOpen, setIsResetConfirmOpen] = React.useState(false)
+    const [isResettingPassword, setIsResettingPassword] = React.useState(false)
+    const [lastResetPassword, setLastResetPassword] = React.useState<string | null>(null)
 
     const resolveToProjectId = React.useCallback((idOrCode: string) => {
         if (!idOrCode) return ""
@@ -188,23 +199,53 @@ export function PersonalForm({
         (projectId: string) => {
             const project = projects.find(
                 (p) =>
-                    p.id === projectId ||
-                    p.uuid === projectId ||
-                    p.code === projectId ||
+                    p.id.toLowerCase() === projectId.toLowerCase() ||
+                    p.uuid?.toLowerCase() === projectId.toLowerCase() ||
+                    p.code?.toLowerCase() === projectId.toLowerCase() ||
+                    p.code?.toLowerCase().replace(/_/g, "-") === projectId.toLowerCase().replace(/_/g, "-") ||
                     p.domain?.split(".")[0]?.toLowerCase() === projectId.toLowerCase()
             )
             const pid = project?.id || projectId
             const puuid = project?.uuid || ""
             const pcode = project?.code?.toLowerCase() || ""
 
-            const list = rolesByProject[pid] || rolesByProject[puuid] || rolesByProject[pcode]
+            const list =
+                rolesByProject[pid] ||
+                rolesByProject[pid.toLowerCase()] ||
+                rolesByProject[puuid] ||
+                rolesByProject[puuid.toLowerCase()] ||
+                rolesByProject[pcode] ||
+                rolesByProject[pcode.replace(/_/g, "-")] ||
+                rolesByProject[projectId] ||
+                rolesByProject[projectId.toLowerCase()]
             let res = flattenedRoles
             if (list && list.length > 0) {
                 res = list.map((r) => ({ id: r.id, name: r.name }))
             }
+
+            // Ensure initial role for this user is always present in options so Select doesn't render empty
+            if (initialData) {
+                const cleanProj = resolveToProjectId(projectId).toLowerCase()
+                const assignedRole = initialData.project_roles?.find((pr) => {
+                    const cleanPrPid = resolveToProjectId(pr.project_id).toLowerCase()
+                    return (
+                        cleanPrPid === cleanProj ||
+                        pr.project_id.toLowerCase() === projectId.toLowerCase() ||
+                        pr.project_id.toLowerCase() === pid.toLowerCase() ||
+                        pr.project_id.toLowerCase() === puuid.toLowerCase() ||
+                        pr.project_id.toLowerCase() === pcode.toLowerCase()
+                    )
+                })
+                const assignedRoleId = assignedRole?.role_id || (initialData.project_id && resolveToProjectId(initialData.project_id).toLowerCase() === cleanProj ? initialData.roles_id : undefined)
+                const assignedRoleName = assignedRole?.role_name || initialData.roleName
+                if (assignedRoleId && assignedRoleName && !res.some((r) => r.id.toLowerCase() === assignedRoleId.toLowerCase())) {
+                    res = [...res, { id: assignedRoleId, name: assignedRoleName }]
+                }
+            }
+
             return res.filter((r) => !isSuperAdminRole(r.name, r.id))
         },
-        [projects, rolesByProject, flattenedRoles, isSuperAdminRole]
+        [projects, rolesByProject, flattenedRoles, isSuperAdminRole, initialData, resolveToProjectId]
     )
 
     const defaultProjects = React.useMemo(() => {
@@ -222,15 +263,24 @@ export function PersonalForm({
 
     const defaultProjectRoles = React.useMemo(() => {
         if (initialData?.project_roles && initialData.project_roles.length > 0) {
-            return initialData.project_roles.map((pr) => ({
-                project_id: resolveToProjectId(pr.project_id) || pr.project_id,
-                role_id: pr.role_id,
-            }))
+            return initialData.project_roles.map((pr) => {
+                const pid = resolveToProjectId(pr.project_id) || pr.project_id
+                const availRoles = getRolesForProject(pid)
+                const matching = availRoles.find(
+                    (r) =>
+                        r.id.toLowerCase() === pr.role_id.toLowerCase() ||
+                        (pr.role_name && r.name.toLowerCase() === pr.role_name.toLowerCase())
+                )
+                return {
+                    project_id: pid,
+                    role_id: matching ? matching.id : pr.role_id,
+                }
+            })
         }
         const initialRole = initialData?.roles_id ? String(initialData.roles_id) : ""
         return defaultProjects.map((pid) => {
             const availRoles = getRolesForProject(pid)
-            const matching = availRoles.find((r) => r.id === initialRole)
+            const matching = availRoles.find((r) => r.id.toLowerCase() === initialRole.toLowerCase())
             return {
                 project_id: pid,
                 role_id: matching ? matching.id : (availRoles[0]?.id || initialRole),
@@ -266,6 +316,7 @@ export function PersonalForm({
 
     const accessLevel = useWatch({ control: form.control, name: "access_level" })
     const watchedProjectRoles = useWatch({ control: form.control, name: "project_roles" })
+    const watchedPassword = useWatch({ control: form.control, name: "personal_password" })
 
     const handleCopyPassword = React.useCallback(async () => {
         const pwd = form.getValues("personal_password")
@@ -286,6 +337,35 @@ export function PersonalForm({
         toast.success(t("form.passwordRegenerated"))
     }, [form, t])
 
+    const handleConfirmResetPassword = React.useCallback(async () => {
+        if (!initialData?.personal_id || !isWritable) return
+
+        setIsResettingPassword(true)
+        try {
+            const randomPwd = generateRandomPassword(12)
+            const res = await resetPersonalPassword({
+                personal_id: initialData.personal_id,
+                password: randomPwd,
+                firstName: form.getValues("personal_firstname") || initialData.first_name,
+                lastName: form.getValues("personal_lastname") || initialData.last_name,
+                email: form.getValues("personal_email") || initialData.personal_email || initialData.email,
+            })
+
+            if (res.result) {
+                form.setValue("personal_password", randomPwd, { shouldValidate: true })
+                setLastResetPassword(randomPwd)
+                setIsResetConfirmOpen(false)
+                toast.success(t("messages.successResetPassword"))
+            } else {
+                toast.error(res.message || t("messages.errorResetPassword"))
+            }
+        } catch {
+            toast.error(t("messages.errorResetPassword"))
+        } finally {
+            setIsResettingPassword(false)
+        }
+    }, [form, initialData, isWritable, t])
+
     React.useEffect(() => {
         if (initialData) {
             const isSuper =
@@ -294,10 +374,19 @@ export function PersonalForm({
 
             const pRoles =
                 initialData.project_roles && initialData.project_roles.length > 0
-                    ? initialData.project_roles.map((pr) => ({
-                          project_id: resolveToProjectId(pr.project_id) || pr.project_id,
-                          role_id: pr.role_id,
-                      }))
+                    ? initialData.project_roles.map((pr) => {
+                          const pid = resolveToProjectId(pr.project_id) || pr.project_id
+                          const availRoles = getRolesForProject(pid)
+                          const matched = availRoles.find(
+                              (r) =>
+                                  r.id.toLowerCase() === pr.role_id.toLowerCase() ||
+                                  (pr.role_name && r.name.toLowerCase() === pr.role_name.toLowerCase())
+                          )
+                          return {
+                              project_id: pid,
+                              role_id: matched ? matched.id : pr.role_id,
+                          }
+                      })
                     : (Array.isArray(initialData.project_ids) && initialData.project_ids.length > 0
                           ? initialData.project_ids
                           : initialData.project_id
@@ -330,7 +419,8 @@ export function PersonalForm({
                 project_ids: isSuper ? projects.map((p) => p.id) : initialProjects,
                 project_roles: isSuper ? [] : pRoles,
             })
-            setShowPassword(false)
+            setLastResetPassword(null)
+            setIsResetConfirmOpen(false)
         } else {
             const firstPid = projects.length > 0 ? projects[0].id : DEFAULT_PROJECT
             const availRoles = getRolesForProject(firstPid)
@@ -347,7 +437,8 @@ export function PersonalForm({
                 project_ids: [firstPid],
                 project_roles: [{ project_id: firstPid, role_id: defaultRole }],
             })
-            setShowPassword(true)
+            setLastResetPassword(null)
+            setIsResetConfirmOpen(false)
         }
     }, [initialData, form, projects, resolveToProjectId, getRolesForProject, flattenedRoles, superAdminRole])
 
@@ -410,20 +501,28 @@ export function PersonalForm({
             return
         }
 
-        if (values.access_level === "SUPER_ADMIN") {
-            values.roles_id = superAdminRole?.id || ""
-            values.project_roles = []
-            values.project_ids = []
+        const submitValues: PersonalFormValues = { ...values }
+
+        if (initialData) {
+            // Password updates in Edit mode are handled exclusively via Reset Password button
+            submitValues.personal_password = ""
+        }
+
+        if (submitValues.access_level === "SUPER_ADMIN") {
+            submitValues.roles_id = superAdminRole?.id || ""
+            submitValues.project_roles = []
+            submitValues.project_ids = []
         } else {
-            if (values.project_roles && values.project_roles.length > 0) {
-                values.roles_id = values.project_roles[0].role_id
+            if (submitValues.project_roles && submitValues.project_roles.length > 0) {
+                submitValues.roles_id = submitValues.project_roles[0].role_id
             }
         }
 
-        onSubmit(values)
+        onSubmit(submitValues)
     }
 
     return (
+        <>
         <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="flex flex-col flex-1 min-h-0 overflow-hidden">
                 <div className="flex-1 overflow-y-auto px-6 py-4 space-y-3.5 max-h-[calc(85vh-130px)]">
@@ -501,9 +600,11 @@ export function PersonalForm({
                                 <span>{t('form.password')}</span>
                                 {!initialData && <span className="text-destructive">*</span>}
                                 {initialData ? (
-                                    <span className="text-xs text-muted-foreground font-normal">
-                                        {t('form.passwordHint')}
-                                    </span>
+                                    lastResetPassword && (
+                                        <span className="text-xs text-emerald-600 dark:text-emerald-400 font-normal">
+                                            {t('form.resetPasswordSuccessHint')}
+                                        </span>
+                                    )
                                 ) : (
                                     <span className="text-xs text-muted-foreground font-normal">
                                         {t('form.temporaryPasswordHint')}
@@ -511,17 +612,25 @@ export function PersonalForm({
                                 )}
                             </FormLabel>
                             <FormControl>
-                                <div className="relative">
-                                    <Input
-                                        type={showPassword ? "text" : "password"}
-                                        placeholder={t('form.passwordPlaceholder')}
-                                        className={cn(!initialData ? "pr-24 font-mono text-sm" : "pr-10")}
-                                        {...field}
-                                    />
-                                    {/* Action buttons inside password input */}
-                                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-muted-foreground">
-                                        {!initialData && (
-                                            <>
+                                <div className="flex items-center gap-2">
+                                    <div className="relative flex-1">
+                                        <Input
+                                            type="text"
+                                            readOnly
+                                            placeholder={initialData ? t('form.resetPasswordPlaceholder') : t('form.passwordPlaceholder')}
+                                            className={cn(
+                                                "bg-muted/40 cursor-default focus-visible:ring-0",
+                                                !initialData
+                                                    ? "pr-16 font-mono text-sm"
+                                                    : watchedPassword
+                                                        ? "pr-10 font-mono text-sm"
+                                                        : "text-xs"
+                                            )}
+                                            {...field}
+                                        />
+                                        {/* Action buttons inside password input */}
+                                        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-0.5 text-muted-foreground">
+                                            {(!initialData || Boolean(watchedPassword)) && (
                                                 <button
                                                     type="button"
                                                     onClick={handleCopyPassword}
@@ -535,6 +644,8 @@ export function PersonalForm({
                                                     )}
                                                     <span className="sr-only">{t("form.copyPassword")}</span>
                                                 </button>
+                                            )}
+                                            {!initialData && (
                                                 <button
                                                     type="button"
                                                     onClick={handleRegeneratePassword}
@@ -544,23 +655,31 @@ export function PersonalForm({
                                                     <RefreshCw className="h-4 w-4" />
                                                     <span className="sr-only">{t("form.regeneratePassword")}</span>
                                                 </button>
-                                            </>
-                                        )}
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="p-1.5 hover:text-foreground cursor-pointer transition-colors rounded hover:bg-muted/80"
-                                        >
-                                            {showPassword ? (
-                                                <EyeOff className="h-4 w-4" />
-                                            ) : (
-                                                <Eye className="h-4 w-4" />
                                             )}
-                                            <span className="sr-only">
-                                                {showPassword ? "Hide password" : "Show password"}
-                                            </span>
-                                        </button>
+                                        </div>
                                     </div>
+                                    {initialData && (
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setIsResetConfirmOpen(true)}
+                                            disabled={isLoading || isResettingPassword || !isWritable}
+                                            className={cn(
+                                                "h-9 shrink-0 gap-1.5 px-3 text-xs cursor-pointer shadow-2xs",
+                                                !isWritable && "opacity-50 cursor-not-allowed"
+                                            )}
+                                        >
+                                            {isResettingPassword ? (
+                                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                            ) : (
+                                                <KeyRound className="h-3.5 w-3.5" />
+                                            )}
+                                            <span>
+                                                {isResettingPassword ? t("form.resettingPassword") : t("form.resetPassword")}
+                                            </span>
+                                        </Button>
+                                    )}
                                 </div>
                             </FormControl>
                             <FormMessage />
@@ -671,7 +790,7 @@ export function PersonalForm({
                                                 {t('form.projects')} <span className="text-destructive">*</span>
                                             </div>
                                         </FormLabel>
-                                        <Popover open={isProjectPopoverOpen} onOpenChange={setIsProjectPopoverOpen}>
+                                        <Popover modal={true} open={isProjectPopoverOpen} onOpenChange={setIsProjectPopoverOpen}>
                                             <PopoverTrigger asChild>
                                                 <FormControl>
                                                     <Button
@@ -714,7 +833,7 @@ export function PersonalForm({
                                                 </Button>
                                             </FormControl>
                                         </PopoverTrigger>
-                                        <PopoverContent className="w-[450px] p-2" align="start">
+                                        <PopoverContent className="w-(--radix-popover-trigger-width) max-w-[calc(100vw-2rem)] p-2" align="start">
                                             <div className="flex items-center justify-between pb-2 mb-2 border-b px-1 text-xs text-muted-foreground">
                                                 <span>{t("form.selectedCount", { count: selectedIds.length })}</span>
                                                 <div className="flex gap-2">
@@ -738,7 +857,11 @@ export function PersonalForm({
                                                     </Button>
                                                 </div>
                                             </div>
-                                            <div className="max-h-56 overflow-y-auto space-y-1">
+                                            <div
+                                                className="max-h-56 overflow-y-auto overscroll-contain space-y-1"
+                                                onWheel={(e) => e.stopPropagation()}
+                                                onTouchMove={(e) => e.stopPropagation()}
+                                            >
                                                 {projects.map((project) => {
                                                     const isSelected = selectedIds.includes(project.id)
                                                     const colorClass = COLOR_PRESET_BG_CLASSES[project.color || "skyblue"] || "bg-[#0895d8]"
@@ -882,5 +1005,36 @@ export function PersonalForm({
                 </div>
             </form>
         </Form>
+
+        <AlertDialog open={isResetConfirmOpen} onOpenChange={setIsResetConfirmOpen}>
+            <AlertDialogContent>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>{t("form.resetPasswordTitle")}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        {t("form.resetPasswordDescription")}{" "}
+                        <strong>
+                            {initialData?.first_name} {initialData?.last_name} ({initialData?.personal_username})
+                        </strong>
+                        ?
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                    <AlertDialogCancel className="cursor-pointer" disabled={isResettingPassword}>
+                        {t("form.cancel")}
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                        onClick={(e) => {
+                            e.preventDefault()
+                            handleConfirmResetPassword()
+                        }}
+                        disabled={isResettingPassword}
+                        className="cursor-pointer"
+                    >
+                        {isResettingPassword ? t("form.resettingPassword") : t("form.confirm")}
+                    </AlertDialogAction>
+                </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+        </>
     )
 }

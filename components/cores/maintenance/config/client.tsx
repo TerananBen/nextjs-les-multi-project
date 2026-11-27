@@ -10,7 +10,7 @@ import { Combobox, ComboboxInput, ComboboxContent, ComboboxEmpty, ComboboxList, 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { toast } from "sonner"
-import { Loader2, Plus, Search, RotateCcw, X, Wrench, Lightbulb, CheckCircle2, Clock, ShieldAlert } from "lucide-react"
+import { Loader2, Plus, Search, X, Wrench, Lightbulb, CheckCircle2, Clock, ShieldAlert } from "lucide-react"
 import { getLeafletIconUrl, MarkerColor, MarkerBadge } from "@/lib/map-icons"
 import { cn } from "@/lib/utils"
 import { usePermission } from "@/components/providers/permission-provider"
@@ -537,12 +537,6 @@ export function MaintenanceConfigClient({
     }, [data, statusFilter, operatorFilter, searchQuery])
 
     const isFiltered = searchQuery !== "" || statusFilter !== "ALL" || operatorFilter !== "ALL"
-
-    const handleResetFilters = () => {
-        setSearchQuery("")
-        setStatusFilter("ALL")
-        setOperatorFilter("ALL")
-    }
 
     const columns = useMaintenanceColumns({
         onDetail: (item) => {

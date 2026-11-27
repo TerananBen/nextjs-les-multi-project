@@ -3,13 +3,7 @@ import { getTranslations } from "next-intl/server"
 import { CheckCircle2 } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 
 interface StatusPageProps {
@@ -29,15 +23,10 @@ export default async function StatusPage({ params }: StatusPageProps) {
   const t = await getTranslations({ locale, namespace: "StatusPage" })
   const headerList = await headers()
 
-  const host =
-    (headerList.get("x-forwarded-host") || headerList.get("host") || "-")
-      .split(",")[0]
-      .trim()
-  const protocol = (
-    headerList.get("x-forwarded-proto") || "http"
-  )
+  const host = (headerList.get("x-forwarded-host") || headerList.get("host") || "-")
     .split(",")[0]
     .trim()
+  const protocol = (headerList.get("x-forwarded-proto") || "http").split(",")[0].trim()
   const environment = process.env.NODE_ENV || "production"
   const serverTime = new Date().toISOString()
 
@@ -57,9 +46,7 @@ export default async function StatusPage({ params }: StatusPageProps) {
             <CheckCircle2 className="h-6 w-6" />
           </div>
           <div className="flex items-center justify-center gap-2">
-            <CardTitle className="text-xl font-semibold">
-              {t("heading")}
-            </CardTitle>
+            <CardTitle className="text-xl font-semibold">{t("heading")}</CardTitle>
             <Badge variant="secondary">{t("statusValue")}</Badge>
           </div>
           <CardDescription className="text-sm text-muted-foreground">
@@ -70,10 +57,7 @@ export default async function StatusPage({ params }: StatusPageProps) {
           <Separator />
           <dl className="space-y-2.5 text-sm">
             {details.map((item) => (
-              <div
-                key={item.label}
-                className="flex items-center justify-between gap-4"
-              >
+              <div key={item.label} className="flex items-center justify-between gap-4">
                 <dt className="text-muted-foreground">{item.label}</dt>
                 <dd className="font-mono text-xs text-foreground break-all text-right">
                   {item.value}

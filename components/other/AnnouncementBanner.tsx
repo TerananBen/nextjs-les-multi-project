@@ -1,8 +1,8 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils"
 
 interface AnnouncementBannerProps {
-  message?: string;
-  className?: string;
+  message?: string
+  className?: string
 }
 
 export const AnnouncementBanner = ({
@@ -25,6 +25,6 @@ export const AnnouncementBanner = ({
       </span>
     </div>
   </div>
-);
+)
 
-export default AnnouncementBanner;
+export default AnnouncementBanner

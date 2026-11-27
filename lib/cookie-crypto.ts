@@ -104,11 +104,7 @@ export const encryptCookieValue = async (plaintext: string): Promise<string> => 
   const iv = new Uint8Array(new ArrayBuffer(IV_BYTE_LENGTH))
   crypto.getRandomValues(iv)
 
-  const cipherBuffer = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv },
-    key,
-    compressed
-  )
+  const cipherBuffer = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, compressed)
   const cipherBytes = new Uint8Array(cipherBuffer)
 
   const combined = new Uint8Array(new ArrayBuffer(iv.byteLength + cipherBytes.byteLength))
@@ -118,7 +114,9 @@ export const encryptCookieValue = async (plaintext: string): Promise<string> => 
   return `${COOKIE_ENC_PREFIX}${toBase64Url(combined)}`
 }
 
-export const decryptCookieValue = async (encrypted?: string | null): Promise<string | undefined> => {
+export const decryptCookieValue = async (
+  encrypted?: string | null
+): Promise<string | undefined> => {
   if (!encrypted) return undefined
   if (!encrypted.startsWith(COOKIE_ENC_PREFIX)) {
     return undefined

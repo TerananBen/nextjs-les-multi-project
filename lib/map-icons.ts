@@ -1,22 +1,22 @@
-export type MarkerColor = 'green' | 'gray' | 'red' | 'blue' | 'yellow' | 'orange';
-export type MarkerBadge = 'A' | 'M' | 'E' | '⚡' | 'X' | null;
+export type MarkerColor = "green" | "gray" | "red" | "blue" | "yellow" | "orange"
+export type MarkerBadge = "A" | "M" | "E" | "⚡" | "X" | null
 
 const COLORS = {
-    green: '#22c55e',
-    gray: '#6b7280',
-    red: '#ef4444',
-    blue: '#3b82f6',
-    yellow: '#eab308',
-    orange: '#f97316',
-    white: '#ffffff',
-    black: '#000000'
-};
+  green: "#22c55e",
+  gray: "#6b7280",
+  red: "#ef4444",
+  blue: "#3b82f6",
+  yellow: "#eab308",
+  orange: "#f97316",
+  white: "#ffffff",
+  black: "#000000",
+}
 
 export function getSvgMarker(colorName: MarkerColor, badge: MarkerBadge): string {
-    const color = COLORS[colorName];
+  const color = COLORS[colorName]
 
-    // Lightbulb Shape
-    const svg = `
+  // Lightbulb Shape
+  const svg = `
   <svg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
@@ -36,22 +36,26 @@ export function getSvgMarker(colorName: MarkerColor, badge: MarkerBadge): string
         <!-- Shine/Reflection -->
         <path d="M13 10 C13 10 15 8 18 8" stroke="white" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.4"/>
 
-      ${badge ? `
+      ${
+        badge
+          ? `
       <!-- Badge Text (Inside Bulb) -->
       <text x="20" y="21" font-family="Arial, sans-serif" font-weight="900" font-size="14" text-anchor="middle" fill="white" style="text-shadow: 0px 1px 2px rgba(0,0,0,0.3);">${badge}</text>
-      ` : ''}
+      `
+          : ""
+      }
     </g>
-  </svg>`;
+  </svg>`
 
-    return svg.trim();
+  return svg.trim()
 }
 
 export function getLeafletIconUrl(color: MarkerColor, badge: MarkerBadge): string {
-    const svg = getSvgMarker(color, badge);
-    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  const svg = getSvgMarker(color, badge)
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`
 }
 
 export function getGoogleMapsIconHtml(color: MarkerColor, badge: MarkerBadge): string {
-    const svg = getSvgMarker(color, badge);
-    return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+  const svg = getSvgMarker(color, badge)
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`
 }

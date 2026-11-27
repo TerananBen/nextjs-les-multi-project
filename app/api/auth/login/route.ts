@@ -1,59 +1,74 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getKeycloakLoginUrl, isKeycloakConfigured, generatePkcePair, getAuthCallbackUri } from "@/lib/keycloak";
-import { isIpAddress, DEFAULT_PROJECT, resolveProjectSlug, normalizeHostWithProject } from "@/config/projects";
+import { NextRequest, NextResponse } from "next/server"
+import {
+  getKeycloakLoginUrl,
+  isKeycloakConfigured,
+  generatePkcePair,
+  getAuthCallbackUri,
+} from "@/lib/keycloak"
+import {
+  isIpAddress,
+  DEFAULT_PROJECT,
+  resolveProjectSlug,
+  normalizeHostWithProject,
+} from "@/config/projects"
 
 export async function GET(request: NextRequest) {
   if (!isKeycloakConfigured()) {
     return NextResponse.json(
       { error: "Keycloak is not configured in environment variables." },
       { status: 500 }
-    );
+    )
   }
 
-  const { searchParams } = request.nextUrl;
-  const locale = searchParams.get("locale") || process.env.DEFAULT_LOCALE || "th";
-  const returnUrl = searchParams.get("returnUrl") || `/${locale}/dashboard/group`;
+  const { searchParams } = request.nextUrl
+  const locale = searchParams.get("locale") || process.env.DEFAULT_LOCALE || "th"
+  const returnUrl = searchParams.get("returnUrl") || `/${locale}/dashboard/group`
 
   // Resolve project client ID from host subdomain or cookie
-  const host = (request.headers.get("x-forwarded-host") || request.headers.get("host") || "").split(",")[0].trim();
-  const hostWithoutPort = host.split(":")[0].toLowerCase();
-  const isIp = isIpAddress(hostWithoutPort);
-  const parts = hostWithoutPort.split(".");
-  const isLocalhost = hostWithoutPort.endsWith("localhost") || hostWithoutPort === "127.0.0.1";
-  const minParts = isLocalhost ? 1 : 2;
+  const host = (request.headers.get("x-forwarded-host") || request.headers.get("host") || "")
+    .split(",")[0]
+    .trim()
+  const hostWithoutPort = host.split(":")[0].toLowerCase()
+  const isIp = isIpAddress(hostWithoutPort)
+  const parts = hostWithoutPort.split(".")
+  const isLocalhost = hostWithoutPort.endsWith("localhost") || hostWithoutPort === "127.0.0.1"
+  const minParts = isLocalhost ? 1 : 2
 
-  let projectClientId: string | undefined;
+  let projectClientId: string | undefined
   if (!isIp && parts.length > minParts && parts[0] && parts[0] !== "www") {
-    projectClientId = parts[0];
+    projectClientId = parts[0]
   } else {
-    const cookieProject = request.cookies.get("current_project")?.value;
+    const cookieProject = request.cookies.get("current_project")?.value
     if (cookieProject) {
-      projectClientId = cookieProject;
+      projectClientId = cookieProject
     }
   }
 
   if (!projectClientId) {
-    projectClientId = process.env.KEYCLOAK_CLIENT_ID || DEFAULT_PROJECT || "nb32-nbiot";
+    projectClientId = process.env.KEYCLOAK_CLIENT_ID || DEFAULT_PROJECT || "nb32-nbiot"
   }
 
   // In local dev: redirect bare localhost/127.0.0.1 to project subdomain so auth flow runs on tenant origin
   if (isLocalhost && (hostWithoutPort === "localhost" || hostWithoutPort === "127.0.0.1")) {
-    const slug = resolveProjectSlug(projectClientId) || DEFAULT_PROJECT || "nb32-nbiot";
-    const targetHost = normalizeHostWithProject(host, slug);
-    const forwardUrl = new URL(request.nextUrl.pathname + request.nextUrl.search, `http://${targetHost}`);
-    return NextResponse.redirect(forwardUrl);
+    const slug = resolveProjectSlug(projectClientId) || DEFAULT_PROJECT || "nb32-nbiot"
+    const targetHost = normalizeHostWithProject(host, slug)
+    const forwardUrl = new URL(
+      request.nextUrl.pathname + request.nextUrl.search,
+      `http://${targetHost}`
+    )
+    return NextResponse.redirect(forwardUrl)
   }
 
   const state = JSON.stringify({
     locale,
     returnUrl,
     clientId: projectClientId || undefined,
-  });
+  })
 
-  const { codeVerifier, codeChallenge } = generatePkcePair();
+  const { codeVerifier, codeChallenge } = generatePkcePair()
 
-  const prompt = searchParams.get("prompt") || undefined;
-  const redirectUri = getAuthCallbackUri(request);
+  const prompt = searchParams.get("prompt") || undefined
+  const redirectUri = getAuthCallbackUri(request)
   const keycloakAuthUrl = getKeycloakLoginUrl(
     redirectUri,
     state,
@@ -61,23 +76,25 @@ export async function GET(request: NextRequest) {
     projectClientId || undefined,
     codeChallenge,
     prompt
-  );
+  )
 
-  const isLocal = host.includes("localhost") || host.includes("127.0.0.1");
-  const isSecure = !isLocal && (request.nextUrl.protocol === "https:" || request.headers.get("x-forwarded-proto") === "https");
+  const isLocal = host.includes("localhost") || host.includes("127.0.0.1")
+  const isSecure =
+    !isLocal &&
+    (request.nextUrl.protocol === "https:" || request.headers.get("x-forwarded-proto") === "https")
 
-  const response = NextResponse.redirect(keycloakAuthUrl);
+  const response = NextResponse.redirect(keycloakAuthUrl)
   response.cookies.set("pkce_verifier", codeVerifier, {
     httpOnly: true,
     secure: isSecure,
     sameSite: "lax",
     path: "/",
     maxAge: 300,
-  });
+  })
   // Clear any existing session tokens so a fresh login is forced
-  response.cookies.delete("jwt");
-  response.cookies.delete("refresh_token");
-  response.cookies.delete("menuRole");
+  response.cookies.delete("jwt")
+  response.cookies.delete("refresh_token")
+  response.cookies.delete("menuRole")
 
-  return response;
+  return response
 }

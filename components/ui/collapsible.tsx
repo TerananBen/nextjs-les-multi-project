@@ -8,13 +8,7 @@ function Collapsible({
   className,
   ...props
 }: React.ComponentProps<typeof CollapsiblePrimitive.Root>) {
-  return (
-    <CollapsiblePrimitive.Root
-      data-slot="collapsible"
-      className={className}
-      {...props}
-    />
-  )
+  return <CollapsiblePrimitive.Root data-slot="collapsible" className={className} {...props} />
 }
 
 function CollapsibleTrigger({

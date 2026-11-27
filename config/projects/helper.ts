@@ -1,18 +1,14 @@
-import type {
-  ColorPreset,
-  DefineProjectInput,
-  ProjectConfig,
-} from "./types";
+import type { ColorPreset, DefineProjectInput, ProjectConfig } from "./types"
 
 export interface ProjectTheme {
-  primaryColor: string;
-  secondaryColor: string;
-  accentColor: string;
-  backgroundColor: string;
-  textColor: string;
-  sidebarColor?: string;
-  sidebarForeground?: string;
-  sidebarAccent?: string;
+  primaryColor: string
+  secondaryColor: string
+  accentColor: string
+  backgroundColor: string
+  textColor: string
+  sidebarColor?: string
+  sidebarForeground?: string
+  sidebarAccent?: string
 }
 
 export const COLOR_PRESETS: Record<ColorPreset, ProjectTheme> = {
@@ -186,7 +182,7 @@ export const COLOR_PRESETS: Record<ColorPreset, ProjectTheme> = {
     sidebarForeground: "#ffffff",
     sidebarAccent: "#383838",
   },
-};
+}
 
 export const COLOR_PRESET_BG_CLASSES: Record<ColorPreset, string> = {
   blue: "bg-[#3072f1]",
@@ -206,7 +202,7 @@ export const COLOR_PRESET_BG_CLASSES: Record<ColorPreset, string> = {
   navy: "bg-[#001941]",
   charcoal: "bg-[#4b4b4b]",
   gray: "bg-[#4b4b4b]",
-};
+}
 
 const slugify = (text: string): string =>
   text
@@ -214,22 +210,22 @@ const slugify = (text: string): string =>
     .trim()
     .replace(/[^\w\s-]/g, "")
     .replace(/[\s_-]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+    .replace(/^-+|-+$/g, "")
 
 export const defineProject = (input: DefineProjectInput): ProjectConfig => {
-  const id = input.id || slugify(input.name);
+  const id = input.id || slugify(input.name)
 
   if (!/^[a-zA-Z0-9_-]+$/.test(id)) {
     throw new Error(
       `Invalid project ID "${id}". Must contain only letters, numbers, hyphens, and underscores.`
-    );
+    )
   }
 
-  const domain = input.domain || `${id}.localhost`;
-  const code = input.code || (domain ? domain.split('.')[0] : id);
-  const logo = input.logo || "/logo-le-full.svg";
-  const appIcon = input.appIcon || "/logo-le.svg";
-  const color = input.color || "blue";
+  const domain = input.domain || `${id}.localhost`
+  const code = input.code || (domain ? domain.split(".")[0] : id)
+  const logo = input.logo || "/logo-le-full.svg"
+  const appIcon = input.appIcon || "/logo-le.svg"
+  const color = input.color || "blue"
 
   return {
     id,
@@ -241,8 +237,8 @@ export const defineProject = (input: DefineProjectInput): ProjectConfig => {
     appIcon,
     color,
     enableLoginOtp: input.enableLoginOtp ?? false,
-  };
-};
+  }
+}
 
 const VALID_COLORS = new Set<string>([
   "blue",
@@ -262,59 +258,65 @@ const VALID_COLORS = new Set<string>([
   "navy",
   "charcoal",
   "gray",
-]);
+])
 
 export interface NestProjectRaw {
-  id: string;
-  code?: string;
-  name: string;
-  domain?: string;
-  logo?: string;
-  sidebar_logo?: string;
-  app_icon?: string;
-  appIcon?: string;
-  favicon_logo?: string;
-  color?: string;
-  enableLoginOtp?: boolean;
-  enable_login_otp?: boolean;
+  id: string
+  code?: string
+  name: string
+  domain?: string
+  logo?: string
+  sidebar_logo?: string
+  app_icon?: string
+  appIcon?: string
+  favicon_logo?: string
+  color?: string
+  enableLoginOtp?: boolean
+  enable_login_otp?: boolean
 }
 
 export const normalizeNestProject = (p: NestProjectRaw): ProjectConfig => {
   const isImage = (val?: string) =>
     Boolean(
       val &&
-        (val.startsWith("/") ||
-          val.startsWith("http") ||
-          val.endsWith(".svg") ||
-          val.endsWith(".png") ||
-          val.endsWith(".ico") ||
-          val.endsWith(".jpg"))
-    );
-  const isColor = (val?: string) => Boolean(val && VALID_COLORS.has(val));
+      (val.startsWith("/") ||
+        val.startsWith("http") ||
+        val.endsWith(".svg") ||
+        val.endsWith(".png") ||
+        val.endsWith(".ico") ||
+        val.endsWith(".jpg"))
+    )
+  const isColor = (val?: string) => Boolean(val && VALID_COLORS.has(val))
 
-  let color: ColorPreset = "blue";
-  if (p.color === "#a32828" || p.color === "red") color = "red";
-  else if (p.color === "#b95387" || p.color === "rose" || p.color === "pink") color = "rose";
-  else if (p.color === "#bf5800" || p.color === "orange") color = "orange";
-  else if (p.color === "#45a976" || p.color === "#45a9a4" || p.color === "green" || p.color === "teal") color = "green";
-  else if (p.color === "#429ec1" || p.color === "cyan") color = "cyan";
-  else if (p.color === "#001941" || p.color === "navy") color = "navy";
-  else if (p.color === "#4b4b4b" || p.color === "charcoal" || p.color === "gray") color = "charcoal";
-  else if (isColor(p.color)) color = p.color as ColorPreset;
-  else if (isColor(p.favicon_logo)) color = p.favicon_logo as ColorPreset;
+  let color: ColorPreset = "blue"
+  if (p.color === "#a32828" || p.color === "red") color = "red"
+  else if (p.color === "#b95387" || p.color === "rose" || p.color === "pink") color = "rose"
+  else if (p.color === "#bf5800" || p.color === "orange") color = "orange"
+  else if (
+    p.color === "#45a976" ||
+    p.color === "#45a9a4" ||
+    p.color === "green" ||
+    p.color === "teal"
+  )
+    color = "green"
+  else if (p.color === "#429ec1" || p.color === "cyan") color = "cyan"
+  else if (p.color === "#001941" || p.color === "navy") color = "navy"
+  else if (p.color === "#4b4b4b" || p.color === "charcoal" || p.color === "gray") color = "charcoal"
+  else if (isColor(p.color)) color = p.color as ColorPreset
+  else if (isColor(p.favicon_logo)) color = p.favicon_logo as ColorPreset
 
-  let logo = "/logo-le-full.svg";
-  if (isImage(p.logo)) logo = p.logo!;
-  else if (isImage(p.sidebar_logo)) logo = p.sidebar_logo!;
-  else if (isImage(p.color)) logo = p.color!;
+  let logo = "/logo-le-full.svg"
+  if (isImage(p.logo)) logo = p.logo!
+  else if (isImage(p.sidebar_logo)) logo = p.sidebar_logo!
+  else if (isImage(p.color)) logo = p.color!
 
-  let appIcon = "/logo-le.svg";
-  if (isImage(p.appIcon)) appIcon = p.appIcon!;
-  else if (isImage(p.app_icon)) appIcon = p.app_icon!;
-  else if (isImage(p.favicon_logo)) appIcon = p.favicon_logo!;
-  else if (isImage(p.sidebar_logo)) appIcon = p.sidebar_logo!;
+  let appIcon = "/logo-le.svg"
+  if (isImage(p.appIcon)) appIcon = p.appIcon!
+  else if (isImage(p.app_icon)) appIcon = p.app_icon!
+  else if (isImage(p.favicon_logo)) appIcon = p.favicon_logo!
+  else if (isImage(p.sidebar_logo)) appIcon = p.sidebar_logo!
 
-  const code = p.code || (p.domain ? p.domain.split('.')[0] : p.id);
+  const code = p.code || (p.domain ? p.domain.split(".")[0] : p.id)
 
   return {
     id: p.id,
@@ -326,8 +328,8 @@ export const normalizeNestProject = (p: NestProjectRaw): ProjectConfig => {
     appIcon,
     color,
     enableLoginOtp: p.enableLoginOtp ?? p.enable_login_otp ?? false,
-  };
-};
+  }
+}
 
 // Backward compatibility alias
-export const defineTenant = defineProject;
+export const defineTenant = defineProject

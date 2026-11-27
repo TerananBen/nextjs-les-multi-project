@@ -132,22 +132,28 @@
   --accent: oklch(0.96 0.01 240);
   --accent-foreground: oklch(0.25 0.05 240);
   --destructive: oklch(0.6 0.15 20);
-  --border: oklch(0.90 0.01 240);
-  --input: oklch(0.90 0.01 240);
+  --border: oklch(0.9 0.01 240);
+  --input: oklch(0.9 0.01 240);
   --ring: var(--project-primary, var(--tenant-primary, oklch(0.65 0.12 245)));
   --chart-1: var(--project-primary, var(--tenant-primary, oklch(0.65 0.12 245)));
   --chart-2: oklch(0.75 0.12 220);
   --chart-3: oklch(0.85 0.1 200);
   --chart-4: oklch(0.6 0.15 260);
   --chart-5: oklch(0.7 0.12 280);
-  
+
   /* Sidebar — project-aware (Brand Theme) */
   --sidebar: var(--project-sidebar, var(--tenant-sidebar, #0284c7));
-  --sidebar-foreground: var(--project-sidebar-foreground, var(--tenant-sidebar-foreground, #ffffff));
+  --sidebar-foreground: var(
+    --project-sidebar-foreground,
+    var(--tenant-sidebar-foreground, #ffffff)
+  );
   --sidebar-primary: var(--project-sidebar-foreground, var(--tenant-sidebar-foreground, #ffffff));
   --sidebar-primary-foreground: var(--project-sidebar, var(--tenant-sidebar, #0284c7));
   --sidebar-accent: var(--project-sidebar-accent, var(--tenant-sidebar-accent, #0369a1));
-  --sidebar-accent-foreground: var(--project-sidebar-foreground, var(--tenant-sidebar-foreground, #ffffff));
+  --sidebar-accent-foreground: var(
+    --project-sidebar-foreground,
+    var(--tenant-sidebar-foreground, #ffffff)
+  );
   --sidebar-border: var(--project-sidebar, var(--tenant-sidebar, #0284c7));
   --sidebar-ring: var(--project-primary, var(--tenant-primary, oklch(0.65 0.12 245)));
 }
@@ -168,8 +174,8 @@
 }
 /* Hide scrollbar for IE, Edge and Firefox */
 .no-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 /* Leaflet Popup Theme Integration */
@@ -177,7 +183,9 @@
   background-color: var(--card) !important;
   color: var(--card-foreground) !important;
   border-radius: var(--radius-lg, 0.75rem) !important;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
   border: 1px solid var(--border) !important;
   padding: 0 !important;
 }
@@ -205,7 +213,9 @@
   background-color: var(--card) !important;
   color: var(--card-foreground) !important;
   border-radius: var(--radius-lg, 0.75rem) !important;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1) !important;
   border: 1px solid var(--border) !important;
   padding: 0.875rem !important;
   overflow: visible !important;
@@ -329,4 +339,3 @@
 .rule-label {
   line-height: 1.3;
 }
-

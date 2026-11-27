@@ -14,11 +14,7 @@ interface UnauthorizedPageProps {
   params: Promise<{ locale: string }>
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>
-}) {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params
   const t = await getTranslations({ locale, namespace: "UnauthorizedPage" })
   return {
@@ -26,9 +22,7 @@ export async function generateMetadata({
   }
 }
 
-export default async function UnauthorizedPage({
-  params,
-}: UnauthorizedPageProps) {
+export default async function UnauthorizedPage({ params }: UnauthorizedPageProps) {
   const { locale } = await params
   const t = await getTranslations({ locale })
 
@@ -59,14 +53,18 @@ export default async function UnauthorizedPage({
   }
 
   const headerList = await headers()
-  const rawHost = (headerList.get("x-forwarded-host") || headerList.get("host") || "").split(",")[0].trim()
+  const rawHost = (headerList.get("x-forwarded-host") || headerList.get("host") || "")
+    .split(",")[0]
+    .trim()
   const cookieStore = await cookies()
   const cookieProject = cookieStore.get("current_project")?.value
   const slug = resolveProjectSlug(cookieProject) || DEFAULT_PROJECT || "nb32-nbiot"
   const targetHost = normalizeHostWithProject(rawHost, slug)
   const isLocal = rawHost.includes("localhost") || rawHost.includes("127.0.0.1")
   const proto = isLocal ? "http" : "https"
-  const restartLoginUrl = targetHost ? `${proto}://${targetHost}/api/auth/login?prompt=login&locale=${locale}` : `/api/auth/login?prompt=login&locale=${locale}`
+  const restartLoginUrl = targetHost
+    ? `${proto}://${targetHost}/api/auth/login?prompt=login&locale=${locale}`
+    : `/api/auth/login?prompt=login&locale=${locale}`
 
   return (
     <div className="min-h-svh w-full flex flex-col items-center justify-center p-4 md:p-8 relative transition-colors duration-500 bg-background text-foreground overflow-hidden select-none">

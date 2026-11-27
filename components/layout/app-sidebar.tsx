@@ -33,96 +33,290 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar"
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { MenuItem } from "@/app/actions/auth"
 import { Link, usePathname } from "@/i18n/routing"
 
 // Menu aliases for backward compatibility between old and new names
 const MENU_ALIASES: Record<string, string> = {
-  "V_GroupDashboard": "dashboard_group",
-  "V_Dashboard": "dashboard_overview",
-  "V_StreetLight": "control_streetlight",
-  "V_GroupConfig": "control_group",
-  "V_SettingSchedule": "control_schedule",
-  "V_MapDisconnect": "map_disconnect",
-  "V_MapGlobal": "map_global",
-  "V_MapChangeLamp": "map_changelamp",
-  "V_MaintenanceDashboard": "maintenance_dashboard",
-  "V_MaintenanceConfig": "maintenance_request",
-  "V_MaintenanceDetail": "maintenance_list",
-  "V_SettingMenu": "system_menu_permission",
-  "V_SettingApi": "system_api_setting",
-  "V_ProjectSetting": "system_project",
-  "V_AlertStreetLight": "system_alert",
-  "V_Personal": "system_personal",
-  "V_SettingDevice": "system_device",
-  "dashboard_group": "V_GroupDashboard",
-  "dashboard_overview": "V_Dashboard",
-  "control_streetlight": "V_StreetLight",
-  "control_group": "V_GroupConfig",
-  "control_schedule": "V_SettingSchedule",
-  "map_disconnect": "V_MapDisconnect",
-  "map_global": "V_MapGlobal",
-  "map_changelamp": "V_MapChangeLamp",
-  "maintenance_dashboard": "V_MaintenanceDashboard",
-  "maintenance_request": "V_MaintenanceConfig",
-  "maintenance_list": "V_MaintenanceDetail",
-  "system_menu_permission": "V_SettingMenu",
-  "system_api_setting": "V_SettingApi",
-  "system_project": "V_ProjectSetting",
-  "system_alert": "V_AlertStreetLight",
-  "system_personal": "V_Personal",
-  "system_device": "V_SettingDevice",
+  V_GroupDashboard: "dashboard_group",
+  V_Dashboard: "dashboard_overview",
+  V_StreetLight: "control_streetlight",
+  V_GroupConfig: "control_group",
+  V_SettingSchedule: "control_schedule",
+  V_MapDisconnect: "map_disconnect",
+  V_MapGlobal: "map_global",
+  V_MapChangeLamp: "map_changelamp",
+  V_MaintenanceDashboard: "maintenance_dashboard",
+  V_MaintenanceConfig: "maintenance_request",
+  V_MaintenanceDetail: "maintenance_list",
+  V_SettingMenu: "system_menu_permission",
+  V_SettingApi: "system_api_setting",
+  V_ProjectSetting: "system_project",
+  V_AlertStreetLight: "system_alert",
+  V_Personal: "system_personal",
+  V_SettingDevice: "system_device",
+  dashboard_group: "V_GroupDashboard",
+  dashboard_overview: "V_Dashboard",
+  control_streetlight: "V_StreetLight",
+  control_group: "V_GroupConfig",
+  control_schedule: "V_SettingSchedule",
+  map_disconnect: "V_MapDisconnect",
+  map_global: "V_MapGlobal",
+  map_changelamp: "V_MapChangeLamp",
+  maintenance_dashboard: "V_MaintenanceDashboard",
+  maintenance_request: "V_MaintenanceConfig",
+  maintenance_list: "V_MaintenanceDetail",
+  system_menu_permission: "V_SettingMenu",
+  system_api_setting: "V_SettingApi",
+  system_project: "V_ProjectSetting",
+  system_alert: "V_AlertStreetLight",
+  system_personal: "V_Personal",
+  system_device: "V_SettingDevice",
 }
 
 // Map menu_name to icon, title, url and distinct high-contrast colorful accent
-const menuMapping: Record<string, { title: string; icon: React.ElementType; url: string; color: string }> = {
+const menuMapping: Record<
+  string,
+  { title: string; icon: React.ElementType; url: string; color: string }
+> = {
   // New standardized names
-  "dashboard_overview": { title: "menu.overview", icon: IconBriefcase, url: "/dashboard/overview", color: "text-emerald-600 skyblue:text-emerald-300 dark:text-emerald-400" },
-  "system_alert": { title: "menu.alerts", icon: IconBell, url: "/setting-system/alerts", color: "text-red-500 skyblue:text-red-300 dark:text-red-400" },
-  "control_group": { title: "menu.groupConfig", icon: IconSettings, url: "/setting-control/group-config", color: "text-purple-600 skyblue:text-purple-300 dark:text-purple-400" },
-  "dashboard_group": { title: "menu.groupDashboard", icon: IconBriefcase, url: "/dashboard/group", color: "text-amber-500 skyblue:text-amber-300 dark:text-amber-400" },
-  "maintenance_request": { title: "menu.maintenanceConfig", icon: IconTool, url: "/maintenance/config", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
-  "maintenance_dashboard": { title: "menu.maintenanceDashboard", icon: IconBriefcase, url: "/maintenance/dashboard", color: "text-cyan-600 skyblue:text-cyan-200 dark:text-cyan-300" },
-  "map_disconnect": { title: "menu.mapDisconnect", icon: IconMap2, url: "/map/disconnect", color: "text-rose-500 skyblue:text-rose-300 dark:text-rose-400" },
-  "map_global": { title: "menu.mapGlobal", icon: IconMap2, url: "/map/global", color: "text-teal-600 skyblue:text-teal-300 dark:text-teal-400" },
-  "system_permission": { title: "menu.permission", icon: IconShieldLock, url: "/setting-system/permission", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
-  "system_project_permissions": { title: "menu.permission", icon: IconShieldLock, url: "/setting-system/permission", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
-  "system_menu_superadmin": { title: "menu.superadmin", icon: IconClockPlay, url: "/setting-system/menu-superadmin", color: "text-indigo-600 skyblue:text-indigo-300 dark:text-indigo-400" },
-  "system_project_permissions_api": { title: "menu.permission", icon: IconShieldLock, url: "/setting-system/permission", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
-  "system_pipeline_schedule": { title: "menu.superadmin", icon: IconClockPlay, url: "/setting-system/menu-superadmin", color: "text-indigo-600 skyblue:text-indigo-300 dark:text-indigo-400" },
-  "system_personal": { title: "menu.personal", icon: IconUser, url: "/setting-system/personal", color: "text-teal-600 skyblue:text-teal-300 dark:text-teal-400" },
-  "system_menu_permission": { title: "menu.menuSettings", icon: IconSettings, url: "/setting-system/menu-settings", color: "text-amber-600 skyblue:text-amber-300 dark:text-amber-400" },
-  "system_api_setting": { title: "menu.apiSettings", icon: IconApi, url: "/setting-system/api-settings", color: "text-emerald-600 skyblue:text-emerald-300 dark:text-emerald-400" },
-  "control_schedule": { title: "menu.scheduleSettings", icon: IconCalendarTime, url: "/setting-control/schedule-settings", color: "text-violet-600 skyblue:text-violet-300 dark:text-violet-400" },
-  "control_streetlight": { title: "menu.streetLight", icon: IconBulb, url: "/setting-control/street-light", color: "text-yellow-500 skyblue:text-yellow-300 dark:text-yellow-400" },
-  "maintenance_list": { title: "menu.maintenanceDetail", icon: IconListDetails, url: "/maintenance/detail", color: "text-pink-600 skyblue:text-pink-300 dark:text-pink-400" },
-  "map_changelamp": { title: "menu.mapChangeLamp", icon: IconReplace, url: "/map/change-lamp", color: "text-lime-600 skyblue:text-lime-300 dark:text-lime-400" },
-  "system_device": { title: "menu.deviceSettings", icon: IconDeviceAnalytics, url: "/dashboard/settings-device", color: "text-fuchsia-600 skyblue:text-fuchsia-300 dark:text-fuchsia-400" },
-  "system_project": { title: "menu.projectSettings", icon: IconFolders, url: "/setting-system/menu-superadmin", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
+  dashboard_overview: {
+    title: "menu.overview",
+    icon: IconBriefcase,
+    url: "/dashboard/overview",
+    color: "text-emerald-600 skyblue:text-emerald-300 dark:text-emerald-400",
+  },
+  system_alert: {
+    title: "menu.alerts",
+    icon: IconBell,
+    url: "/setting-system/alerts",
+    color: "text-red-500 skyblue:text-red-300 dark:text-red-400",
+  },
+  control_group: {
+    title: "menu.groupConfig",
+    icon: IconSettings,
+    url: "/setting-control/group-config",
+    color: "text-purple-600 skyblue:text-purple-300 dark:text-purple-400",
+  },
+  dashboard_group: {
+    title: "menu.groupDashboard",
+    icon: IconBriefcase,
+    url: "/dashboard/group",
+    color: "text-amber-500 skyblue:text-amber-300 dark:text-amber-400",
+  },
+  maintenance_request: {
+    title: "menu.maintenanceConfig",
+    icon: IconTool,
+    url: "/maintenance/config",
+    color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400",
+  },
+  maintenance_dashboard: {
+    title: "menu.maintenanceDashboard",
+    icon: IconBriefcase,
+    url: "/maintenance/dashboard",
+    color: "text-cyan-600 skyblue:text-cyan-200 dark:text-cyan-300",
+  },
+  map_disconnect: {
+    title: "menu.mapDisconnect",
+    icon: IconMap2,
+    url: "/map/disconnect",
+    color: "text-rose-500 skyblue:text-rose-300 dark:text-rose-400",
+  },
+  map_global: {
+    title: "menu.mapGlobal",
+    icon: IconMap2,
+    url: "/map/global",
+    color: "text-teal-600 skyblue:text-teal-300 dark:text-teal-400",
+  },
+  system_permission: {
+    title: "menu.permission",
+    icon: IconShieldLock,
+    url: "/setting-system/permission",
+    color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400",
+  },
+  system_project_permissions: {
+    title: "menu.permission",
+    icon: IconShieldLock,
+    url: "/setting-system/permission",
+    color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400",
+  },
+  system_menu_superadmin: {
+    title: "menu.superadmin",
+    icon: IconClockPlay,
+    url: "/setting-system/menu-superadmin",
+    color: "text-indigo-600 skyblue:text-indigo-300 dark:text-indigo-400",
+  },
+  system_project_permissions_api: {
+    title: "menu.permission",
+    icon: IconShieldLock,
+    url: "/setting-system/permission",
+    color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400",
+  },
+  system_pipeline_schedule: {
+    title: "menu.superadmin",
+    icon: IconClockPlay,
+    url: "/setting-system/menu-superadmin",
+    color: "text-indigo-600 skyblue:text-indigo-300 dark:text-indigo-400",
+  },
+  system_personal: {
+    title: "menu.personal",
+    icon: IconUser,
+    url: "/setting-system/personal",
+    color: "text-teal-600 skyblue:text-teal-300 dark:text-teal-400",
+  },
+  system_menu_permission: {
+    title: "menu.menuSettings",
+    icon: IconSettings,
+    url: "/setting-system/menu-settings",
+    color: "text-amber-600 skyblue:text-amber-300 dark:text-amber-400",
+  },
+  system_api_setting: {
+    title: "menu.apiSettings",
+    icon: IconApi,
+    url: "/setting-system/api-settings",
+    color: "text-emerald-600 skyblue:text-emerald-300 dark:text-emerald-400",
+  },
+  control_schedule: {
+    title: "menu.scheduleSettings",
+    icon: IconCalendarTime,
+    url: "/setting-control/schedule-settings",
+    color: "text-violet-600 skyblue:text-violet-300 dark:text-violet-400",
+  },
+  control_streetlight: {
+    title: "menu.streetLight",
+    icon: IconBulb,
+    url: "/setting-control/street-light",
+    color: "text-yellow-500 skyblue:text-yellow-300 dark:text-yellow-400",
+  },
+  maintenance_list: {
+    title: "menu.maintenanceDetail",
+    icon: IconListDetails,
+    url: "/maintenance/detail",
+    color: "text-pink-600 skyblue:text-pink-300 dark:text-pink-400",
+  },
+  map_changelamp: {
+    title: "menu.mapChangeLamp",
+    icon: IconReplace,
+    url: "/map/change-lamp",
+    color: "text-lime-600 skyblue:text-lime-300 dark:text-lime-400",
+  },
+  system_device: {
+    title: "menu.deviceSettings",
+    icon: IconDeviceAnalytics,
+    url: "/dashboard/settings-device",
+    color: "text-fuchsia-600 skyblue:text-fuchsia-300 dark:text-fuchsia-400",
+  },
+  system_project: {
+    title: "menu.projectSettings",
+    icon: IconFolders,
+    url: "/setting-system/menu-superadmin",
+    color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400",
+  },
 
   // Legacy aliases for backward compatibility
-  "V_Dashboard": { title: "menu.overview", icon: IconBriefcase, url: "/dashboard/overview", color: "text-emerald-600 skyblue:text-emerald-300 dark:text-emerald-400" },
-  "V_AlertStreetLight": { title: "menu.alerts", icon: IconBell, url: "/setting-system/alerts", color: "text-red-500 skyblue:text-red-300 dark:text-red-400" },
-  "V_GroupConfig": { title: "menu.groupConfig", icon: IconSettings, url: "/setting-control/group-config", color: "text-purple-600 skyblue:text-purple-300 dark:text-purple-400" },
-  "V_GroupDashboard": { title: "menu.groupDashboard", icon: IconBriefcase, url: "/dashboard/group", color: "text-amber-500 skyblue:text-amber-300 dark:text-amber-400" },
-  "V_MaintenanceConfig": { title: "menu.maintenanceConfig", icon: IconTool, url: "/maintenance/config", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
-  "V_MaintenanceDashboard": { title: "menu.maintenanceDashboard", icon: IconBriefcase, url: "/maintenance/dashboard", color: "text-cyan-600 skyblue:text-cyan-200 dark:text-cyan-300" },
-  "V_MapDisconnect": { title: "menu.mapDisconnect", icon: IconMap2, url: "/map/disconnect", color: "text-rose-500 skyblue:text-rose-300 dark:text-rose-400" },
-  "V_MapGlobal": { title: "menu.mapGlobal", icon: IconMap2, url: "/map/global", color: "text-teal-600 skyblue:text-teal-300 dark:text-teal-400" },
-  "V_Personal": { title: "menu.personal", icon: IconUser, url: "/setting-system/personal", color: "text-teal-600 skyblue:text-teal-300 dark:text-teal-400" },
-  "V_SettingMenu": { title: "menu.menuSettings", icon: IconSettings, url: "/setting-system/menu-settings", color: "text-amber-600 skyblue:text-amber-300 dark:text-amber-400" },
-  "V_SettingApi": { title: "menu.apiSettings", icon: IconApi, url: "/setting-system/api-settings", color: "text-emerald-600 skyblue:text-emerald-300 dark:text-emerald-400" },
-  "V_SettingSchedule": { title: "menu.scheduleSettings", icon: IconCalendarTime, url: "/setting-control/schedule-settings", color: "text-violet-600 skyblue:text-violet-300 dark:text-violet-400" },
-  "V_StreetLight": { title: "menu.streetLight", icon: IconBulb, url: "/setting-control/street-light", color: "text-yellow-500 skyblue:text-yellow-300 dark:text-yellow-400" },
-  "V_MaintenanceDetail": { title: "menu.maintenanceDetail", icon: IconListDetails, url: "/maintenance/detail", color: "text-pink-600 skyblue:text-pink-300 dark:text-pink-400" },
-  "V_MapChangeLamp": { title: "menu.mapChangeLamp", icon: IconReplace, url: "/map/change-lamp", color: "text-lime-600 skyblue:text-lime-300 dark:text-lime-400" },
-  "V_SettingDevice": { title: "menu.deviceSettings", icon: IconDeviceAnalytics, url: "/dashboard/settings-device", color: "text-fuchsia-600 skyblue:text-fuchsia-300 dark:text-fuchsia-400" },
-  "V_ProjectSetting": { title: "menu.projectSettings", icon: IconFolders, url: "/setting-system/menu-superadmin", color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400" },
+  V_Dashboard: {
+    title: "menu.overview",
+    icon: IconBriefcase,
+    url: "/dashboard/overview",
+    color: "text-emerald-600 skyblue:text-emerald-300 dark:text-emerald-400",
+  },
+  V_AlertStreetLight: {
+    title: "menu.alerts",
+    icon: IconBell,
+    url: "/setting-system/alerts",
+    color: "text-red-500 skyblue:text-red-300 dark:text-red-400",
+  },
+  V_GroupConfig: {
+    title: "menu.groupConfig",
+    icon: IconSettings,
+    url: "/setting-control/group-config",
+    color: "text-purple-600 skyblue:text-purple-300 dark:text-purple-400",
+  },
+  V_GroupDashboard: {
+    title: "menu.groupDashboard",
+    icon: IconBriefcase,
+    url: "/dashboard/group",
+    color: "text-amber-500 skyblue:text-amber-300 dark:text-amber-400",
+  },
+  V_MaintenanceConfig: {
+    title: "menu.maintenanceConfig",
+    icon: IconTool,
+    url: "/maintenance/config",
+    color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400",
+  },
+  V_MaintenanceDashboard: {
+    title: "menu.maintenanceDashboard",
+    icon: IconBriefcase,
+    url: "/maintenance/dashboard",
+    color: "text-cyan-600 skyblue:text-cyan-200 dark:text-cyan-300",
+  },
+  V_MapDisconnect: {
+    title: "menu.mapDisconnect",
+    icon: IconMap2,
+    url: "/map/disconnect",
+    color: "text-rose-500 skyblue:text-rose-300 dark:text-rose-400",
+  },
+  V_MapGlobal: {
+    title: "menu.mapGlobal",
+    icon: IconMap2,
+    url: "/map/global",
+    color: "text-teal-600 skyblue:text-teal-300 dark:text-teal-400",
+  },
+  V_Personal: {
+    title: "menu.personal",
+    icon: IconUser,
+    url: "/setting-system/personal",
+    color: "text-teal-600 skyblue:text-teal-300 dark:text-teal-400",
+  },
+  V_SettingMenu: {
+    title: "menu.menuSettings",
+    icon: IconSettings,
+    url: "/setting-system/menu-settings",
+    color: "text-amber-600 skyblue:text-amber-300 dark:text-amber-400",
+  },
+  V_SettingApi: {
+    title: "menu.apiSettings",
+    icon: IconApi,
+    url: "/setting-system/api-settings",
+    color: "text-emerald-600 skyblue:text-emerald-300 dark:text-emerald-400",
+  },
+  V_SettingSchedule: {
+    title: "menu.scheduleSettings",
+    icon: IconCalendarTime,
+    url: "/setting-control/schedule-settings",
+    color: "text-violet-600 skyblue:text-violet-300 dark:text-violet-400",
+  },
+  V_StreetLight: {
+    title: "menu.streetLight",
+    icon: IconBulb,
+    url: "/setting-control/street-light",
+    color: "text-yellow-500 skyblue:text-yellow-300 dark:text-yellow-400",
+  },
+  V_MaintenanceDetail: {
+    title: "menu.maintenanceDetail",
+    icon: IconListDetails,
+    url: "/maintenance/detail",
+    color: "text-pink-600 skyblue:text-pink-300 dark:text-pink-400",
+  },
+  V_MapChangeLamp: {
+    title: "menu.mapChangeLamp",
+    icon: IconReplace,
+    url: "/map/change-lamp",
+    color: "text-lime-600 skyblue:text-lime-300 dark:text-lime-400",
+  },
+  V_SettingDevice: {
+    title: "menu.deviceSettings",
+    icon: IconDeviceAnalytics,
+    url: "/dashboard/settings-device",
+    color: "text-fuchsia-600 skyblue:text-fuchsia-300 dark:text-fuchsia-400",
+  },
+  V_ProjectSetting: {
+    title: "menu.projectSettings",
+    icon: IconFolders,
+    url: "/setting-system/menu-superadmin",
+    color: "text-orange-500 skyblue:text-orange-300 dark:text-orange-400",
+  },
 }
 
 // Define menu groups
@@ -224,10 +418,22 @@ export function AppSidebar({ menuItems = [], user, sidebarLogo, ...props }: AppS
         .then((res) => res.text())
         .then((text) => {
           const processed = text
-            .replace('<svg width="550" height="80"', '<svg class="h-10 w-auto select-none text-sidebar-foreground transition-colors duration-500"')
-            .replace('stroke="#cccccc" stroke-width="2"', 'stroke="currentColor" stroke-width="2" stroke-opacity="0.3"')
-            .replace('fill="white" font-family="Arial, sans-serif" font-weight="bold"', 'fill="currentColor" font-family="Arial, sans-serif" font-weight="bold"')
-            .replace('fill="white" font-family="Arial, sans-serif" font-weight="normal"', 'fill="currentColor" font-family="Arial, sans-serif" font-weight="normal"')
+            .replace(
+              '<svg width="550" height="80"',
+              '<svg class="h-10 w-auto select-none text-sidebar-foreground transition-colors duration-500"'
+            )
+            .replace(
+              'stroke="#cccccc" stroke-width="2"',
+              'stroke="currentColor" stroke-width="2" stroke-opacity="0.3"'
+            )
+            .replace(
+              'fill="white" font-family="Arial, sans-serif" font-weight="bold"',
+              'fill="currentColor" font-family="Arial, sans-serif" font-weight="bold"'
+            )
+            .replace(
+              'fill="white" font-family="Arial, sans-serif" font-weight="normal"',
+              'fill="currentColor" font-family="Arial, sans-serif" font-weight="normal"'
+            )
           setSvgContent(processed)
         })
         .catch((err) => console.error("Error loading sidebar logo:", err))
@@ -236,7 +442,11 @@ export function AppSidebar({ menuItems = [], user, sidebarLogo, ...props }: AppS
 
   const isSuperAdmin = React.useMemo(() => {
     const roleLower = (user?.role || "").toLowerCase()
-    return roleLower.includes("superadmin") || roleLower.includes("super_admin") || roleLower.includes("super-admin")
+    return (
+      roleLower.includes("superadmin") ||
+      roleLower.includes("super_admin") ||
+      roleLower.includes("super-admin")
+    )
   }, [user?.role])
 
   // Create a map of readable menu items for easy lookup (supporting aliases)
@@ -313,12 +523,16 @@ export function AppSidebar({ menuItems = [], user, sidebarLogo, ...props }: AppS
         {visibleGroups.map((group, index) => {
           const isOpen = openGroups[group.title] ?? true
           const isGroupActive = group.items.some((item) => {
-            return pathname === item.url || (item.url !== "#" && pathname.startsWith(item.url + "/"))
+            return (
+              pathname === item.url || (item.url !== "#" && pathname.startsWith(item.url + "/"))
+            )
           })
 
           return (
             <React.Fragment key={group.title}>
-              {index > 0 && <SidebarSeparator className="my-1 mx-3 bg-sidebar-foreground/25 h-px" />}
+              {index > 0 && (
+                <SidebarSeparator className="my-1 mx-3 bg-sidebar-foreground/25 h-px" />
+              )}
               <Collapsible
                 open={isOpen}
                 onOpenChange={(open) => handleToggleGroup(group.title, open)}
@@ -335,13 +549,13 @@ export function AppSidebar({ menuItems = [], user, sidebarLogo, ...props }: AppS
                     )}
                   >
                     <CollapsibleTrigger className="flex w-full items-center justify-between">
-                      <span className="truncate">
-                        {t(group.title)}
-                      </span>
-                      <ChevronDown className={cn(
-                        "size-4 shrink-0 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180",
-                        isGroupActive ? "text-sidebar-foreground" : "text-sidebar-foreground/60"
-                      )} />
+                      <span className="truncate">{t(group.title)}</span>
+                      <ChevronDown
+                        className={cn(
+                          "size-4 shrink-0 transition-transform duration-200 group-data-[state=open]/collapsible:rotate-180",
+                          isGroupActive ? "text-sidebar-foreground" : "text-sidebar-foreground/60"
+                        )}
+                      />
                     </CollapsibleTrigger>
                   </SidebarGroupLabel>
                   <CollapsibleContent>

@@ -14,35 +14,22 @@ interface SiteHeaderProps {
   user?: NavUserProps["user"]
 }
 
-export function SiteHeader({
-  currentProjectId = "",
-  projects = [],
-  user,
-}: SiteHeaderProps) {
+export function SiteHeader({ currentProjectId = "", projects = [], user }: SiteHeaderProps) {
   return (
     <header className="flex h-(--header-height) shrink-0 items-center gap-2 border-b bg-background transition-[width,height] ease-linear md:rounded-t-xl group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)">
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
         <SidebarTrigger className="cursor-pointer -ml-1" />
-        <Separator
-          orientation="vertical"
-          className="mx-2 data-[orientation=vertical]:h-4"
-        />
+        <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
         <HeaderProjectTitle />
         <div className="ml-auto flex items-center gap-2">
           {projects.length > 1 && (
-            <ProjectSwitcher
-              currentProjectId={currentProjectId}
-              projects={projects}
-            />
+            <ProjectSwitcher currentProjectId={currentProjectId} projects={projects} />
           )}
           <ThemeSwitcher />
           <LanguageSwitcher />
           {user && (
             <>
-              <Separator
-                orientation="vertical"
-                className="mx-1 data-[orientation=vertical]:h-4"
-              />
+              <Separator orientation="vertical" className="mx-1 data-[orientation=vertical]:h-4" />
               <NavUser user={user} />
             </>
           )}

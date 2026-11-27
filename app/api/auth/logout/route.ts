@@ -1,88 +1,103 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getKeycloakLogoutUrl, logoutKeycloak, isKeycloakTokenValid, decodeJwtPayload } from "@/lib/keycloak";
-import { resolveProjectSlug, isIpAddress, DEFAULT_PROJECT } from "@/config/projects";
-import { decryptCookieValue } from "@/lib/cookie-crypto";
+import { NextRequest, NextResponse } from "next/server"
+import {
+  getKeycloakLogoutUrl,
+  logoutKeycloak,
+  isKeycloakTokenValid,
+  decodeJwtPayload,
+} from "@/lib/keycloak"
+import { resolveProjectSlug, isIpAddress, DEFAULT_PROJECT } from "@/config/projects"
+import { decryptCookieValue } from "@/lib/cookie-crypto"
 
 export async function GET(request: NextRequest) {
-  const refreshToken = await decryptCookieValue(request.cookies.get("refresh_token")?.value);
-  const idToken = await decryptCookieValue(request.cookies.get("id_token")?.value);
-  const currentProject = request.cookies.get("current_project")?.value;
+  const refreshToken = await decryptCookieValue(request.cookies.get("refresh_token")?.value)
+  const idToken = await decryptCookieValue(request.cookies.get("id_token")?.value)
+  const currentProject = request.cookies.get("current_project")?.value
 
   // Determine host and protocol
-  const host = (request.headers.get("x-forwarded-host") || request.headers.get("host") || "").split(",")[0].trim();
-  const hostWithoutPort = host.split(":")[0].toLowerCase();
-  const isIp = isIpAddress(hostWithoutPort);
-  const parts = hostWithoutPort.split(".");
-  const isLocalhost = hostWithoutPort.endsWith("localhost");
-  const minParts = isLocalhost ? 1 : 2;
+  const host = (request.headers.get("x-forwarded-host") || request.headers.get("host") || "")
+    .split(",")[0]
+    .trim()
+  const hostWithoutPort = host.split(":")[0].toLowerCase()
+  const isIp = isIpAddress(hostWithoutPort)
+  const parts = hostWithoutPort.split(".")
+  const isLocalhost = hostWithoutPort.endsWith("localhost")
+  const minParts = isLocalhost ? 1 : 2
 
-  let resolvedClientId: string | undefined;
+  let resolvedClientId: string | undefined
   if (refreshToken) {
-    const refreshPayload = decodeJwtPayload<{ azp?: string }>(refreshToken);
-    if (refreshPayload?.azp && typeof refreshPayload.azp === "string" && refreshPayload.azp.trim()) {
-      resolvedClientId = refreshPayload.azp.trim();
+    const refreshPayload = decodeJwtPayload<{ azp?: string }>(refreshToken)
+    if (
+      refreshPayload?.azp &&
+      typeof refreshPayload.azp === "string" &&
+      refreshPayload.azp.trim()
+    ) {
+      resolvedClientId = refreshPayload.azp.trim()
     }
   }
   if (!resolvedClientId && idToken) {
-    const idPayload = decodeJwtPayload<{ azp?: string }>(idToken);
+    const idPayload = decodeJwtPayload<{ azp?: string }>(idToken)
     if (idPayload?.azp && typeof idPayload.azp === "string" && idPayload.azp.trim()) {
-      resolvedClientId = idPayload.azp.trim();
+      resolvedClientId = idPayload.azp.trim()
     }
   }
   if (!resolvedClientId && !isIp && parts.length > minParts && parts[0] && parts[0] !== "www") {
-    resolvedClientId = resolveProjectSlug(parts[0]);
+    resolvedClientId = resolveProjectSlug(parts[0])
   }
   if (!resolvedClientId && currentProject) {
-    resolvedClientId = resolveProjectSlug(currentProject);
+    resolvedClientId = resolveProjectSlug(currentProject)
   }
   if (!resolvedClientId) {
-    resolvedClientId = process.env.KEYCLOAK_CLIENT_ID || DEFAULT_PROJECT;
+    resolvedClientId = process.env.KEYCLOAK_CLIENT_ID || DEFAULT_PROJECT
   }
 
-  const isLocal = host.includes("localhost") || host.includes("127.0.0.1");
-  const proto = request.headers.get("x-forwarded-proto") || (isLocal ? "http" : (process.env.USING_HTTPS === "true" ? "https" : "http"));
-  const appUrl = host ? `${proto}://${host}` : (process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3008");
+  const isLocal = host.includes("localhost") || host.includes("127.0.0.1")
+  const proto =
+    request.headers.get("x-forwarded-proto") ||
+    (isLocal ? "http" : process.env.USING_HTTPS === "true" ? "https" : "http")
+  const appUrl = host
+    ? `${proto}://${host}`
+    : process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3008"
 
-  const loginUrl = `${appUrl}/api/auth/login?prompt=login`;
+  const loginUrl = `${appUrl}/api/auth/login?prompt=login`
 
-  let targetUrl: string = loginUrl;
-  const hasValidIdToken = isKeycloakTokenValid(idToken);
+  let targetUrl: string = loginUrl
+  const hasValidIdToken = isKeycloakTokenValid(idToken)
 
   if (hasValidIdToken && idToken) {
     // If idToken is valid, frontchannel logout with id_token_hint clears Keycloak session & browser cookies and redirects to post_logout_redirect_uri.
     // Do NOT invoke backchannel logout first, as it would destroy the session and cause Keycloak to reject id_token_hint as expired/invalid.
-    const keycloakLogoutUrl = getKeycloakLogoutUrl(loginUrl, idToken, resolvedClientId);
+    const keycloakLogoutUrl = getKeycloakLogoutUrl(loginUrl, idToken, resolvedClientId)
     if (keycloakLogoutUrl) {
-      targetUrl = keycloakLogoutUrl;
+      targetUrl = keycloakLogoutUrl
     }
   } else if (refreshToken) {
     // If idToken is expired or absent, do NOT send expired id_token_hint to Keycloak (which causes EXPIRED_ACTION error).
     // Instead, terminate session via backchannel logout and redirect directly to login with prompt=login.
     try {
-      await logoutKeycloak(refreshToken, resolvedClientId);
+      await logoutKeycloak(refreshToken, resolvedClientId)
     } catch (e) {
-      console.warn("[Logout] Backchannel logout failed:", e);
+      console.warn("[Logout] Backchannel logout failed:", e)
     }
   }
 
-  const response = NextResponse.redirect(targetUrl);
+  const response = NextResponse.redirect(targetUrl)
 
   // Force clear all auth cookies on the response
-  response.cookies.set("jwt", "", { path: "/", maxAge: 0 });
-  response.cookies.set("refresh_token", "", { path: "/", maxAge: 0 });
-  response.cookies.set("id_token", "", { path: "/", maxAge: 0 });
-  response.cookies.set("menuRole", "", { path: "/", maxAge: 0 });
-  response.cookies.set("current_project", "", { path: "/", maxAge: 0 });
-  response.cookies.set("remember_me", "", { path: "/", maxAge: 0 });
-  response.cookies.set("pkce_verifier", "", { path: "/", maxAge: 0 });
-  response.cookies.delete("jwt");
-  response.cookies.delete("refresh_token");
-  response.cookies.delete("id_token");
-  response.cookies.delete("menuRole");
-  response.cookies.delete("current_project");
-  response.cookies.delete("current_tenant");
-  response.cookies.delete("remember_me");
-  response.cookies.delete("pkce_verifier");
+  response.cookies.set("jwt", "", { path: "/", maxAge: 0 })
+  response.cookies.set("refresh_token", "", { path: "/", maxAge: 0 })
+  response.cookies.set("id_token", "", { path: "/", maxAge: 0 })
+  response.cookies.set("menuRole", "", { path: "/", maxAge: 0 })
+  response.cookies.set("current_project", "", { path: "/", maxAge: 0 })
+  response.cookies.set("remember_me", "", { path: "/", maxAge: 0 })
+  response.cookies.set("pkce_verifier", "", { path: "/", maxAge: 0 })
+  response.cookies.delete("jwt")
+  response.cookies.delete("refresh_token")
+  response.cookies.delete("id_token")
+  response.cookies.delete("menuRole")
+  response.cookies.delete("current_project")
+  response.cookies.delete("current_tenant")
+  response.cookies.delete("remember_me")
+  response.cookies.delete("pkce_verifier")
 
-  return response;
+  return response
 }

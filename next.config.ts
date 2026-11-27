@@ -1,20 +1,20 @@
-import type { NextConfig } from "next";
-import createNextIntlPlugin from 'next-intl/plugin';
+import type { NextConfig } from "next"
+import createNextIntlPlugin from "next-intl/plugin"
 
-const withNextIntl = createNextIntlPlugin();
+const withNextIntl = createNextIntlPlugin()
 
 const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: '/(.*)',
+        source: "/(.*)",
         headers: [
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'X-Frame-Options', value: 'DENY' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         ],
       },
-    ];
+    ]
   },
   logging: {
     fetches: {
@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
       allowedOrigins: process.env.ALLOWED_ORIGINS?.split(",") || ["10.0.0.10", "localhost"],
-      bodySizeLimit: '10mb',
+      bodySizeLimit: "10mb",
     },
   },
   allowedDevOrigins: process.env.ALLOWED_ORIGINS?.split(",") || ["10.0.0.10", "localhost"],
@@ -39,6 +39,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-};
+}
 
-export default withNextIntl(nextConfig);
+export default withNextIntl(nextConfig)

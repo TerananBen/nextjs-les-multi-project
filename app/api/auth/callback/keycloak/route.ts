@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server"
+import { cookies } from "next/headers"
 import {
   exchangeKeycloakCode,
   extractAllProjectIdsFromPayload,
@@ -9,115 +9,133 @@ import {
   logoutKeycloak,
   refreshKeycloakToken,
   updateUserActiveProject,
-} from "@/lib/keycloak";
-import { resolveProjectUuid, resolveProjectSlug, isIpAddress, DEFAULT_PROJECT, normalizeHostWithProject } from "@/config/projects";
-import { markEmailVerified } from "@/lib/verify-email-store";
-import { encryptCookieValue } from "@/lib/cookie-crypto";
+} from "@/lib/keycloak"
+import {
+  resolveProjectUuid,
+  resolveProjectSlug,
+  isIpAddress,
+  DEFAULT_PROJECT,
+  normalizeHostWithProject,
+} from "@/config/projects"
+import { markEmailVerified } from "@/lib/verify-email-store"
+import { encryptCookieValue } from "@/lib/cookie-crypto"
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = request.nextUrl;
-  const code = searchParams.get("code");
-  const error = searchParams.get("error");
-  const errorDesc = searchParams.get("error_description");
-  const state = searchParams.get("state");
+  const { searchParams } = request.nextUrl
+  const code = searchParams.get("code")
+  const error = searchParams.get("error")
+  const errorDesc = searchParams.get("error_description")
+  const state = searchParams.get("state")
 
   // Determine locale from cookie or default
-  const defaultLocale = process.env.DEFAULT_LOCALE || "th";
-  let targetLocale = defaultLocale;
-  let returnUrl = `/${targetLocale}/dashboard/group`;
-  let resolvedClientId: string | undefined;
+  const defaultLocale = process.env.DEFAULT_LOCALE || "th"
+  let targetLocale = defaultLocale
+  let returnUrl = `/${targetLocale}/dashboard/group`
+  let resolvedClientId: string | undefined
 
   if (state) {
     try {
       // If state is JSON encoded with returnUrl, locale, and clientId
       if (state.startsWith("{")) {
-        const parsedState = JSON.parse(state);
+        const parsedState = JSON.parse(state)
         if (parsedState.locale && (parsedState.locale === "th" || parsedState.locale === "en")) {
-          targetLocale = parsedState.locale;
+          targetLocale = parsedState.locale
         } else {
-          targetLocale = "th";
+          targetLocale = "th"
         }
         if (parsedState.returnUrl && parsedState.returnUrl.startsWith("/")) {
-          returnUrl = parsedState.returnUrl;
+          returnUrl = parsedState.returnUrl
         }
         if (parsedState.clientId) {
-          resolvedClientId = parsedState.clientId;
+          resolvedClientId = parsedState.clientId
         }
       } else if (state.startsWith("/")) {
-        returnUrl = state;
-        const potentialLocale = state.split("/")[1];
+        returnUrl = state
+        const potentialLocale = state.split("/")[1]
         if (potentialLocale === "th" || potentialLocale === "en") {
-          targetLocale = potentialLocale;
+          targetLocale = potentialLocale
         }
       }
     } catch {
-      targetLocale = "th";
+      targetLocale = "th"
     }
   }
 
   // Ensure returnUrl always has the proper locale prefix
   if (returnUrl === "/" || returnUrl === "") {
-    returnUrl = `/${targetLocale}/dashboard/group`;
-  } else if (!returnUrl.startsWith("/th/") && !returnUrl.startsWith("/en/") && returnUrl !== "/th" && returnUrl !== "/en") {
-    returnUrl = `/${targetLocale}${returnUrl}`;
+    returnUrl = `/${targetLocale}/dashboard/group`
+  } else if (
+    !returnUrl.startsWith("/th/") &&
+    !returnUrl.startsWith("/en/") &&
+    returnUrl !== "/th" &&
+    returnUrl !== "/en"
+  ) {
+    returnUrl = `/${targetLocale}${returnUrl}`
   }
 
   // Fallback clientId from subdomain
   if (!resolvedClientId) {
-    const host = (request.headers.get("x-forwarded-host") || request.headers.get("host") || "").split(",")[0].trim();
-    const hostWithoutPort = host.split(":")[0].toLowerCase();
+    const host = (request.headers.get("x-forwarded-host") || request.headers.get("host") || "")
+      .split(",")[0]
+      .trim()
+    const hostWithoutPort = host.split(":")[0].toLowerCase()
     if (!isIpAddress(hostWithoutPort)) {
-      const sub = hostWithoutPort.split(".")[0];
+      const sub = hostWithoutPort.split(".")[0]
       if (sub && sub !== "localhost" && sub !== "www") {
-        resolvedClientId = sub;
+        resolvedClientId = sub
       }
     }
   }
 
   if (!resolvedClientId) {
-    resolvedClientId = process.env.KEYCLOAK_CLIENT_ID || DEFAULT_PROJECT;
+    resolvedClientId = process.env.KEYCLOAK_CLIENT_ID || DEFAULT_PROJECT
   }
 
   // Handle Keycloak error responses (e.g. user cancelled)
   if (error || !code) {
-    console.warn(`[Keycloak Callback] Auth error or missing code: ${error} - ${errorDesc}`);
-    const loginRedirect = new URL(`/${targetLocale}/login`, request.url);
-    if (error) loginRedirect.searchParams.set("error", error);
-    return NextResponse.redirect(loginRedirect);
+    console.warn(`[Keycloak Callback] Auth error or missing code: ${error} - ${errorDesc}`)
+    const loginRedirect = new URL(`/${targetLocale}/login`, request.url)
+    if (error) loginRedirect.searchParams.set("error", error)
+    return NextResponse.redirect(loginRedirect)
   }
 
   // Retrieve PKCE verifier from cookie
-  const cookieStore = await cookies();
-  const codeVerifier = cookieStore.get("pkce_verifier")?.value;
-  cookieStore.delete("pkce_verifier");
+  const cookieStore = await cookies()
+  const codeVerifier = cookieStore.get("pkce_verifier")?.value
+  cookieStore.delete("pkce_verifier")
 
   // Determine callback redirect URI exactly matching the one sent in auth request
-  const redirectUri = getAuthCallbackUri(request);
-  const authResult = await exchangeKeycloakCode(code, redirectUri, resolvedClientId, codeVerifier);
+  const redirectUri = getAuthCallbackUri(request)
+  const authResult = await exchangeKeycloakCode(code, redirectUri, resolvedClientId, codeVerifier)
 
   if (!authResult.success || !authResult.tokenData?.access_token) {
-    console.error(`[Keycloak Callback] Token exchange failed: ${authResult.message}`);
-    const loginRedirect = new URL(`/${targetLocale}/login`, request.url);
-    loginRedirect.searchParams.set("error", "token_exchange_failed");
-    return NextResponse.redirect(loginRedirect);
+    console.error(`[Keycloak Callback] Token exchange failed: ${authResult.message}`)
+    const loginRedirect = new URL(`/${targetLocale}/login`, request.url)
+    loginRedirect.searchParams.set("error", "token_exchange_failed")
+    return NextResponse.redirect(loginRedirect)
   }
 
-  const { tokenData, payload } = authResult;
-  const host = (request.headers.get("x-forwarded-host") || request.headers.get("host") || "").split(",")[0].trim();
-  const isLocal = host.includes("localhost") || host.includes("127.0.0.1");
-  const usingHttps = !isLocal && (process.env.USING_HTTPS === "true" || request.nextUrl.protocol === "https:");
+  const { tokenData, payload } = authResult
+  const host = (request.headers.get("x-forwarded-host") || request.headers.get("host") || "")
+    .split(",")[0]
+    .trim()
+  const isLocal = host.includes("localhost") || host.includes("127.0.0.1")
+  const usingHttps =
+    !isLocal && (process.env.USING_HTTPS === "true" || request.nextUrl.protocol === "https:")
 
   // Extract client or realm role and cache in menuRole cookie
-  const roles = extractRolesFromPayload(payload, resolvedClientId);
+  const roles = extractRolesFromPayload(payload, resolvedClientId)
   const isSuperAdmin = roles.some((r) => {
-    const lower = r.toLowerCase();
-    return lower.includes("superadmin") || lower.includes("super_admin") || lower.includes("super-admin");
-  });
+    const lower = r.toLowerCase()
+    return (
+      lower.includes("superadmin") || lower.includes("super_admin") || lower.includes("super-admin")
+    )
+  })
 
   // Auto-set project: prioritize client / subdomain where login was initiated if allowed
-  const allowedProjects = extractAllProjectIdsFromPayload(payload);
-  const allowedUuids = allowedProjects.map((p) => resolveProjectUuid(p));
-  const targetFromClient = resolvedClientId ? resolveProjectUuid(resolvedClientId) : undefined;
+  const allowedProjects = extractAllProjectIdsFromPayload(payload)
+  const allowedUuids = allowedProjects.map((p) => resolveProjectUuid(p))
+  const targetFromClient = resolvedClientId ? resolveProjectUuid(resolvedClientId) : undefined
 
   // Check if user is attempting to log into an unauthorized subdomain project
   const isHostProjectUnauthorized =
@@ -125,36 +143,36 @@ export async function GET(request: NextRequest) {
     !isSuperAdmin &&
     allowedUuids.length > 0 &&
     !allowedUuids.includes(targetFromClient) &&
-    (!resolvedClientId || !allowedProjects.includes(resolvedClientId));
+    (!resolvedClientId || !allowedProjects.includes(resolvedClientId))
 
   if (isHostProjectUnauthorized) {
     if (tokenData.refresh_token) {
-      await logoutKeycloak(tokenData.refresh_token, resolvedClientId);
+      await logoutKeycloak(tokenData.refresh_token, resolvedClientId)
     }
     const targetProjectSlug =
       (resolvedClientId ? resolveProjectSlug(resolvedClientId) : undefined) ||
       DEFAULT_PROJECT ||
-      "nb32-nbiot";
-    const targetHost = normalizeHostWithProject(host, targetProjectSlug);
-    const proto = request.headers.get("x-forwarded-proto") || (usingHttps ? "https" : "http");
-    const unauthRedirect = new URL(`/${targetLocale}/unauthorized`, `${proto}://${targetHost}`);
-    const response = NextResponse.redirect(unauthRedirect);
-    response.cookies.delete("jwt");
-    response.cookies.delete("refresh_token");
-    response.cookies.delete("id_token");
-    response.cookies.delete("current_project");
-    response.cookies.delete("menuRole");
-    response.cookies.delete("remember_me");
-    response.cookies.delete("pkce_verifier");
-    return response;
+      "nb32-nbiot"
+    const targetHost = normalizeHostWithProject(host, targetProjectSlug)
+    const proto = request.headers.get("x-forwarded-proto") || (usingHttps ? "https" : "http")
+    const unauthRedirect = new URL(`/${targetLocale}/unauthorized`, `${proto}://${targetHost}`)
+    const response = NextResponse.redirect(unauthRedirect)
+    response.cookies.delete("jwt")
+    response.cookies.delete("refresh_token")
+    response.cookies.delete("id_token")
+    response.cookies.delete("current_project")
+    response.cookies.delete("menuRole")
+    response.cookies.delete("remember_me")
+    response.cookies.delete("pkce_verifier")
+    return response
   }
 
   // Differentiate Remember Me (long-lived persistent session) from standard session.
   // In Keycloak, when Remember Me is configured, refresh_expires_in reflects the extended remember me lifespan (> 1 day / 86400s).
   // Standard sessions (without Remember Me) have refresh_expires_in <= realm idle/max timeout.
   // For standard sessions, cookies must NOT have maxAge so they are Session Cookies (cleared when browser closes).
-  const isRememberMe = Boolean(tokenData.refresh_expires_in && tokenData.refresh_expires_in > 86400);
-  const sessionMaxAge = isRememberMe ? tokenData.refresh_expires_in : undefined;
+  const isRememberMe = Boolean(tokenData.refresh_expires_in && tokenData.refresh_expires_in > 86400)
+  const sessionMaxAge = isRememberMe ? tokenData.refresh_expires_in : undefined
 
   const cookieOptions = {
     httpOnly: true,
@@ -162,7 +180,7 @@ export async function GET(request: NextRequest) {
     sameSite: "lax" as const,
     path: "/",
     ...(sessionMaxAge !== undefined ? { maxAge: sessionMaxAge } : {}),
-  };
+  }
 
   const clientCookieOptions = {
     httpOnly: false,
@@ -170,64 +188,71 @@ export async function GET(request: NextRequest) {
     sameSite: "lax" as const,
     path: "/",
     ...(sessionMaxAge !== undefined ? { maxAge: sessionMaxAge } : {}),
-  };
-
-  const tokenProjectCode = extractProjectCodeFromPayload(payload);
-  const cleanTokenProjectCode = tokenProjectCode && !tokenProjectCode.toLowerCase().includes("[object") ? tokenProjectCode : undefined;
-  let activeProjectId: string | undefined =
-    cleanTokenProjectCode ||
-    (targetFromClient && (isSuperAdmin || allowedProjects.includes(resolvedClientId!)) ? targetFromClient : undefined) ||
-    resolvedClientId ||
-    (allowedProjects.length > 0 && !allowedProjects[0].toLowerCase().includes("[object") ? allowedProjects[0] : undefined);
-
-  if (!activeProjectId || activeProjectId.toLowerCase().includes("[object")) {
-    activeProjectId = process.env.DEFAULT_PROJECT_CODE || DEFAULT_PROJECT;
   }
 
-  const projectSlug = resolveProjectSlug(activeProjectId) || DEFAULT_PROJECT;
+  const tokenProjectCode = extractProjectCodeFromPayload(payload)
+  const cleanTokenProjectCode =
+    tokenProjectCode && !tokenProjectCode.toLowerCase().includes("[object")
+      ? tokenProjectCode
+      : undefined
+  let activeProjectId: string | undefined =
+    cleanTokenProjectCode ||
+    (targetFromClient && (isSuperAdmin || allowedProjects.includes(resolvedClientId!))
+      ? targetFromClient
+      : undefined) ||
+    resolvedClientId ||
+    (allowedProjects.length > 0 && !allowedProjects[0].toLowerCase().includes("[object")
+      ? allowedProjects[0]
+      : undefined)
+
+  if (!activeProjectId || activeProjectId.toLowerCase().includes("[object")) {
+    activeProjectId = process.env.DEFAULT_PROJECT_CODE || DEFAULT_PROJECT
+  }
+
+  const projectSlug = resolveProjectSlug(activeProjectId) || DEFAULT_PROJECT
 
   // Update active project in Keycloak user attributes and refresh token to get updated claims
   if (payload?.sub && projectSlug) {
-    await updateUserActiveProject(payload.sub, projectSlug, tokenData.access_token);
+    await updateUserActiveProject(payload.sub, projectSlug, tokenData.access_token)
     if (tokenData.refresh_token) {
-      const refreshed = await refreshKeycloakToken(tokenData.refresh_token);
+      const refreshed = await refreshKeycloakToken(tokenData.refresh_token)
       if (refreshed?.access_token) {
-        tokenData.access_token = refreshed.access_token;
+        tokenData.access_token = refreshed.access_token
         if (refreshed.refresh_token) {
-          tokenData.refresh_token = refreshed.refresh_token;
+          tokenData.refresh_token = refreshed.refresh_token
         }
       }
     }
   }
 
   // Encrypt tokens before storing in cookies
-  const encryptedAccessToken = await encryptCookieValue(tokenData.access_token);
+  const encryptedAccessToken = await encryptCookieValue(tokenData.access_token)
   const encryptedRefreshToken = tokenData.refresh_token
     ? await encryptCookieValue(tokenData.refresh_token)
-    : undefined;
+    : undefined
   const encryptedIdToken = tokenData.id_token
     ? await encryptCookieValue(tokenData.id_token)
-    : undefined;
+    : undefined
 
   // Set JWT access token cookie
-  cookieStore.set("jwt", encryptedAccessToken, cookieOptions);
+  cookieStore.set("jwt", encryptedAccessToken, cookieOptions)
 
   // Set Refresh token cookie
   if (encryptedRefreshToken) {
-    cookieStore.set("refresh_token", encryptedRefreshToken, cookieOptions);
+    cookieStore.set("refresh_token", encryptedRefreshToken, cookieOptions)
   }
 
   // Set ID token cookie (used for Keycloak logout hint)
   if (encryptedIdToken) {
-    cookieStore.set("id_token", encryptedIdToken, cookieOptions);
+    cookieStore.set("id_token", encryptedIdToken, cookieOptions)
   }
 
   if (activeProjectId) {
-    cookieStore.set("current_project", activeProjectId, clientCookieOptions);
+    cookieStore.set("current_project", activeProjectId, clientCookieOptions)
   }
 
   if (roles.length > 0) {
-    cookieStore.set("menuRole", roles[0], clientCookieOptions);
+    cookieStore.set("menuRole", roles[0], clientCookieOptions)
   }
 
   if (isRememberMe) {
@@ -237,37 +262,43 @@ export async function GET(request: NextRequest) {
       sameSite: "lax",
       path: "/",
       maxAge: sessionMaxAge,
-    });
+    })
   } else {
-    cookieStore.delete("remember_me");
+    cookieStore.delete("remember_me")
   }
 
   cookieStore.set("NEXT_LOCALE", targetLocale, {
     path: "/",
     maxAge: 365 * 24 * 60 * 60, // Persist language preference for 1 year
     sameSite: "lax",
-  });
+  })
 
   // Record user last login timestamp in NestJS (Keycloak user_attribute)
   if (payload?.sub && tokenData.access_token) {
-    fetch(`${process.env.API_URL || "http://localhost:5000"}/api/iam/users/${encodeURIComponent(payload.sub)}/login`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${tokenData.access_token}`,
-      },
-    }).catch((err) => console.error("[Keycloak Callback] Failed to record login:", err));
+    fetch(
+      `${process.env.API_URL || "http://localhost:5000"}/api/iam/users/${encodeURIComponent(payload.sub)}/login`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${tokenData.access_token}`,
+        },
+      }
+    ).catch((err) => console.error("[Keycloak Callback] Failed to record login:", err))
   }
 
   // Detect email verification callback (Tab 2 only)
-  const userEmail = payload?.email ? String(payload.email).toLowerCase().trim() : undefined;
-  const username = payload?.preferred_username ? String(payload.preferred_username).toLowerCase().trim() : undefined;
-  const referer = request.headers.get("referer") || "";
-  const isActionTokenReferer = referer.includes("action-token") || referer.includes("execution=VERIFY_EMAIL");
+  const userEmail = payload?.email ? String(payload.email).toLowerCase().trim() : undefined
+  const username = payload?.preferred_username
+    ? String(payload.preferred_username).toLowerCase().trim()
+    : undefined
+  const referer = request.headers.get("referer") || ""
+  const isActionTokenReferer =
+    referer.includes("action-token") || referer.includes("execution=VERIFY_EMAIL")
 
-  const isFromVerifyEmail = isActionTokenReferer;
+  const isFromVerifyEmail = isActionTokenReferer
 
   if (isFromVerifyEmail) {
-    cookieStore.delete("verify_email_waiting");
+    cookieStore.delete("verify_email_waiting")
 
     markEmailVerified(userEmail || username, {
       redirectUrl: returnUrl,
@@ -278,7 +309,7 @@ export async function GET(request: NextRequest) {
       },
       projectId: activeProjectId,
       roles,
-    });
+    })
 
     const closeHtml = `<!DOCTYPE html>
 <html>
@@ -302,7 +333,7 @@ export async function GET(request: NextRequest) {
     setTimeout(tryClose, 200);
   </script>
 </body>
-</html>`;
+</html>`
 
     const closeResponse = new NextResponse(closeHtml, {
       status: 200,
@@ -310,20 +341,20 @@ export async function GET(request: NextRequest) {
         "Content-Type": "text/html; charset=utf-8",
         "Cache-Control": "no-store, no-cache, must-revalidate",
       },
-    });
+    })
 
-    closeResponse.cookies.set("jwt", encryptedAccessToken, cookieOptions);
+    closeResponse.cookies.set("jwt", encryptedAccessToken, cookieOptions)
     if (encryptedRefreshToken) {
-      closeResponse.cookies.set("refresh_token", encryptedRefreshToken, cookieOptions);
+      closeResponse.cookies.set("refresh_token", encryptedRefreshToken, cookieOptions)
     }
     if (encryptedIdToken) {
-      closeResponse.cookies.set("id_token", encryptedIdToken, cookieOptions);
+      closeResponse.cookies.set("id_token", encryptedIdToken, cookieOptions)
     }
     if (activeProjectId) {
-      closeResponse.cookies.set("current_project", activeProjectId, clientCookieOptions);
+      closeResponse.cookies.set("current_project", activeProjectId, clientCookieOptions)
     }
     if (roles.length > 0) {
-      closeResponse.cookies.set("menuRole", roles[0], clientCookieOptions);
+      closeResponse.cookies.set("menuRole", roles[0], clientCookieOptions)
     }
     if (isRememberMe) {
       closeResponse.cookies.set("remember_me", "1", {
@@ -332,23 +363,23 @@ export async function GET(request: NextRequest) {
         sameSite: "lax",
         path: "/",
         maxAge: sessionMaxAge,
-      });
+      })
     } else {
-      closeResponse.cookies.delete("remember_me");
+      closeResponse.cookies.delete("remember_me")
     }
     closeResponse.cookies.set("NEXT_LOCALE", targetLocale, {
       path: "/",
       maxAge: 365 * 24 * 60 * 60,
       sameSite: "lax",
-    });
-    closeResponse.cookies.delete("verify_email_waiting");
+    })
+    closeResponse.cookies.delete("verify_email_waiting")
 
-    return closeResponse;
+    return closeResponse
   }
 
   // Redirect to target dashboard preserving the actual host / subdomain
-  const targetHost = normalizeHostWithProject(host, projectSlug);
-  const proto = request.headers.get("x-forwarded-proto") || (usingHttps ? "https" : "http");
-  const destination = new URL(returnUrl, `${proto}://${targetHost}`);
-  return NextResponse.redirect(destination);
+  const targetHost = normalizeHostWithProject(host, projectSlug)
+  const proto = request.headers.get("x-forwarded-proto") || (usingHttps ? "https" : "http")
+  const destination = new URL(returnUrl, `${proto}://${targetHost}`)
+  return NextResponse.redirect(destination)
 }

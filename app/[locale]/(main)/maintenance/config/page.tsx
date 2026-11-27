@@ -2,11 +2,11 @@ import { getTranslations } from "next-intl/server"
 import { MaintenanceConfigClient } from "@/components/cores/maintenance/config/client"
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
-    const { locale } = await params
-    const t = await getTranslations({ locale, namespace: "Sidebar" })
-    return {
-        title: t("menu.maintenanceConfig"),
-    }
+  const { locale } = await params
+  const t = await getTranslations({ locale, namespace: "Sidebar" })
+  return {
+    title: t("menu.maintenanceConfig"),
+  }
 }
 
 const mapMode = process.env.MAP_MODE || "offline"
@@ -18,17 +18,17 @@ const iconScale = process.env.MAP_ICON_SCALE || "1"
 const googleMapsApiKey = process.env.GOOGLE_MAPS_KEY || ""
 
 export default function Page() {
-    return (
-        <div className="flex flex-1 flex-col gap-4 p-4 md:gap-3 md:p-3 min-h-[calc(100vh-4rem)]">
-            <MaintenanceConfigClient
-                mapMode={mapMode as "online" | "offline"}
-                mapOfflineUrl={mapOfflineUrl}
-                defaultLat={defaultLat}
-                defaultLng={defaultLng}
-                defaultZoom={defaultZoom}
-                iconScale={iconScale}
-                googleMapsApiKey={googleMapsApiKey}
-            />
-        </div>
-    )
+  return (
+    <div className="flex flex-1 flex-col gap-4 p-4 md:gap-3 md:p-3 min-h-[calc(100vh-4rem)]">
+      <MaintenanceConfigClient
+        mapMode={mapMode as "online" | "offline"}
+        mapOfflineUrl={mapOfflineUrl}
+        defaultLat={defaultLat}
+        defaultLng={defaultLng}
+        defaultZoom={defaultZoom}
+        iconScale={iconScale}
+        googleMapsApiKey={googleMapsApiKey}
+      />
+    </div>
+  )
 }

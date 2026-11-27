@@ -5,16 +5,19 @@ import { useTranslations } from "next-intl"
 import { useProject } from "@/components/providers/project-provider"
 
 export function HeaderProjectTitle({ className }: { className?: string }) {
-    const t = useTranslations()
-    const { config } = useProject()
-    const title = config?.code || config?.name || t("ProjectName")
+  const t = useTranslations()
+  const { config } = useProject()
+  const title = config?.code || config?.name || t("ProjectName")
 
-    return (
-        <h1
-            className={cn("text-base font-semibold text-project-primary truncate max-w-[300px] md:max-w-[400px]", className)}
-            title={title}
-        >
-            {title}
-        </h1>
-    )
+  return (
+    <h1
+      className={cn(
+        "text-base font-semibold text-project-primary truncate max-w-[300px] md:max-w-[400px]",
+        className
+      )}
+      title={title}
+    >
+      {title}
+    </h1>
+  )
 }

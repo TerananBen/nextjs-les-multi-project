@@ -1,48 +1,50 @@
-import nodemailer from "nodemailer";
+import nodemailer from "nodemailer"
 
 interface OtpRecord {
-  code: string;
-  expiresAt: number;
-  attempts: number;
-  lastSentAt: number;
-  verified: boolean;
+  code: string
+  expiresAt: number
+  attempts: number
+  lastSentAt: number
+  verified: boolean
 }
 
 // In-memory store for OTPs: email (lowercase) -> OtpRecord attached to globalThis for Next.js App Router route sharing
 const globalForOtp = globalThis as unknown as {
-  profileOtpMap?: Map<string, OtpRecord>;
-  profileOtpCleanupTimer?: NodeJS.Timeout;
-};
+  profileOtpMap?: Map<string, OtpRecord>
+  profileOtpCleanupTimer?: NodeJS.Timeout
+}
 
-export const otpMap =
-  globalForOtp.profileOtpMap || new Map<string, OtpRecord>();
+export const otpMap = globalForOtp.profileOtpMap || new Map<string, OtpRecord>()
 
 if (!globalForOtp.profileOtpMap) {
-  globalForOtp.profileOtpMap = otpMap;
+  globalForOtp.profileOtpMap = otpMap
 
   // Clean up expired records every 10 minutes
-  const cleanupTimer = setInterval(() => {
-    const now = Date.now();
-    for (const [email, record] of otpMap.entries()) {
-      if (now > record.expiresAt + 10 * 60 * 1000) {
-        otpMap.delete(email);
+  const cleanupTimer = setInterval(
+    () => {
+      const now = Date.now()
+      for (const [email, record] of otpMap.entries()) {
+        if (now > record.expiresAt + 10 * 60 * 1000) {
+          otpMap.delete(email)
+        }
       }
-    }
-  }, 10 * 60 * 1000);
+    },
+    10 * 60 * 1000
+  )
 
   if (typeof cleanupTimer.unref === "function") {
-    cleanupTimer.unref();
+    cleanupTimer.unref()
   }
 
-  globalForOtp.profileOtpCleanupTimer = cleanupTimer;
+  globalForOtp.profileOtpCleanupTimer = cleanupTimer
 }
 
 const getMailTransporter = () => {
-  const host = process.env.SMTP_HOST || "192.167.5.51";
-  const port = Number(process.env.SMTP_PORT) || 1025;
-  const user = process.env.SMTP_USER || "";
-  const pass = process.env.SMTP_PASSWORD || "";
-  const secure = process.env.SMTP_SECURE === "true";
+  const host = process.env.SMTP_HOST || "192.167.5.51"
+  const port = Number(process.env.SMTP_PORT) || 1025
+  const user = process.env.SMTP_USER || ""
+  const pass = process.env.SMTP_PASSWORD || ""
+  const secure = process.env.SMTP_SECURE === "true"
 
   return nodemailer.createTransport({
     host,
@@ -52,8 +54,8 @@ const getMailTransporter = () => {
     tls: {
       rejectUnauthorized: false,
     },
-  });
-};
+  })
+}
 
 /**
  * Send a 6-digit OTP code to the specified email address
@@ -62,21 +64,21 @@ export const sendProfileEmailOtp = async (
   email: string,
   locale = "th"
 ): Promise<{ success: boolean; message: string; cooldownSeconds?: number }> => {
-  const cleanEmail = email.trim().toLowerCase();
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const cleanEmail = email.trim().toLowerCase()
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!cleanEmail || !emailRegex.test(cleanEmail)) {
     return {
       success: false,
       message: locale === "th" ? "รูปแบบอีเมลไม่ถูกต้อง" : "Invalid email format",
-    };
+    }
   }
 
-  const now = Date.now();
-  const existing = otpMap.get(cleanEmail);
+  const now = Date.now()
+  const existing = otpMap.get(cleanEmail)
 
   // Rate-limit: 60 seconds cooldown between send requests
   if (existing && now - existing.lastSentAt < 60000) {
-    const remainingSeconds = Math.ceil((60000 - (now - existing.lastSentAt)) / 1000);
+    const remainingSeconds = Math.ceil((60000 - (now - existing.lastSentAt)) / 1000)
     return {
       success: false,
       message:
@@ -84,12 +86,12 @@ export const sendProfileEmailOtp = async (
           ? `กรุณารออีก ${remainingSeconds} วินาที ก่อนขอรหัสใหม่`
           : `Please wait ${remainingSeconds} seconds before requesting a new code`,
       cooldownSeconds: remainingSeconds,
-    };
+    }
   }
 
   // Generate 6-digit OTP
-  const otp = Math.floor(100000 + Math.random() * 900000).toString();
-  const expiresAt = now + 5 * 60 * 1000; // 5 minutes validity
+  const otp = Math.floor(100000 + Math.random() * 900000).toString()
+  const expiresAt = now + 5 * 60 * 1000 // 5 minutes validity
 
   otpMap.set(cleanEmail, {
     code: otp,
@@ -97,12 +99,12 @@ export const sendProfileEmailOtp = async (
     attempts: 0,
     lastSentAt: now,
     verified: false,
-  });
+  })
 
-  const isThai = locale.startsWith("th");
+  const isThai = locale.startsWith("th")
   const subject = isThai
     ? `[LES Platform] รหัสสำหรับยืนยันอีเมลของคุณคือ ${otp}`
-    : `[LES Platform] Your email verification code is ${otp}`;
+    : `[LES Platform] Your email verification code is ${otp}`
 
   const htmlContent = `
 <!DOCTYPE html>
@@ -141,11 +143,11 @@ export const sendProfileEmailOtp = async (
   </div>
 </body>
 </html>
-  `.trim();
+  `.trim()
 
   try {
-    const transporter = getMailTransporter();
-    const fromAddress = process.env.SMTP_FROM || '"LES Platform" <keycloak@example.local>';
+    const transporter = getMailTransporter()
+    const fromAddress = process.env.SMTP_FROM || '"LES Platform" <keycloak@example.local>'
     await transporter.sendMail({
       from: fromAddress,
       to: cleanEmail,
@@ -154,26 +156,24 @@ export const sendProfileEmailOtp = async (
       text: isThai
         ? `[LES Platform] รหัสสำหรับยืนยันอีเมล (OTP): ${otp}\nรหัสนี้มีอายุการใช้งาน 300 วินาที\nหากคุณไม่ได้เป็นผู้ทำรายการนี้ กรุณาเพิกเฉยต่ออีเมลฉบับนี้`
         : `[LES Platform] Your email verification code (OTP): ${otp}\nThis code will expire in 300 seconds.\nIf you did not request this code, please ignore this email.`,
-    });
+    })
 
     return {
       success: true,
       message:
-        locale === "th"
-          ? "ส่งรหัสยืนยันไปยังอีเมลเรียบร้อยแล้ว"
-          : "Verification code sent to your email",
-    };
+        locale === "th" ? "ส่งรหัสยืนยันไปยังอีเมลเรียบร้อยแล้ว" : "Verification code sent to your email",
+    }
   } catch (err) {
-    console.error("[Email OTP Service] Failed to send email:", err);
+    console.error("[Email OTP Service] Failed to send email:", err)
     return {
       success: false,
       message:
         locale === "th"
           ? "ไม่สามารถส่งอีเมลได้ กรุณาตรวจสอบอีเมลหรือลองใหม่อีกครั้ง"
           : "Failed to send email. Please check your address or try again.",
-    };
+    }
   }
-};
+}
 
 /**
  * Verify a 6-digit OTP code for the specified email
@@ -183,74 +183,73 @@ export const verifyProfileEmailOtp = (
   inputCode: string,
   locale = "th"
 ): { success: boolean; verified: boolean; message: string } => {
-  const cleanEmail = email.trim().toLowerCase();
-  const cleanCode = inputCode.trim();
+  const cleanEmail = email.trim().toLowerCase()
+  const cleanCode = inputCode.trim()
 
-  const record = otpMap.get(cleanEmail);
-  const isThai = locale.startsWith("th");
+  const record = otpMap.get(cleanEmail)
+  const isThai = locale.startsWith("th")
 
   if (!record) {
     return {
       success: false,
       verified: false,
-      message:
-        isThai
-          ? "ยังไม่มีการขอรหัส OTP สำหรับอีเมลนี้ หรือรหัสหมดอายุแล้ว"
-          : "No OTP requested for this email or code has expired",
-    };
+      message: isThai
+        ? "ยังไม่มีการขอรหัส OTP สำหรับอีเมลนี้ หรือรหัสหมดอายุแล้ว"
+        : "No OTP requested for this email or code has expired",
+    }
   }
 
   if (Date.now() > record.expiresAt) {
-    otpMap.delete(cleanEmail);
+    otpMap.delete(cleanEmail)
     return {
       success: false,
       verified: false,
-      message: isThai ? "รหัส OTP หมดอายุแล้ว กรุณากดขอรหัสใหม่" : "OTP code has expired. Please request a new one",
-    };
+      message: isThai
+        ? "รหัส OTP หมดอายุแล้ว กรุณากดขอรหัสใหม่"
+        : "OTP code has expired. Please request a new one",
+    }
   }
 
   if (record.attempts >= 5) {
-    otpMap.delete(cleanEmail);
+    otpMap.delete(cleanEmail)
     return {
       success: false,
       verified: false,
-      message:
-        isThai
-          ? "คุณกรอกรหัสผิดเกินจำนวนครั้งที่กำหนด กรุณากดขอรหัสใหม่"
-          : "Too many incorrect attempts. Please request a new code",
-    };
+      message: isThai
+        ? "คุณกรอกรหัสผิดเกินจำนวนครั้งที่กำหนด กรุณากดขอรหัสใหม่"
+        : "Too many incorrect attempts. Please request a new code",
+    }
   }
 
   if (record.code !== cleanCode) {
-    record.attempts += 1;
+    record.attempts += 1
     return {
       success: false,
       verified: false,
-      message:
-        isThai
-          ? `รหัส OTP ไม่ถูกต้อง (เหลือโอกาสอีก ${5 - record.attempts} ครั้ง)`
-          : `Incorrect OTP code (${5 - record.attempts} attempts remaining)`,
-    };
+      message: isThai
+        ? `รหัส OTP ไม่ถูกต้อง (เหลือโอกาสอีก ${5 - record.attempts} ครั้ง)`
+        : `Incorrect OTP code (${5 - record.attempts} attempts remaining)`,
+    }
   }
 
   // Verification successful!
-  record.verified = true;
+  record.verified = true
   // Keep verified status valid for 15 minutes to complete form submission
-  record.expiresAt = Date.now() + 15 * 60 * 1000;
+  record.expiresAt = Date.now() + 15 * 60 * 1000
 
   return {
     success: true,
     verified: true,
     message: isThai ? "ยืนยันอีเมลสำเร็จเรียบร้อยแล้ว" : "Email verified successfully",
-  };
-};
+  }
+}
 
 /**
  * Check if the email is currently verified
  */
 export const isProfileEmailVerified = (email: string): boolean => {
-  const cleanEmail = email.trim().toLowerCase();
-  const record = otpMap.get(cleanEmail);
-  if (!record) return false;
-  return record.verified && Date.now() <= record.expiresAt;
-};
+  const cleanEmail = email.trim().toLowerCase()
+  const record = otpMap.get(cleanEmail)
+  if (!record) return false
+  return record.verified && Date.now() <= record.expiresAt
+}
